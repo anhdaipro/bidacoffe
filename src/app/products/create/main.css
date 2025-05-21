@@ -1,0 +1,202 @@
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Chiều cao toàn màn hình */
+  text-align: center;
+}
+
+.loading-icon {
+  width: 50px;
+  height: 50px;
+  animation: spin 1.5s linear infinite; /* Hiệu ứng xoay */
+}
+
+.loading-circle {
+  animation: dash 1.5s ease-in-out infinite; /* Hiệu ứng vẽ đường tròn */
+}
+
+.loading-text {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #333;
+}
+
+/* Hiệu ứng xoay */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Hiệu ứng vẽ đường tròn */
+@keyframes dash {
+  0% {
+    stroke-dashoffset: 283;
+  }
+  50% {
+    stroke-dashoffset: 75;
+    transform: rotate(135deg);
+  }
+  100% {
+    stroke-dashoffset: 283;
+    transform: rotate(450deg);
+  }
+}
+
+.product-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .product-title {
+    text-align: center;
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .product-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  label {
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .form-input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  
+  .form-input:focus {
+    border-color: #4CAF50;
+  }
+  
+  .submit-btn {
+    padding: 12px;
+    font-size: 18px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .submit-btn:hover {
+    background-color: #45a049;
+  }
+  
+  .back-link {
+    display: inline-block;
+    margin-top: 20px;
+    text-align: center;
+    color: #007BFF;
+    font-size: 16px;
+  }
+  
+  .back-link:hover {
+    text-decoration: underline;
+  }
+  .image-preview {
+    display: flex;
+    align-items: center; /* Căn giữa theo chiều dọc */
+    gap: 10px; /* Khoảng cách giữa ảnh và nút */
+  }
+  
+  .preview-img {
+    max-width: 200px;
+    max-height: 200px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    background-color: #f9f9f9;
+  }
+  .hidden-file-input {
+    display: none; /* Ẩn input file */
+  }
+  
+  .custom-file-btn {
+    padding: 10px 15px;
+    font-size: 14px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .custom-file-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .custom-file-btn:active {
+    background-color: #003d80;
+  }
+  .delete-file-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .delete-file-btn:hover {
+    background-color: #d9363e;
+  }
+  
+  .delete-file-btn:active {
+    background-color: #b71c1c;
+  }
+  .message-error {
+    color: red;
+    font-size: 12px;
+   
+  }
+  .flex-container {
+    display: flex;
+    justify-content: flex-end; /* Căn phần tử con sang bên phải */
+    margin-top: 16px; /* Khoảng cách phía trên */
+  }
+  
+  .flex-container a {
+    text-decoration: none; /* Loại bỏ gạch chân */
+    color: #007bff; /* Màu xanh cho liên kết */
+    font-size: 14px; /* Kích thước chữ */
+    font-weight: bold; /* Chữ đậm */
+    padding: 8px 12px; /* Khoảng cách bên trong */
+    border: 1px solid #007bff; /* Viền xanh */
+    border-radius: 5px; /* Bo góc */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Hiệu ứng hover */
+  }
+  
+  .flex-container a:hover {
+    background-color: #007bff; /* Nền xanh khi hover */
+    color: white; /* Chữ trắng khi hover */
+  }

@@ -1,0 +1,49 @@
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Chiều cao toàn màn hình */
+    text-align: center;
+  }
+  
+  .loading-icon {
+    width: 50px;
+    height: 50px;
+    animation: spin 1.5s linear infinite; /* Hiệu ứng xoay */
+  }
+  
+  .loading-circle {
+    animation: dash 1.5s ease-in-out infinite; /* Hiệu ứng vẽ đường tròn */
+  }
+  
+  .loading-text {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  /* Hiệu ứng xoay */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Hiệu ứng vẽ đường tròn */
+  @keyframes dash {
+    0% {
+      stroke-dashoffset: 283;
+    }
+    50% {
+      stroke-dashoffset: 75;
+      transform: rotate(135deg);
+    }
+    100% {
+      stroke-dashoffset: 283;
+      transform: rotate(450deg);
+    }
+  }

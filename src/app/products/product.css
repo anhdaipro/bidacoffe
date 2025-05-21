@@ -1,0 +1,167 @@
+/* app/products/product.css */
+
+.product-container {
+    max-width: 1000px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    
+    
+  }
+  
+  .product-title {
+    text-align: center;
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .product-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  
+  .product-table th, .product-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+  }
+  
+  .product-table th {
+    background-color: #f4f4f4;
+  }
+  
+  .edit-btn {
+    padding: 8px 8px;
+    background-color: #ffc107;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    text-align: center;
+  }
+  
+  .edit-btn:hover {
+    background-color: #e0a800;
+  }
+  
+  .create-btn {
+    display: block;
+    width: 200px;
+    padding: 12px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+  }
+  
+  .create-btn:hover {
+    background-color: #45a049;
+  }
+  .delete-btn {
+    background-color: #ff4d4f; /* Màu đỏ */
+    color: white; /* Màu chữ trắng */
+    border: none; /* Loại bỏ viền */
+    padding: 8px 12px; /* Khoảng cách bên trong */
+    border-radius: 4px; /* Bo góc */
+    cursor: pointer; /* Con trỏ chuột */
+    font-size: 14px; /* Kích thước chữ */
+    transition: background-color 0.3s ease; /* Hiệu ứng hover */
+    text-align: center;
+  }
+  
+  .delete-btn:hover {
+    background-color: #d9363e; /* Màu đỏ đậm hơn khi hover */
+  }
+  
+  .delete-btn:active {
+    background-color: #b71c1c; /* Màu đỏ đậm hơn khi nhấn */
+  }
+  .product-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover; /* Đảm bảo hình ảnh không bị méo */
+    border-radius: 4px; /* Bo góc hình ảnh */
+    border: 1px solid #ddd; /* Viền nhẹ */
+  }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Chiều cao toàn màn hình */
+    text-align: center;
+  }
+  
+  .loading-icon {
+    width: 50px;
+    height: 50px;
+    animation: spin 1.5s linear infinite; /* Hiệu ứng xoay */
+  }
+  
+  .loading-circle {
+    animation: dash 1.5s ease-in-out infinite; /* Hiệu ứng vẽ đường tròn */
+  }
+  
+  .loading-text {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  /* Hiệu ứng xoay */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Hiệu ứng vẽ đường tròn */
+  @keyframes dash {
+    0% {
+      stroke-dashoffset: 283;
+    }
+    50% {
+      stroke-dashoffset: 75;
+      transform: rotate(135deg);
+    }
+    100% {
+      stroke-dashoffset: 283;
+      transform: rotate(450deg);
+    }
+  }
+
+/*phân trang */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 10px;
+  }
+  
+  .pagination-btn {
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .pagination-btn:hover {
+    background-color: #ff4d4f;
+    color: white;
+  }
+  
+  .pagination-btn.active {
+    background-color: #ff4d4f;
+    color: white;
+    border-color: #ff4d4f;
+    
+  }
+  

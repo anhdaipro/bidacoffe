@@ -1,0 +1,13 @@
+// src/types/express.d.ts
+import { User } from "../models/User";
+
+// Đảm bảo đây là module bằng cách thêm export {} nếu không có import
+export {}; // Dòng này biến file thành module
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: User;
+    }
+  }
+}

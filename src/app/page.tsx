@@ -1,7 +1,19 @@
+"use client"
 import Image from "next/image";
 import styles from "./page.module.css";
-
+import { useRouter } from "next/navigation";
+import { useEffect } from 'react';
+import { useAuthStore } from "./store/useUserStore";
 export default function Home() {
+  const user = useAuthStore(state => state.user);
+  const router = useRouter();
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token || !user) {
+      // Nếu chưa đăng nhập, chuyển hướng về trang Login
+      router.push('/login');
+    }
+  }, [router]);
   return (
     <div className={styles.page}>
       <main className={styles.main}>

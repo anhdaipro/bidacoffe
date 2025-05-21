@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  nextjs:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASSWORD=anhdai123
+      - DB_NAME=bida
+    depends_on:
+      - mysql
+    command: npm start
+    # volumes:
+    #   - ./:/app
+
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: anhdai123
+      MYSQL_DATABASE: bida
+    # ports:
+    #   - "3307:3306" # Đổi 3307 ở bên trái (host) để tránh trùng
+
+  redis:
+    image: redis:alpine
+    command: redis-server --requirepass anhdai123
+    ports:
+      - "6380:6379"
+
+
+

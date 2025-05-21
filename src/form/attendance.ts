@@ -1,0 +1,9 @@
+
+const STATUS_PRESENT = 1;
+const STATUS_LATE = 2;
+const STATUS_ABSENT = 3;
+export const LSTATUS = [
+  STATUS_PRESENT,
+  STATUS_LATE,
+  STATUS_ABSENT
+]

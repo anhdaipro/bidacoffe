@@ -1,0 +1,342 @@
+import jwt from 'jsonwebtoken';
+import { Request, Response } from 'express';
+import User from '../models/Users';
+import { Op } from 'sequelize';
+import bcrypt from 'bcrypt';
+import { JWT_SECRET,REFRESH_TOKEN_SECRET, ROLE_CUSTOMER, STATUS_ACTIVE } from '../BidaConst';
+import crypto from 'crypto';
+import { addDay } from '../Format';
+const refreshTokens: Record<string, number> = {}; // Bộ nhớ tạm (thay bằng DB trong thực tế)
+class UserController {
+    public static async createCustomer(req: Request, res: Response): Promise<void> {
+        try {
+            const { phone,name } = req.body;
+            const username = phone
+            const password = '123123'
+            const roleId = ROLE_CUSTOMER;
+            const status = STATUS_ACTIVE
+            // Kiểm tra xem username hoặc phone đã tồn tại chưa
+            const existingUser = await User.findOne({
+                where: {
+                    [Op.or]: [{ phone }, { phone }],
+                },
+            });
+
+            if (existingUser) {
+                res.status(400).json({ message: 'Tên người dùng hoặc số điện thoại đã tồn tại' });
+                return;
+            }
+
+            // Mã hóa mật khẩu
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            // Tạo người dùng mới
+            const newUser = await User.create({
+                username,
+                phone,
+                name,
+                status,
+                password: hashedPassword,
+                roleId,
+            });
+
+            res.status(201).json({ message: 'Tạo khách hàng thành công', data: newUser });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Đã xảy ra lỗi khi tạo người dùng' });
+        }
+    }
+    public static async updateCustomer(req: Request, res: Response): Promise<void> {
+        try {
+            const {id} = req.params
+            const customer =  await User.findByPk(id)
+            if(!customer){
+                res.status(404).json({ message: 'Người dùng không tồn tại' });
+                return;
+            }
+            const { phone,name } = req.body;
+            const username = phone
+            const password = '123123'
+            const roleId = ROLE_CUSTOMER;
+            const status = STATUS_ACTIVE
+            // Kiểm tra xem username hoặc phone đã tồn tại chưa
+            const existingUser = await User.findOne({
+                where: {
+                    phone: phone,
+                    id: {
+                    [Op.ne]: id
+                    }
+                }
+                
+            });
+
+            if (existingUser) {
+                res.status(400).json({ message: 'Số điện thoại đã tồn tại' });
+                return;
+            }
+            Object.assign(customer,{phone,
+                name,
+                status,})
+            // Mã hóa mật khẩu
+            await customer.save()
+
+            res.status(201).json({ message: 'Tạo khách hàng thành công', data: customer });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Đã xảy ra lỗi khi tạo người dùng' });
+        }
+    }
+    public static async createUser(req: Request, res: Response): Promise<void> {
+        try {
+            const { username, phone, password, roleId, address,name } = req.body;
+            
+            // Kiểm tra xem username hoặc phone đã tồn tại chưa
+            const existingUser = await User.findOne({
+                where: {
+                    [Op.or]: [{ username }, { phone }],
+                },
+            });
+            console.log(existingUser)
+            if (existingUser) {
+                res.status(400).json({ message: 'Tên người dùng hoặc số điện thoại đã tồn tại' });
+                return;
+            }
+
+            // Mã hóa mật khẩu
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            // Tạo người dùng mới
+            const newUser = await User.create({
+                username,
+                phone,
+                password: hashedPassword,
+                roleId,
+                address
+            });
+
+            res.status(201).json({ message: 'Người dùng đã được tạo thành công', user: newUser });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Đã xảy ra lỗi khi tạo người dùng' });
+        }
+    }
+    public static async login(req: Request, res: Response): Promise<void> {
+    try {
+        const { identifier, password } = req.body;
+        const user = await User.findOne({
+            where: {
+            [Op.or]: [{ username: identifier }, { phone: identifier }],
+            },
+            // attributes:['id', 'name', 'username', 'roleId', 'phone', 'status', 'address'],
+        });
+    
+        if (!user) {
+            res.status(404).json({ message: 'Người dùng không tồn tại' });
+            return;
+        }
+        const isPasswordValid = user.password && await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            res.status(401).json({ message: 'Mật khẩu không chính xác' });
+            return;
+        }
+    
+        const accessToken = jwt.sign(
+            { id: user.id, roleId: user.roleId },
+            JWT_SECRET,
+            { expiresIn: '10h' } // Access token hết hạn sau 45 phút
+        );
+        const refreshToken = jwt.sign(
+            { userId: user.id },
+            REFRESH_TOKEN_SECRET,
+        );
+        // const refreshToken = crypto.randomBytes(64).toString('hex'); // Tạo refresh token
+        res.json({ accessToken, refreshToken, user});
+        } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error });
+        }
+    }
+    public static async refreshToken(req: Request, res: Response): Promise<void> {
+        try{
+            const { refreshToken } = req.body;
+
+            if (!refreshToken) {
+                res.status(403).json({ message: 'Refresh token không hợp lệ' });
+            }
+            console.log(refreshToken)
+            const payload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET) as { userId: string };
+            // Tạo access token mới
+            // const newAccessToken = jwt.sign(
+            //     { id: userId },
+            //     JWT_SECRET,
+            //     { expiresIn: '10h' } // Access token mới hết hạn sau 15 phút
+            // );
+            const newAccessToken = jwt.sign({ userId: payload.userId }, JWT_SECRET, {
+                expiresIn: '45m',
+            });
+            console.log(newAccessToken)
+            res.status(201).json({ accessToken: newAccessToken });
+        }catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+            res.status(500).json({
+                message: 'Error creating shift',
+                error: errorMessage,
+            });
+        }
+        
+    }
+    public static async logout(req: Request, res: Response){
+        const { refreshToken } = req.body;
+        if (refreshToken && refreshTokens[refreshToken]) {
+            delete refreshTokens[refreshToken]; // Xóa refresh token khỏi bộ nhớ
+        }
+        return res.status(200).json({ message: 'Đăng xuất thành công' });
+    }
+    // Lấy thông tin người dùng theo ID
+    public static async getUserById(req: Request, res: Response): Promise<void> {
+        try {
+        const { id } = req.params;
+        const user = await User.findByPk(id);
+
+        if (!user) {
+            res.status(404).json({ message: 'Người dùng không tồn tại' });
+            return;
+        }
+
+        res.status(200).json(user);
+        } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Đã xảy ra lỗi khi lấy thông tin người dùng' });
+        }
+    }
+    public static async getUserByPhone(req: Request, res: Response): Promise<void> {
+        try {
+        const { phone } = req.body;
+        const user = await User.findOne({
+            where:{phone:phone}
+        });
+
+        if (!user) {
+            const newUser = await (new User).createCustomer(phone)
+            res.status(200).json({data:null, message:'Chưa có khách hàng'});
+            return;
+        }
+
+        res.status(200).json({data:user, message:'Lấy khách hàng thành công'});
+        } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Đã xảy ra lỗi khi lấy thông tin người dùng' });
+        }
+    }
+    // Cập nhật thông tin người dùng
+    public static async updateUser(req: Request, res: Response): Promise<void> {
+        try {
+        const { id } = req.params;
+        const { username, phone, password, roleId } = req.body;
+
+        const user = await User.findByPk(id);
+
+        if (!user) {
+            res.status(404).json({ message: 'Người dùng không tồn tại' });
+            return;
+        }
+
+        // Cập nhật thông tin người dùng
+        await user.update({
+            username: username || user.username,
+            phone: phone || user.phone,
+            password: password ? await bcrypt.hash(password, 10) : user.password,
+            roleId: roleId || user.roleId,
+        });
+
+        res.status(200).json({ message: 'Cập nhật thông tin người dùng thành công', user });
+        } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Đã xảy ra lỗi khi cập nhật thông tin người dùng' });
+        }
+    }
+
+    // Xóa người dùng
+    public static async deleteUser(req: Request, res: Response): Promise<void> {
+        try {
+        const { id } = req.params;
+
+        const user = await User.findByPk(id);
+
+        if (!user) {
+            res.status(404).json({ message: 'Người dùng không tồn tại' });
+            return;
+        }
+
+        // Xóa người dùng
+        await user.destroy();
+
+        res.status(200).json({ message: 'Xóa người dùng thành công' });
+        } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Đã xảy ra lỗi khi xóa người dùng' });
+        }
+    }
+    // điểm
+    public static async getAllCustomer(req: Request, res: Response): Promise<void> {
+        try {
+        // Lấy các tham số từ query
+        const { page = 1, limit = 20, name, status, dateFrom, dateTo,categoryId, phone } = req.query;
+        // Chuyển đổi `page` và `limit` sang số nguyên
+        const pageNumber = parseInt(page as string, 10) || 1;
+        const limitNumber = parseInt(limit as string, 10) || 20;
+        // Tính toán offset
+        const offset = (pageNumber - 1) * limitNumber;
+
+        const where:any = {};
+        where.roleId = ROLE_CUSTOMER
+        if (name) {
+            where.name = { [Op.like]: `%${name}%` }; // Tìm kiếm theo tên (LIKE '%name%')
+        }
+        if (phone) {
+            where.phone = phone; // Tìm kiếm theo tên (LIKE '%name%')
+        }
+        if (status) {
+            where.status = status; // Tìm kiếm theo trạng thái
+        }
+        if (categoryId) {
+            where.categoryId = categoryId; // Tìm kiếm theo trạng thái
+        }
+        if (dateFrom || dateTo) {
+            where.createdAt = {
+            ...(dateFrom && { [Op.gte]: dateFrom }), // Ngày bắt đầu
+            ...(dateTo && { [Op.lte]: addDay(dateTo as string,1)  }), // Ngày kết thúc
+            };
+        }
+        // Truy vấn cơ sở dữ liệu với phân trang và điều kiện tìm kiếm
+        const { rows: users, count: total } = await User.findAndCountAll({
+            where,
+            limit: limitNumber,
+            offset,
+            attributes:['phone', 'point', 'name','createdAt', 'status','id'],
+        });
+        // Tính tổng số trang
+        const totalPages = Math.ceil(total / limitNumber);
+        const data = {
+        data: users,
+        pagination: {
+            total: total,
+            totalPages: totalPages,
+            currentPage: pageNumber,
+            limit: limitNumber,
+        },
+        }
+        res.status(200).json({ message: 'Lấy dữ liệu thành công', data: users,
+            pagination: {
+                total: total,
+                totalPages: totalPages,
+                currentPage: pageNumber,
+                limit: limitNumber,
+            }, });
+        } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Đã xảy ra lỗi khi xóa người dùng' });
+        }
+    }
+}
+export default UserController

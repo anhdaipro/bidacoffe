@@ -1,0 +1,257 @@
+/* Loading Spinner */
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .loading-icon {
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .loading-icon circle {
+    stroke: #007bff;
+    stroke-width: 8;
+    stroke-dasharray: 150;
+    stroke-dashoffset: 0;
+    animation: dash 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes dash {
+    0% {
+      stroke-dashoffset: 150;
+    }
+    50% {
+      stroke-dashoffset: 75;
+      transform: rotate(45deg);
+    }
+    100% {
+      stroke-dashoffset: 150;
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Container for the entire page */
+.container {
+  max-width: 1000px;
+  margin: 24px auto;
+  padding: 20px;
+  background: #fff;
+  font-family: Arial, sans-serif;
+}
+
+/* Page title */
+.container .title {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 20px;
+}
+
+/* Actions section */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.create-btn {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 15px;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.create-btn:hover {
+  background-color: #45a049;
+}
+
+/* Transaction list */
+.transaction-list {
+  margin-top: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Transaction header */
+.transaction-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr; /* Adjust column sizes */
+  font-weight: bold;
+  background-color: #f4f4f4;
+  padding: 8px 16px;
+  border-bottom: 2px solid #ddd;
+  position: sticky;
+  top:0
+}
+
+.header-cell {
+  text-align: left;
+  padding: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+/* Transaction card */
+.transaction-card {
+  padding: 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+.transaction-card:last-child {
+  border-bottom: none;
+}
+
+.transaction-title {
+  margin-bottom: 10px;
+}
+
+.transaction-title h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.transaction-title p {
+  margin: 4px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+/* Transaction info */
+.transaction-info {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+  font-size: 14px;
+  color: #555;
+}
+
+.transaction-type {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.transaction-total {
+  font-weight: bold;
+  color: #28a745;
+}
+/* Transaction Actions */
+.transaction-actions {
+  display: flex;
+  justify-content: space-between; /* Căn các nút sang bên phải */
+  gap: 8px; /* Khoảng cách giữa các nút */
+  margin-top: 16px; /* Khoảng cách phía trên */
+}
+
+.transaction-actions button,a {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Edit Button */
+.transaction-actions .edit-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.transaction-actions .edit-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Delete Button */
+.transaction-actions .delete-btn {
+  background-color: #ff4d4d;
+  color: white;
+}
+
+.transaction-actions .delete-btn:hover {
+  background-color: #cc0000;
+}
+/* Pagination (if applicable) */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination button {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  margin: 0 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.pagination button:hover {
+  background-color: #ff4d4f;
+}
+
+.pagination button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+.pagination button.active{
+  background-color: #ff4d4f;
+    color: white;
+    border-color: #ff4d4f;
+}
+.transaction-main{
+  background-color: #f4f4f4;
+  padding: 16px;
+}
+/* Container for each detail row */
+.detail-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr; /* Tên sản phẩm chiếm nhiều không gian hơn */
+  padding-left: 0;
+  border-bottom: 1px solid #ddd;
+  align-items: center;
+}
+
+/* Last row without border */
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+/* Individual cells in the detail row */
+.detail-cell {
+  display:flex;
+  align-items: center;
+  padding: 8px;
+  text-align: left;
+  font-size: 14px;
+  color: #555;
+  gap:8px;
+}
+
+/* Highlight row on hover */
+.detail-row:hover {
+  background-color: #f9f9f9;
+}
