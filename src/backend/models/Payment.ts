@@ -1,5 +1,6 @@
-import { Model, DataTypes } from 'sequelize';
+import { Model, DataTypes,Op } from 'sequelize';
 import sequelize from '../database/db';
+import dayjs from 'dayjs';
 class Payment extends Model {
   public id!: number;
   public sessionId!: number;//bàn thanh toán
@@ -11,6 +12,18 @@ class Payment extends Model {
   public paidAtBigint!: Date;//thanh toán lúc
   public note?: string;//ghi chú
   public employeeId?:string;
+  public async countInvoice(){
+    const today = dayjs();
+    const todayStr = today.format('YYYY-MM-DD'); // "2025-05-24"
+    const todayBigint = dayjs(todayStr).unix();      // UNIX timestamp (giây)
+    return await Payment.count({
+      where:{
+          paitAtBigint: {
+              [Op.gte] : todayBigint
+          }
+      }
+  })
+  }
 }
 
 Payment.init(

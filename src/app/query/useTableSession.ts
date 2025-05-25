@@ -1,13 +1,14 @@
 import { useQuery,useMutation,useQueryClient } from '@tanstack/react-query';
 import {fetchTableSessions, fetchTableSession, createTableSession, updateTableSession, deleteTableSession,fetchTableSessionPlaying, fetchTableSessionFinish, fetchOrderTableSession, startTableSession, fetchRewardTableSession} from '../api/apiTableSession'
-import { FormSearch } from '../conponent/tableSession/Search';
-export const useTableSessions = (page: number, limit: number, formData:FormSearch) => {
+import { TableSessionFormSearch } from '../type/model/TableSession';
+export const useTableSessions = (page: number, limit: number, formData:TableSessionFormSearch) => {
   return useQuery({
-    queryKey:['transactions',page, limit, formData],
+    queryKey:['TableSessions',page, limit, formData],
     queryFn: async () =>{
         return await fetchTableSessions(page,limit,formData)
     },
     staleTime:1000*6,
+    refetchOnWindowFocus: false, // ✅ KHÔNG refetch khi quay lại tab
     })
 };
 export const useTableSessionsPlaying = () => {
@@ -16,7 +17,8 @@ export const useTableSessionsPlaying = () => {
       queryFn: async () =>{
           return await fetchTableSessionPlaying()
       },
-      staleTime:1000*60,
+      staleTime:1000*6,
+      refetchOnWindowFocus: false, // ✅ KHÔNG refetch khi quay lại tab
       })
   };
 export const useTableSession = (id:number) => {
@@ -25,7 +27,8 @@ export const useTableSession = (id:number) => {
         queryFn: async () => {
             return await fetchTableSession(id)
         },
-        staleTime:1000*60*60,
+        staleTime:1000*6,
+        refetchOnWindowFocus: false, // ✅ KHÔNG refetch khi quay lại tab
     })
   };
 export const useFinishTableSession = () =>{
@@ -81,7 +84,7 @@ export const useUpdateTableSession = () => {
       onSuccess: (data,variables) => {
         // Sau khi thành công, invalid cache cho 'products' để fetch lại dữ liệu
         // 2. Cập nhật cache ngay lập tức cho sản phẩm cụ thể
-        queryClient.setQueryData(['TableSession', variables.id], data);
+        
       },
       onError: (error: any) => {
 

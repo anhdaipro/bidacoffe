@@ -1,6 +1,6 @@
 import { DataTypes, Model, Op } from 'sequelize';
 import sequelize from '../database/db';
-import User from './Users';
+import User from './User';
   // Định nghĩa các loại ca làm việc
 export enum SHIFT_TYPES {
     MORNING= 1,

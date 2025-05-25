@@ -1,5 +1,5 @@
 "use client"
-import BilliardTableForm from "@/app/conponent/billiardTable/Form";
+import Form from "@/app/conponent/billiardTable/Form";
 import { useBilliardTable } from "@/app/query/useBilliardTable";
 import { useParams } from "next/navigation";
 const UpdateTablePage:React.FC = () => {
@@ -29,7 +29,7 @@ const UpdateTablePage:React.FC = () => {
             <p className="loading-text">Đang tải dữ liệu...</p>
         </div>
     );
-    return (<BilliardTableForm table={table}/>)
+    return (<Form table={table}/>)
    
   };
   

@@ -1,5 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../database/db';
+import { STATUS_PLAYING } from '@/form/billiardTable';
 class BilliardTable extends Model {
   public id!: number;
   public tableNumber!: number;
@@ -8,6 +9,19 @@ class BilliardTable extends Model {
   public type!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+  public async countTable(){
+    return await BilliardTable.count();
+  }
+  public async countTablePlaying(){
+    return await BilliardTable.findAll({
+      where:{
+        status:STATUS_PLAYING
+      },
+      attributes: {
+        exclude: ['createdAt', 'updatedAt', 'uidLogin']
+      }
+    });
+  }
 }
 
 BilliardTable.init(

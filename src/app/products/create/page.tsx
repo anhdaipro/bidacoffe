@@ -6,12 +6,12 @@ import FormProductPage from '@/app/conponent/product/FormProduct';
 import { STATUS_ACTIVE } from '@/form/product';
 const CreateProductPage = () => {
   const product = {
-    id: null,
+    id:0,
     name: "",
     status:STATUS_ACTIVE,
-    image: null,
+    image: '',
     price: 0,
-    categoryId: '',
+    categoryId: 0,
   };
  
 

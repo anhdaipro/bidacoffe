@@ -38,37 +38,11 @@ import { v4 as uuidv4 } from 'uuid';
 import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EventIcon from '@mui/icons-material/Event';
-
-export interface Detail {
-  productId: number;
-  categoryId: number;
-  quantity: number;
-  price: number;
-}
-
-interface Product {
-  id: number;
-  name: string;
-  categoryId: number;
-}
-
-export interface FormInputs {
-  type: number | null;
-  totalAmount: number;
-  dateDelivery: string;
-  details: Detail[];
-}
-
-interface ProductTransaction {
-  id: number | null;
-  type: number | null;
-  totalAmount: number;
-  dateDelivery: string;
-  details: Detail[];
-}
+import { Transaction, TransactionDetailForm, TransactionForm } from '@/app/type/model/Transaction';
+import { Product } from '@/app/type/model/Product';
 
 interface Props {
-  transaction: ProductTransaction;
+  transaction: TransactionForm;
 }
 
 const StyledDatePicker = styled(DatePicker)(({ theme }) => ({
@@ -92,11 +66,12 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
     control, 
     setValue, 
     watch 
-  } = useForm<FormInputs>({
-    defaultValues: {
+  } = useForm<TransactionForm>({
+    values: {
       ...transaction
     }
   });
+  const [product, setProduct] = React.useState<Product | null>(null);
 
   const { mutate: addTransaction } = useCreateTransaction();
   const { mutate: updateTransaction } = useUpdateTransaction();
@@ -114,7 +89,7 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
   const type = watch('type');
   const dateDelivery = watch('dateDelivery');
 
-  const handleDetailChange = (index: number, field: keyof Detail, value: any) => {
+  const handleDetailChange = (index: number, field: keyof TransactionDetailForm, value: any) => {
     const newDetails = [...details];
     newDetails[index][field] = Number(value);
     setValue('details', newDetails);
@@ -148,7 +123,7 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
     return acc + (detail.price * detail.quantity);
   }, 0);
 
-  const sendData = async (data: FormInputs) => {
+  const sendData = async (data: TransactionForm) => {
     const payload = {
       ...data,
       totalAmount: totalAmount,
@@ -156,7 +131,7 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
     handleRequest(payload);
   };
 
-  const handleRequest = (payload: FormInputs) => {
+  const handleRequest = (payload: TransactionForm) => {
     if (transaction.id) {
       const id = transaction.id;
       updateTransaction({ id, payload }, {
@@ -207,7 +182,7 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
       </Box>
     );
   }
-
+  console.log(searchInput)
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Box display="flex" justifyContent="flex-end" mb={4}>
@@ -245,15 +220,18 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
               <Controller
                 name="type"
                 control={control}
-                rules={{ required: 'Loại giao dịch không để trống' }}
+                rules={{ required: 'Loại giao dịch không để trống',
+                  validate: (value) => Number(value) > 0 || 'Loại giao dịch không để trống',
+                 }}
                 render={({ field }) => (
                   <Select
                     {...field}
+                    value={type}
                     labelId="transaction-type-label"
                     label="Loại giao dịch"
                     error={!!errors.type}
                   >
-                    <MenuItem value="">Chọn loại giao dịch</MenuItem>
+                    <MenuItem value="0">Chọn loại giao dịch</MenuItem>
                     {Object.entries(TRANSACTION_TYPE_LABELS).map(([key, value]) => (
                       <MenuItem key={key} value={key}>
                         {value}
@@ -276,11 +254,11 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
                 <Controller
                   name="dateDelivery"
                   control={control}
-                  rules={{ required: 'Ngày nhập xuất không để trống' }}
+                  rules={{required:'Ngày giao dịch không để trống'}}
                   render={({ field }) => (
                     <DatePicker
                     className="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-fullWidth"
-                    value={dayjs(dateDelivery)}
+                    value={dateDelivery ? dayjs(dateDelivery) : null}
                     onChange={(date) => {
                       setValue('dateDelivery', dayjs(date).format('YYYY-MM-DD'))
                     }}
@@ -311,40 +289,35 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
             <Typography variant="subtitle1" gutterBottom>
               Thêm sản phẩm
             </Typography>
-            <Autocomplete
-                options={products}
-                getOptionLabel={(option: Product) => option.name}
-                inputValue={searchInput}
-                onInputChange={(_event, newInputValue) => {
-                  if (!ignoreInputChange) {
-                    setSearchInput(newInputValue);
-                  }
-                  setIgnoreInputChange(false);
-                }}
-                onChange={(_event, value) => {
-                  if (value) {
-                    addProductToDetails(value);
-                    setIgnoreInputChange(true);
-                    setSearchInput('');
-                  }
-                }}
-                componentsProps={{
-                  clearIndicator: { sx: { display: 'none' } },
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Tìm sản phẩm..."
-                    placeholder="Tìm sản phẩm..."
-                    fullWidth
-                  />
-                )}
-                filterOptions={(options, { inputValue }) =>
-                  options.filter((option) =>
-                    normalizeString(option.name).includes(normalizeString(inputValue))
-                  )
-                }
-              />
+          <Autocomplete
+            options={products}
+            getOptionLabel={(option: Product) => option.name}
+            value={product}
+            onChange={(_event, newValue) => {
+              setProduct(newValue);
+              if (newValue) {
+                addProductToDetails(newValue);
+              }
+            }}
+            inputValue={searchInput}
+            onInputChange={(_event, newInput, reason) => {
+              if (reason === 'input') {
+                setSearchInput(newInput);
+              } else if (reason === 'clear') {
+                setSearchInput('');
+                setProduct(null);
+              }
+            }}
+            onClose={(_event, reason) => {
+            
+                setSearchInput('');  // reset khi mất focus
+                setProduct(null);
+              
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Tìm sản phẩm..." placeholder="Tìm sản phẩm..." fullWidth />
+            )}
+        />
           </Grid>
 
           <Grid size={{xs:12}}>
@@ -354,8 +327,8 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
                   <TableRow>
                     <TableCell>STT</TableCell>
                     <TableCell>Tên sản phẩm</TableCell>
-                    <TableCell>Giá</TableCell>
-                    <TableCell>Số lượng</TableCell>
+                    <TableCell sx={{ width: '150px' }}>Giá</TableCell>
+                    <TableCell sx={{ width: '150px' }}>Số lượng</TableCell>
                     <TableCell>Tiền</TableCell>
                     <TableCell>Action</TableCell>
                   </TableRow>
@@ -384,7 +357,7 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
                                 {...field}
                                 size="small"
                                 fullWidth
-                                value={field.value}
+                                value={formatNumber(field.value)}
                                 onChange={(e) => {
                                   const raw = e.target.value.replace(/,/g, '');
                                   const numeric = Number(raw);
@@ -411,7 +384,7 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
                                 {...field}
                                 size="small"
                                 fullWidth
-                                value={field.value}
+                                value={formatNumber(field.value)}
                                 onChange={(e) => {
                                   const raw = e.target.value.replace(/,/g, '');
                                   const numeric = Number(raw);

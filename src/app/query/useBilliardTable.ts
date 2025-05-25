@@ -7,6 +7,7 @@ export const useBilliardTables = () => {
         return await fetchBilliardTables()
     },
     staleTime:1000*60,
+    refetchOnWindowFocus: false, // ✅ KHÔNG refetch khi quay lại tab
     })
 };
 export const useBilliardTable = (id:number) => {
@@ -16,6 +17,7 @@ export const useBilliardTable = (id:number) => {
             return await fetchBilliardTable(id)
         },
         staleTime:1000*60*60,
+        refetchOnWindowFocus: false, // ✅ KHÔNG refetch khi quay lại tab
     })
   };
 
@@ -82,5 +84,6 @@ export const useBilliardTableActive = () => {
             return res
         },
         staleTime:1000*6,
+        refetchOnWindowFocus: false, // ✅ KHÔNG refetch khi quay lại tab
     })
 }

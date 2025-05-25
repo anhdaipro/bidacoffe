@@ -24,6 +24,7 @@ import {
 } from '@mui/material';
 
 import Search from './Search';
+import { ProductFormSearch } from '@/app/type/model/Product';
 
 interface Product {
   id: number;
@@ -38,23 +39,16 @@ interface Product {
   rUidLogin: { name: string };
 }
 
-export interface FormSearch {
-  status: string;
-  categoryId: string;
-  name: string;
-  dateFrom: string;
-  dateTo: string;
-}
-
 const Index = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
-  const [formData, setFormData] = useState<FormSearch>({
+  const [formData, setFormData] = useState<ProductFormSearch>({
     status: '',
     categoryId: '',
     name: '',
     dateFrom: '',
     dateTo: '',
+    uidLogin:'',
   });
   const { data, isLoading } = useProducts(currentPage, itemsPerPage, formData);
   const updateStore = useControlStore((state) => state.updateStore);
@@ -101,7 +95,7 @@ const Index = () => {
     updateStatus({ id, status });
   };
 
-  const setFormSearch = (data: FormSearch) => {
+  const setFormSearch = (data: ProductFormSearch) => {
     setFormData((prev) => ({ ...prev, ...data }));
   };
 

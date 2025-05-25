@@ -2,7 +2,7 @@ import { DataTypes, Model } from 'sequelize';
 import sequelize from '../database/db';
 import BilliardTable from './BilliardTable'; // nếu có
 import TableOrderDetail from './TableOrder';
-import User from './Users';
+import User from './User';
 import { ROLE_ADMIN } from '../BidaConst';
 import { STATUS_AVAILABLE, STATUS_PAID, STATUS_PLAYING, STATUS_WAIT_PAID } from '@form/billiardTable';
 import { PAYMENT_METHOD } from '@form/payment';
@@ -70,6 +70,21 @@ class TableSession extends Model {
       const now = this.endTime ? new Date(this.endTime).getTime() : Date.now();
       const playedMinutes = Math.ceil((now - startTime) / 60000);
       return playedMinutes;
+    }
+    public async getTablePlaying(){
+      const aSession = await TableSession.findAll({
+        where:{
+          status:STATUS_PLAYING
+        },
+        attributes:['id', 'phone', 'playerName','playedMinutes','startTime','endTime'],
+        include:{ model: BilliardTable, as: 'table', attributes:['id', 'tableNumber'] },
+      })
+      const data = aSession.map((session:TableSession)=>{
+
+        const plain = session.get({ plain: true }); // toàn bộ data thường
+        return {...plain.table,playedMinutes: session.fnCalculatePlayedMinutes()}
+      })
+      return data;
     }
     
 }

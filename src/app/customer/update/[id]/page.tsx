@@ -1,5 +1,5 @@
 "use client"
-import CustomerForm from "@/app/conponent/customer/Form"
+import Form from "@/app/conponent/customer/Form"
 import { useGetUser } from "@/app/query/useUser";
 import { useParams } from "next/navigation";
 const Update = () =>{
@@ -30,7 +30,7 @@ const Update = () =>{
         </div>
     );
     return (
-        <CustomerForm customer={customer} />
+        <Form customer={customer} />
     )
 }
 export default Update

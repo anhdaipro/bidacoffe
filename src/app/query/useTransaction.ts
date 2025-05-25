@@ -1,13 +1,14 @@
 import { useQuery,useMutation,useQueryClient } from '@tanstack/react-query';
 import {fetchTransactions, fetchTransaction, createTransaction, updateTransaction, deleteTransaction} from '../api/apiTransaction'
-import { FormSearch } from '../conponent/transaction/Search';
-export const useTransactions = (page: number, limit: number, formData:FormSearch) => {
+import { TransactionFormSearch } from '../type/model/Transaction';
+export const useTransactions = (page: number, limit: number, formData:TransactionFormSearch) => {
   return useQuery({
     queryKey:['transactions',page, limit, formData],
     queryFn: async () =>{
         return await fetchTransactions(page,limit,formData)
     },
     staleTime:1000*6,
+    refetchOnWindowFocus: false, // ✅ KHÔNG refetch khi quay lại tab
     })
 };
 export const useTransaction = (id:number) => {
@@ -17,6 +18,7 @@ export const useTransaction = (id:number) => {
             return await fetchTransaction(id)
         },
         staleTime:1000*6,
+        refetchOnWindowFocus: false, // ✅ KHÔNG refetch khi quay lại tab
     })
   };
 

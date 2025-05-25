@@ -1,14 +1,14 @@
-import BilliardTableForm from "@/app/conponent/billiardTable/Form";
+import Form from "@/app/conponent/billiardTable/Form";
 
 const CreateBilliardTable = () => {
     const table = {
         status: 0,
         tableNumber: 1,
-        type: null,
+        type: 0,
         hourlyRate: 0,
     };
   
-    return (<BilliardTableForm table={table}/>)
+    return (<Form table={table}/>)
    
   };
   

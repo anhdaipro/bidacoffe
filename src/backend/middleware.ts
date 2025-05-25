@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
-import jwt, { JwtPayload } from 'jsonwebtoken';
-import User from './models/Users';
+import jwt, { JwtPayload,TokenExpiredError } from 'jsonwebtoken';
+import User from './models/User';
 import multer from 'multer';
 declare global {
     namespace Express {
@@ -26,9 +26,10 @@ export const  authenticateJWT = async (
     res.status(401).json({ message: 'Token không được cung cấp' });
     return;
   }
-
   try {
+      console.log('TOKEN:', token);
         const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+        console.log(decoded)
         const user = await User.findByPk(decoded.id )
         if (!user) {
             throw new Error()
@@ -36,6 +37,9 @@ export const  authenticateJWT = async (
         req.user = user
         next()
   } catch (error) {
+    if (error instanceof TokenExpiredError) {
+      res.status(401).json({ message: 'Token đã hết hạn' });
+    }
     res.status(403).json({ message: 'Token không hợp lệ' });
   }
 };

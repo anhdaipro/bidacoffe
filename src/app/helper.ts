@@ -16,3 +16,8 @@ export function formatDate(dateStr:string) {
     date.getFullYear()} ${date.getHours().toString().padStart(2, '0')}:${
     date.getMinutes().toString().padStart(2, '0')}`;
 }
+export const calHourPlay = (playedMinutes: number) => {
+  const hours = Math.floor(playedMinutes / 60);
+  const mins = playedMinutes - hours * 60;
+  return `${hours} giờ ${mins} phút`;
+};

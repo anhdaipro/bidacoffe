@@ -1,7 +1,7 @@
-import { FormSearch } from "../conponent/product/Index";
-import axiosInstance from "../hook/axiosInstance";
 
-const fetchProducts = async (page:number, limit:number, data:FormSearch) => {
+import axiosInstance from "../hook/axiosInstance";
+import { ProductFormSearch } from "../type/model/Product";
+const fetchProducts = async (page:number, limit:number, data:ProductFormSearch) => {
   try {
     const params = new URLSearchParams({
       page: String(page),

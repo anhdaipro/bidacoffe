@@ -3,6 +3,7 @@ import React, { useState, memo } from 'react';
 import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { DateTimePicker } from '@mui/x-date-pickers';
 import {
   Box,
   Typography,
@@ -17,6 +18,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  IconButton,
   Paper,
   Autocomplete,
   CircularProgress,
@@ -24,6 +26,7 @@ import {
   InputLabel,
   FormHelperText,
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -38,21 +41,7 @@ import { formatNumber, normalizeString } from '@/app/helper';
 import { STATUS_SESSION_LABELS } from '@/form/billiardTable';
 import { PAYMENT_METHOD_LABELS } from '@/form/payment';
 import { TableSessionForm } from '@/app/type/model/TableSession';
-
-
-interface Detail {
-  productId: number;
-  categoryId: number;
-  quantity: number;
-  price: number;
-}
-
-interface Product {
-  id: number;
-  name: string;
-  categoryId: number;
-}
-
+import { Product } from '@/app/type/model/Product';
 interface Props {
   tableSession: TableSessionForm;
 }
@@ -68,6 +57,7 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
   const [ignoreInputChange, setIgnoreInputChange] = useState(false);
   const addToast = useToastStore((state) => state.addToast);
   const [searchInput, setSearchInput] = useState('');
+  const [product, setProduct] = React.useState<Product | null>(null);
   const router = useRouter();
 
   const {
@@ -78,17 +68,18 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
     setValue,
     watch,
   } = useForm<TableSessionForm>({
-    defaultValues: { ...tableSession },
+    values: tableSession,
   });
-
+  console.log(watch())
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'orders',
   });
-  const {tableId,status,paymentMethod} = watch()
+  const {tableId,status,paymentMethod,startTime,endTime} = watch()
   const details = watch('orders');
-  const totalAmount = details.reduce((acc, detail) => acc + detail.price * detail.quantity, 0);
-
+  const amountOrder = details.reduce((acc, detail) => acc + detail.price * detail.quantity, 0);
+  console.log(tableSession)
+  console.log(startTime)
   // Loading state
   if (isLoading || isLoadingTable) {
     return (
@@ -103,7 +94,7 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
 
   // Handle form submission
   const sendData: SubmitHandler<TableSessionForm> = async (data) => {
-    const payload = { ...data, totalAmount };
+    const payload = { ...data, amountOrder };
     if (tableSession.id) {
       updateTransaction(
         { id: tableSession.id, payload },
@@ -114,7 +105,7 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
               message: 'Cập nhật thành công',
               type: 'success',
             });
-            router.push('/transaction');
+            router.push('/tableSession');
           },
           onError: (error: any) => {
             addToast({
@@ -140,7 +131,7 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
             message: 'Tạo mới thành công',
             type: 'success',
           });
-          router.push('/transaction');
+          router.push('/tableSession');
         },
         onError: (error: any) => {
           addToast({
@@ -172,7 +163,7 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
       productId: product.id,
       categoryId: product.categoryId,
       quantity: 1,
-      price: 0,
+      price: product.price,
     });
     // Reset the Autocomplete input
     setSearchInput('');
@@ -225,8 +216,10 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
             <Grid size={{xs:12, sm:6}}>
               <FormControl fullWidth error={!!errors.status}>
                 <InputLabel>Trạng thái</InputLabel>
-                <Select value={status} {...register('status', { required: 'Trạng thái không để trống' })} label="Trạng thái">
-                 
+                <Select value={status} {...register('status', { required: 'Trạng thái không để trống',
+                  validate: (value) => (Number(value) > 0 ? true : 'Trạng thái không để trống'),
+                 })} label="Trạng thái">
+                  <MenuItem value="0"> Chọn trạng thái</MenuItem>
                   {Object.entries(STATUS_SESSION_LABELS).map(([key, value]) => (
                     <MenuItem key={key} value={key}>
                       {value}
@@ -241,8 +234,11 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
             <Grid size={{xs:12, sm:6}}>
               <FormControl fullWidth error={!!errors.paymentMethod}>
                 <InputLabel>Phương thức thanh toán</InputLabel>
-                <Select value={paymentMethod} {...register('paymentMethod')} label="Phương thức thanh toán">
-                  
+                <Select value={paymentMethod} 
+                {...register('paymentMethod', {})}
+                label="Phương thức thanh toán"
+                >
+                  <MenuItem value="0"> Chọn phương thức thanh toán</MenuItem>
                   {Object.entries(PAYMENT_METHOD_LABELS).map(([key, value]) => (
                     <MenuItem key={key} value={key}>
                       {value}
@@ -257,7 +253,7 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
             <Grid size={{xs:12, sm:6}}>
               <FormControl fullWidth error={!!errors.tableId}>
                 <InputLabel>Bàn số</InputLabel>
-                <Select value={watch('tableId')} {...register('tableId', { required: 'Bàn không để trống' })} label="Bàn số">
+                <Select value={tableId} {...register('tableId', { required: 'Bàn không để trống' })} label="Bàn số">
                   
                   {tables.map((table: any) => (
                     <MenuItem key={table.id} value={table.id}>
@@ -276,10 +272,12 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
                 control={control}
                 rules={{ required: 'Thời gian bắt đầu không để trống' }}
                 render={({ field, fieldState: { error } }) => (
-                  <DatePicker
+                  <DateTimePicker
+                  
                     label="Bắt đầu"
-                    value={field.value ? dayjs(field.value) : null}
-                    onChange={(date) => field.onChange(date ? date.format('YYYY-MM-DD') : '')}
+                    format='DD/MM/YYYY HH:mm'
+                    value={startTime ? dayjs(startTime) : null}
+                    onChange={(date) => field.onChange(date ? date.format('YYYY-MM-DD HH:mm') : '')}
                     slotProps={{
                       textField: {
                         fullWidth: true,
@@ -287,6 +285,8 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
                         helperText: error?.message,
                       },
                     }}
+                    timeSteps={{ minutes: 1 }}  // Quan trọng
+                    ampm={false} // 👈 Bắt buộc để dùng định dạng 24 giờ
                   />
                 )}
               />
@@ -298,10 +298,12 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
                 name="endTime"
                 control={control}
                 render={({ field, fieldState: { error } }) => (
-                  <DatePicker
+                  <DateTimePicker
+                  
                     label="Kết thúc"
                     value={field.value ? dayjs(field.value) : null}
-                    onChange={(date) => field.onChange(date ? date.format('YYYY-MM-DD') : '')}
+                    onChange={(date) => field.onChange(date ? date.format('YYYY-MM-DD HH:mm') : '')}
+                    format='DD/MM/YYYY HH:mm'
                     slotProps={{
                       textField: {
                         fullWidth: true,
@@ -309,6 +311,9 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
                         helperText: error?.message,
                       },
                     }}
+                    timeSteps={{ minutes: 1 }}  // Quan trọng
+                    ampm={false} // 👈 Bắt buộc để dùng định dạng 24 giờ
+                    
                   />
                 )}
               />
@@ -333,39 +338,34 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
                 Thêm sản phẩm
               </Typography>
               <Autocomplete
-                options={products}
-                getOptionLabel={(option: Product) => option.name}
-                inputValue={searchInput}
-                onInputChange={(_event, newInputValue) => {
-                  if (!ignoreInputChange) {
-                    setSearchInput(newInputValue);
-                  }
-                  setIgnoreInputChange(false);
-                }}
-                onChange={(_event, value) => {
-                  if (value) {
-                    addProductToDetails(value);
-                    setIgnoreInputChange(true);
-                    setSearchInput('');
-                  }
-                }}
-                componentsProps={{
-                  clearIndicator: { sx: { display: 'none' } },
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Tìm sản phẩm..."
-                    placeholder="Tìm sản phẩm..."
-                    fullWidth
-                  />
-                )}
-                filterOptions={(options, { inputValue }) =>
-                  options.filter((option) =>
-                    normalizeString(option.name).includes(normalizeString(inputValue))
-                  )
-                }
-              />
+            options={products}
+            getOptionLabel={(option: Product) => option.name}
+            value={product}
+            onChange={(_event, newValue) => {
+              setProduct(newValue);
+              if (newValue) {
+                addProductToDetails(newValue);
+              }
+            }}
+            inputValue={searchInput}
+            onInputChange={(_event, newInput, reason) => {
+              if (reason === 'input') {
+                setSearchInput(newInput);
+              } else if (reason === 'clear') {
+                setSearchInput('');
+                setProduct(null);
+              }
+            }}
+            onClose={(_event, reason) => {
+            
+                setSearchInput('');  // reset khi mất focus
+                setProduct(null);
+              
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Tìm sản phẩm..." placeholder="Tìm sản phẩm..." fullWidth />
+            )}
+        />
             </Grid>
           </Grid>
 
@@ -374,92 +374,108 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
             Order sản phẩm
           </Typography>
           <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto' }}>
-            <Table sx={{ minWidth: 650 }} aria-label="product details table">
-              <TableHead>
-                <TableRow>
-                  {headers.map((header, index) => (
-                    <TableCell key={index} sx={{ fontWeight: 'bold', textAlign: index === 2 || index === 3 || index === 4 ? 'right' : 'left' }}>
-                      {header}
+          <Box sx={{ overflowX: 'auto' }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>STT</TableCell>
+                    <TableCell>Tên sản phẩm</TableCell>
+                    <TableCell sx={{ width: '150px' }}>Giá</TableCell>
+                    <TableCell sx={{ width: '150px' }}>Số lượng</TableCell>
+                    <TableCell>Tiền</TableCell>
+                    <TableCell>Action</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {details.map((detail, index) => {
+                    const product = products.find((p: Product) => p.id === detail.productId);
+                    if (!product) return null;
+
+                    return (
+                      <TableRow key={index}>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell>{product.name}</TableCell>
+                        
+                        {/* Price */}
+                        <TableCell>
+                          <Controller
+                            name={`orders.${index}.price`}
+                            control={control}
+                            rules={{
+                              required: 'Giá không hợp lệ',
+                              validate: (value) => value > 0 || 'Giá phải lớn hơn 0',
+                            }}
+                            render={({ field }) => (
+                              <TextField
+                                {...field}
+                                size="small"
+                                fullWidth
+                                value={formatNumber(field.value)}
+                                onChange={(e) => {
+                                  const raw = e.target.value.replace(/,/g, '');
+                                  const numeric = Number(raw);
+                                  field.onChange(isNaN(numeric) ? 0 : numeric);
+                                }}
+                                error={!!errors.orders?.[index]?.price}
+                                helperText={errors.orders?.[index]?.price?.message}
+                              />
+                            )}
+                          />
+                        </TableCell>
+
+                        {/* Quantity */}
+                        <TableCell>
+                          <Controller
+                            name={`orders.${index}.quantity`}
+                            control={control}
+                            rules={{
+                              required: 'Số lượng không hợp lệ',
+                              validate: (value) => value > 0 || 'Số lượng phải lớn hơn 0',
+                            }}
+                            render={({ field }) => (
+                              <TextField
+                                {...field}
+                                size="small"
+                                fullWidth
+                                value={formatNumber(field.value)}
+                                onChange={(e) => {
+                                  const raw = e.target.value.replace(/,/g, '');
+                                  const numeric = Number(raw);
+                                  field.onChange(isNaN(numeric) ? 0 : numeric);
+                                }}
+                                error={!!errors.orders?.[index]?.quantity}
+                                helperText={errors.orders?.[index]?.quantity?.message}
+                              />
+                            )}
+                          />
+                        </TableCell>
+
+                        <TableCell>{formatNumber(detail.price * detail.quantity)}</TableCell>
+                        <TableCell>
+                          <IconButton 
+                            onClick={() => remove(index)}
+                            color="error"
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                  <TableRow>
+                    <TableCell colSpan={4} align="right">
+                      <Typography fontWeight="bold">Tổng tiền</Typography>
                     </TableCell>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {details.map((detail, index) => {
-                  const product = products.find((p: Product) => p.id === detail.productId);
-                  if (!product) return null;
-                  return (
-                    <TableRow key={index} sx={{ '&:hover': { bgcolor: 'action.hover' } }}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{product.name}</TableCell>
-                      <TableCell align="right">
-                        <Controller
-                          name={`orders.${index}.price`}
-                          control={control}
-                          rules={{
-                            required: 'Giá không hợp lệ',
-                            validate: (value) => value > 0 || 'Giá phải lớn hơn 0',
-                          }}
-                          render={({ field: { onChange, value }, fieldState: { error } }) => (
-                            <TextField
-                              size="small"
-                              value={formatNumber(value)}
-                              onChange={(e) => {
-                                const raw = e.target.value.replace(/,/g, '');
-                                const numeric = Number(raw);
-                                onChange(isNaN(numeric) ? 0 : numeric);
-                              }}
-                              error={!!error}
-                              helperText={error?.message}
-                              sx={{ width: 100 }}
-                            />
-                          )}
-                        />
-                      </TableCell>
-                      <TableCell align="right">
-                        <Controller
-                          name={`orders.${index}.quantity`}
-                          control={control}
-                          rules={{
-                            required: 'Số lượng không hợp lệ',
-                            validate: (value) => value > 0 || 'Số lượng phải lớn hơn 0',
-                          }}
-                          render={({ field: { onChange, value }, fieldState: { error } }) => (
-                            <TextField
-                              size="small"
-                              value={formatNumber(value)}
-                              onChange={(e) => {
-                                const raw = e.target.value.replace(/,/g, '');
-                                const numeric = Number(raw);
-                                onChange(isNaN(numeric) ? 0 : numeric);
-                              }}
-                              error={!!error}
-                              helperText={error?.message}
-                              sx={{ width: 100 }}
-                            />
-                          )}
-                        />
-                      </TableCell>
-                      <TableCell align="right">{formatNumber(detail.price * detail.quantity)}</TableCell>
-                      <TableCell>
-                        <Button variant="contained" color="error" size="small" onClick={() => remove(index)}>
-                          Xóa
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-                <TableRow>
-                  <TableCell colSpan={4} sx={{ fontWeight: 'bold' }}>
-                    Tổng tiền
-                  </TableCell>
-                  <TableCell align="right" sx={{ fontWeight: 'bold' }}>
-                    {formatNumber(totalAmount)}
-                  </TableCell>
-                  <TableCell />
-                </TableRow>
-              </TableBody>
-            </Table>
+                    <TableCell>
+                      <Typography fontWeight="bold">
+                        {formatNumber(amountOrder)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </Box>
           </TableContainer>
 
           {/* Submit Button */}
@@ -472,4 +488,4 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
   );
 };
 
-export default memo(FormTableSession);
+export default FormTableSession;

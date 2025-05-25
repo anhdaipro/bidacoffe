@@ -8,6 +8,8 @@ import { EXPORT, IMPORT } from '@form/transaction';
 import { STATUS_WAIT_PAID,STATUS_PAID } from '@form/billiardTable';
 import Product from '../models/Product';
 import { CATEGORY_ORDER, STATUS_ACTIVE } from '@form/product';
+import dayjs from 'dayjs';
+import Payment from '../models/Payment';
 
 class ReportController {
   // Action: Báo cáo doanh thu
@@ -232,6 +234,69 @@ class ReportController {
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
             res.status(500).json({ message: 'Lỗi khi tạo báo cáo sản phẩm bán chạy nhất.', error: errorMessage });
+        }
+    }
+    public static async getRevenueSummaryLast7Days(req: Request, res: Response): Promise<void> {
+        try {
+            const today = dayjs();
+            const todayStr = today.format('YYYY-MM-DD'); // "2025-05-24"
+            const todayBigint = dayjs(todayStr).unix();      // UNIX timestamp (giây)
+            const sevenDaysAgo = today.subtract(7, 'day');
+            const seventDaysAgoStr = sevenDaysAgo.format('YYYY-MM-DD')
+            const sevenDaysAgoBigint = dayjs(seventDaysAgoStr).unix(); 
+            const dateCol = fn('DATE', col('paid_at')); // Hoặc 'paidAt' nếu model mapping đúng
+            const countInvoice = await Payment.count({
+                where:{
+                    paidAtBigint: {
+                        [Op.gte] : todayBigint
+                    }
+                }
+            })
+            const result = await Payment.findAll({
+            attributes: [
+                [dateCol, 'date'],
+                [fn('SUM', col('total_amount')), 'revenue'],
+            ],
+            where: {
+                paidAtBigint: { // dùng tên trường model
+                [Op.gte]: sevenDaysAgoBigint,
+                // [Op.lt]:today.format('YYYY-MM-DD')
+                },
+            },
+            group: [dateCol],
+            order: [[dateCol, 'ASC']],
+            });
+            const mTable = new BilliardTable
+            const countTable = await mTable.countTable()
+            const aTablePlaying = await (new TableSession).getTablePlaying()
+            const data:any  = {}
+            const weeData = [];
+            for (let i = 0; i <= 7; i++) {
+                const date = sevenDaysAgo.add(i, 'day');
+                const dateFomat = date.format('DD/MM')
+                const mPayment = result.find(item=>item.get('date') == date.format('YYYY-MM-DD'))
+                const revenue = mPayment ? Number(mPayment.get('revenue')) : 0
+                
+                const dayRevenue = {
+                    date:dateFomat,
+                    revenue, // Nếu không có dữ liệu, trả về 0
+                }
+                if(i == 7){
+                    data.todayRevenue = revenue
+                    continue;
+                }
+                
+                weeData.push(dayRevenue);
+            }
+            Object.assign(data,{weeData, countTable, aTablePlaying,countInvoice})
+            data.weeData = weeData
+            res.status(200).json({
+                message: 'Lấy doanh thu thành công',
+                ...data,
+            });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+            res.status(500).json({ message: 'errorMessage', error: errorMessage });
         }
     }
 }

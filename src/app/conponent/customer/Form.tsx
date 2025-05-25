@@ -10,9 +10,9 @@ import { useForm } from 'react-hook-form';
 import styled from 'styled-components';
 import { useRouter } from "next/navigation";
 import { useCreateCustomer, useUpdateCustomer } from '@/app/query/useUser';
-import { FormCustomer } from '../../type/model/Customer';
 import { useToastStore } from '../../store/toastStore';
 import { v4 as uuidv4 } from 'uuid'
+import { CustomerForm } from '@/app/type/model/Customer';
 export const FormContainer = styled.div`
   background-color: #f9f9f9;
   padding: 20px;
@@ -102,9 +102,9 @@ export const StyledLink = styled.a`
 `;
 
 interface Props{
-  customer: FormCustomer;
+  customer: CustomerForm;
 }
-const CustomerForm: React.FC<Props> = ({ customer }) => {
+const Form: React.FC<Props> = ({ customer }) => {
   const user = useAuthStore(state=>state.user)
   const router = useRouter();
     const addToast = useToastStore(state=>state.addToast)
@@ -120,14 +120,14 @@ const CustomerForm: React.FC<Props> = ({ customer }) => {
     watch,
     setValue,
     formState: { errors },
-  } = useForm<FormCustomer>({
-    defaultValues: {
+  } = useForm<CustomerForm>({
+    values: {
      ...customer
     },
   });
   const { mutate: addCustomer } = useCreateCustomer();
   const { mutate: updateCustomer } = useUpdateCustomer();
-  const handleFormSubmit = (data: FormCustomer) => {
+  const handleFormSubmit = (data: CustomerForm) => {
     const payload = {
       ...data
     };
@@ -189,9 +189,11 @@ const CustomerForm: React.FC<Props> = ({ customer }) => {
           <Label htmlFor="status">Trạng thái</Label>
           <Select
             id="status"
-            {...register('status', { required: 'Trạng thái là bắt buộc' })}
+            {...register('status', { required: 'Trạng thái là bắt buộc',
+              validate: (value) => (Number(value) > 0 ? true : 'Trạng thái là bắt buộc'),
+             })}
           >
-            <option value="">Chọn trạng thái</option>
+            <option value="0">Chọn trạng thái</option>
             {Object.entries(STATUS_LABELS).map(([key, value]) => (
               <option key={key} value={key}>
                 {value}
@@ -219,4 +221,4 @@ const CustomerForm: React.FC<Props> = ({ customer }) => {
   );
 };
 
-export default CustomerForm;
+export default Form;

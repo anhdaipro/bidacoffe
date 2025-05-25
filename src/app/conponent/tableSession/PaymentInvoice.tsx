@@ -7,13 +7,13 @@ import { TableSession } from '@/app/type/model/TableSession';
 import { useTableStore } from '@/app/store/useTableStore';
 import { useReactToPrint } from 'react-to-print';
 import { useProductsSearch } from '@/app/query/useProducts';
-import { Product } from '@/app/type/Model';
 import { useCreatePayment } from '@/app/query/usePayment';
 import { PAYMENT_METHOD } from '@/form/payment';
 import { useToastStore } from '@/app/store/toastStore';
 import { v4 as uuidv4 } from 'uuid';
 import { useShallow } from 'zustand/shallow';
 import { STATUS_AVAILABLE } from '@/form/billiardTable';
+import { Product } from '@/app/type/model/Product';
 // components/PrintTypography.tsx
 
 const PrintTypography: React.FC<TypographyProps> = ({ children, sx, ...props }) => {

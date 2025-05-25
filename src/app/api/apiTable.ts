@@ -1,7 +1,7 @@
 
 
-import { BilliardTableFormProps } from "../conponent/billiardTable/Form";
 import axiosInstance from "../hook/axiosInstance";
+import { BilliardTableForm } from "../type/model/Table";
 const fetchBilliardTables = async () => {
     const response = await axiosInstance.get(`/billiard-table`);
     return response.data;
@@ -10,11 +10,11 @@ const fetchBilliardTable = async (id:number) => {
     const { data } = await axiosInstance.get(`/billiard-table/view/${id}`);
     return data.data;
   };
-const createBilliardTable = async (dataBilliard: BilliardTableFormProps) => {
+const createBilliardTable = async (dataBilliard: BilliardTableForm) => {
     const { data } = await axiosInstance.post('/billiard-table/create', dataBilliard);
     return data.data;
   };
-const updateBilliardTable = async ({ id, payload }: { id: number, payload: BilliardTableFormProps }) => {
+const updateBilliardTable = async ({ id, payload }: { id: number, payload: BilliardTableForm }) => {
 const { data } = await axiosInstance.post(`/billiard-table/update/${id}`, payload);
 return data.data;
 };

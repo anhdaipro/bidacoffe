@@ -17,6 +17,9 @@ const LoginPage: React.FC = () => {
   }, [router])
   const {mutate: login, isPending} = useLogin()
   const setUser = useAuthStore(state=>state.setUser)
+  if(user){
+    return <></>
+  }
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const data = {identifier,password};

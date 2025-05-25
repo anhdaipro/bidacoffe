@@ -19,7 +19,7 @@ import {
   Paper,
 } from "@mui/material";
 
-import { formatNumber } from "../../helper";
+import { calHourPlay, formatNumber } from "../../helper";
 import { useTableSessions } from "@/app/query/useTableSession";
 import { useProductsSearch } from "../../query/useProducts";
 import { useAuthStore } from "@/app/store/useUserStore";
@@ -27,21 +27,13 @@ import { useControlStore } from "../../store/useStore";
 import { CATEGORY_LABELS } from "@/form/product";
 import { STATUS_SESSION_LABELS } from "@/form/billiardTable";
 import { ROLE_ADMIN } from "@/backend/BidaConst";
-import Search, { FormSearch } from "./Search";
+import { OrderDetail, TableSessionFormSearch } from "@/app/type/model/TableSession";
+import Search from "./Search";
 
-interface PropsDetail {
-  productId: number;
+interface PropsDetail extends OrderDetail {
   products: any[];
-  quantity: number;
-  price: number;
-  totalPrice: number;
 }
 
-const calHourPlay = (playedMinutes: number) => {
-  const hours = Math.floor(playedMinutes / 60);
-  const mins = playedMinutes - hours * 60;
-  return `${hours} giờ ${mins} phút`;
-};
 
 const Detail: React.FC<PropsDetail> = ({
   productId,
@@ -84,13 +76,14 @@ const Detail: React.FC<PropsDetail> = ({
 
 const Index: React.FC = () => {
   const [formData, setFormData] = useState({
-    status: "",
-    paymentMethod: 0,
-    tableId: 0,
-    employeeId: 0,
+    status: '',
+    paymentMethod: '',
+    tableId: '',
+    employeeId: '',
     codeNo: "",
     dateFrom: "",
     dateTo: "",
+    uidLogin:"",
   });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
@@ -141,7 +134,7 @@ const Index: React.FC = () => {
   };
 
   // Giữ nguyên phần Search component như bạn có, giả sử truyền props setFormSearch
-  const setFormSearch = (data: FormSearch) => {
+  const setFormSearch = (data: TableSessionFormSearch) => {
     setFormData((prev) => ({ ...prev, ...data }));
   };
   return (
@@ -209,7 +202,7 @@ const Index: React.FC = () => {
               </Grid>
             </Grid>
 
-            <TableContainer component={Box} sx={{ mt: 2 }}>
+            {tableSession.orders.length > 0 && <TableContainer component={Box} sx={{ mt: 2 }}>
               <Table size="small" aria-label="orders detail">
                 <TableHead>
                   <TableRow>
@@ -225,7 +218,7 @@ const Index: React.FC = () => {
                   ))}
                 </TableBody>
               </Table>
-            </TableContainer>
+            </TableContainer>}
 
             <Box
               sx={{

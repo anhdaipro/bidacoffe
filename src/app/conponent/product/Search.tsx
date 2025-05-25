@@ -15,17 +15,19 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { CATEGORY_LABELS, STATUS_LABEL } from '@/form/product';
-import { FormSearch } from './Index';
+import SearchAutocomplete, { AutocompleteItem } from '../Autocomplete';
+import { apiSearchCustomer } from '@/app/api/apiUser';
+import { ProductFormSearch } from '@/app/type/model/Product';
 
 interface SearchProps {
-  setFormSearch: (data: FormSearch) => void;
-  form: FormSearch;
+  setFormSearch: (data: ProductFormSearch) => void;
+  form: ProductFormSearch;
 }
 
 const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
   // Convert string dates to Dayjs objects or null
-  const [formData, setFormData] = useState<FormSearch>({status:'',categoryId: '',name:'',dateFrom: '', dateTo:''});
-
+  const [formData, setFormData] = useState<ProductFormSearch>({ ...form });
+  const [item,setItem] = useState<AutocompleteItem|null>(null)
   // Handle input and select changes
   const handleChange = (
     key: keyof typeof formData,
@@ -45,9 +47,14 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
       status: formData.status,
       dateFrom: formData.dateFrom ? dayjs(formData.dateFrom).format('YYYY-MM-DD') : '',
       dateTo: formData.dateTo ? dayjs(formData.dateTo).format('YYYY-MM-DD') : '',
+      uidLogin:formData.uidLogin
     });
   };
-
+  const selectItem = (item:AutocompleteItem|null) =>{
+    handleChange('uidLogin', item ? item?.id.toString() : '')
+    setItem(item)
+  }
+  console.log(formData)
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box sx={{
@@ -58,7 +65,7 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
         mx: 'auto',
         p: 2
       }}>
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
         <Grid size={{xs:12, sm:6, md: 4}}>
           <TextField
             fullWidth
@@ -129,7 +136,14 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
             slotProps={{ textField: { fullWidth: true, variant: 'outlined' } }}
           />
         </Grid>
-
+        <Grid size={{xs:12, sm:6, md: 4}}>
+          <SearchAutocomplete 
+          itemchoice={item}
+          label='Nhập tên người tạo'
+          fetcher={apiSearchCustomer}
+          onSelect={(item:AutocompleteItem|null) => selectItem(item)}
+          />
+        </Grid>
       </Grid>
       {/* Nút tìm kiếm tách riêng */}
         <Box sx={{  marginTop: 2 }}>

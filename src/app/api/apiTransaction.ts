@@ -1,9 +1,7 @@
 
-import { FormInputs } from "../conponent/transaction/FormTransaction";
-import { FormSearch } from "../conponent/transaction/Search";
 import axiosInstance from "../hook/axiosInstance";
-
-const fetchTransactions = async (page:number, limit:number, data: FormSearch) => {
+import { TransactionForm, TransactionFormSearch } from "../type/model/Transaction";
+const fetchTransactions = async (page:number, limit:number, data: TransactionFormSearch) => {
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
@@ -16,11 +14,11 @@ const fetchTransaction = async (id:number) => {
     const { data } = await axiosInstance.get(`/product-transactions/view/${id}`);
     return data.data;
   };
-const createTransaction = async (dataTransaction: FormInputs) => {
+const createTransaction = async (dataTransaction: TransactionForm) => {
     const { data } = await axiosInstance.post('/product-transactions/create', dataTransaction);
     return data.data;
   };
-const updateTransaction= async ({ id, payload }: { id: number, payload: FormInputs }) => {
+const updateTransaction= async ({ id, payload }: { id: number, payload: TransactionForm }) => {
   console.log(payload)
 const { data } = await axiosInstance.post(`/product-transactions/update/${id}`, payload);
 return data.data;

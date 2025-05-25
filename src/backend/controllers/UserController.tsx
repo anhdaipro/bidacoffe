@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
-import User from '../models/Users';
+import User from '../models/User';
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
 import { JWT_SECRET,REFRESH_TOKEN_SECRET, ROLE_CUSTOMER, STATUS_ACTIVE } from '../BidaConst';
@@ -143,10 +143,10 @@ class UserController {
         const accessToken = jwt.sign(
             { id: user.id, roleId: user.roleId },
             JWT_SECRET,
-            { expiresIn: '10h' } // Access token hết hạn sau 45 phút
+            { expiresIn: '1h' } // Access token hết hạn sau 45 phút
         );
         const refreshToken = jwt.sign(
-            { userId: user.id },
+            { id: user.id,roleId: user.roleId },
             REFRESH_TOKEN_SECRET,
         );
         // const refreshToken = crypto.randomBytes(64).toString('hex'); // Tạo refresh token
@@ -163,16 +163,17 @@ class UserController {
             if (!refreshToken) {
                 res.status(403).json({ message: 'Refresh token không hợp lệ' });
             }
-            console.log(refreshToken)
-            const payload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET) as { userId: string };
+            const payload = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET) as { id: number;roleId:number };
             // Tạo access token mới
             // const newAccessToken = jwt.sign(
             //     { id: userId },
             //     JWT_SECRET,
             //     { expiresIn: '10h' } // Access token mới hết hạn sau 15 phút
             // );
-            const newAccessToken = jwt.sign({ userId: payload.userId }, JWT_SECRET, {
-                expiresIn: '45m',
+            const newAccessToken = jwt.sign({ 
+                id: payload.id,roleId:payload.roleId }, 
+                JWT_SECRET, {
+                expiresIn: '1h',
             });
             console.log(newAccessToken)
             res.status(201).json({ accessToken: newAccessToken });
@@ -336,6 +337,42 @@ class UserController {
         } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Đã xảy ra lỗi khi xóa người dùng' });
+        }
+    }
+    public static async searchCustomer(req: Request, res: Response): Promise<void> {
+        try {
+            const { name,roleId } = req.query;
+    
+            if (!name) {
+                res.status(400).json({ message: 'Vui lòng cung cấp tên để tìm kiếm' });
+                return;
+            }
+    
+            const customers = await User.findAll({
+                where: {
+                    [Op.or]: [
+                        {
+                            name: {
+                                [Op.like]: `%${name}%`
+                            }
+                        },
+                        {
+                            phone: {
+                                [Op.like]: `%${name}%`
+                            }
+                        }
+                    ],
+                    roleId:roleId
+                },
+                limit: 10
+            });
+            const aData = customers.map(item=>{
+                return {id:item.id, name:item.name, label: `${item.name} - ${item.phone}`}
+            })
+            res.status(200).json(aData);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Đã xảy ra lỗi khi tìm kiếm người dùng' });
         }
     }
 }

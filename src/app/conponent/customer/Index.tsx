@@ -11,26 +11,14 @@ import { useAuthStore } from '../../store/useUserStore';
 import { ROLE_ADMIN } from '@/backend/BidaConst';
 import { usegetAllUsers } from '@/app/query/useUser';
 import Search from './Search';
-interface Customer{
-    id: number;
-    name:string;
-    status:number;
-    phone:string;
-    point:number;
-    canUpdate:boolean;
-    canDelete:boolean;
-    createdAt: string;
-}
-export interface FormSearch{
-  status:string;
-  phone:string;
-  dateFrom:string;
-  dateTo:string;
-}
+import { Customer, CustomerFormSearch } from '@/app/type/model/Customer';
 const Index = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 20; // Số sản phẩm trên mỗi trang
-    const [formData, setFormData] = useState<FormSearch>({status:'',phone: '',dateFrom: '', dateTo:''});
+    const [formData, setFormData] = useState<CustomerFormSearch>({
+        status:'',phone: '',dateFrom: '', dateTo:'',
+        uidLogin:'',
+    });
     const { data, isLoading } = usegetAllUsers(currentPage, itemsPerPage,formData);
     const updateStore  = useControlStore(state=>state.updateStore);
     const user = useAuthStore(state=>state.user)
@@ -61,21 +49,20 @@ const Index = () => {
         </div>
         );
     }
-console.log(data)
-  const aCustomer = data.data;
-  const totalPages = data.pagination.totalPages;
-  const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
+    const aCustomer = data.data;
+    const totalPages = data.pagination.totalPages;
+    const handlePageChange = (page: number) => {
+        if (page >= 1 && page <= totalPages) {
+        setCurrentPage(page);
+        }
+    };
     // Lấy dữ liệu sản phẩm từ API (giả sử API trả về dữ liệu sản phẩm)
     const handleUpdate = (id:number,statusCurrent:number) =>{
         const status = statusCurrent == STATUS_ACTIVE ? STATUS_INACTIVE : STATUS_ACTIVE
         updateStatus({id,status}, {
         })
     }
-    const setFormSearch = (data:FormSearch)=>{
+    const setFormSearch = (data:CustomerFormSearch)=>{
         setFormData(prev => ({ ...prev, ...data }));
         console.log(formData)
     }

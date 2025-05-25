@@ -16,6 +16,9 @@ import { ThemeProvider } from '@mui/material/styles';
 import { theme } from "./type/theme";
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { useAuthStore } from "./store/useUserStore";
+import LoginPage from "./login/page";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -73,7 +76,7 @@ const menus = [
   {title: 'Sản phẩm', url: '/products'},
   {title: 'Phiên chơi', url: '/tableSession'},
   {title: 'Nhân viên', url: '/staff'},
-  {title: 'Thống kế', url: '/dashboarh'},
+  {title: 'Thống kế', url: '/dashboard'},
   {title: 'Giao dịch sản phẩm', url: '/transaction'},
   {title: 'Khách hàng', url: '/customer'},
   {title: 'Cài đặt', url: '/setting'},
@@ -83,8 +86,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [activePage, setActivePage] = React.useState('tables');
+  const user = useAuthStore(state=>state.user)
   const pathname = usePathname();
+  const isLoginPage = pathname === '/login'
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
@@ -92,6 +96,7 @@ export default function RootLayout({
         <LocalizationProvider dateAdapter={AdapterDayjs}>
         <StyledComponentsRegistry>
         <QueryProvider>
+          {!isLoginPage ?
           <Wrapper>
             <Sidebar>
               {menus.map(item =>
@@ -107,7 +112,7 @@ export default function RootLayout({
                 {children}
               </ContentArea>
             </div>
-          </Wrapper>
+          </Wrapper>: <LoginPage/>}
           <Modal/>
           <ToastContainer />
         </QueryProvider>

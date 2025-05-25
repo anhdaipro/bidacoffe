@@ -5,7 +5,7 @@ import multer from 'multer';
 import path from 'path'
 import { Op,ValidationError, ValidationErrorItem} from 'sequelize';
 import { addDay, convertDate } from '../Format';
-import User from '../models/Users';
+import User from '../models/User';
 import redisClient from '../redisClient';
 import { SENCOND_DAY } from '../BidaConst';
 import { ChangeLog } from '@/type/Model';

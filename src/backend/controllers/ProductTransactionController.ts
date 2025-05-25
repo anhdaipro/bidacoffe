@@ -3,7 +3,7 @@ import ProductTransaction from '../models/ProductTransaction';
 import ProductTransactionDetail from '../models/ProductTransactionDetail';
 import { addDay, convertDate, convertDateFormat } from '../Format';
 import { Op } from 'sequelize';
-import User from '../models/Users';
+import User from '../models/User';
 import { ChangeLog } from '@/type/Model';
 import LogUpdate, { TYPE_TRANSACTION } from '../models/LogUpdate';
 class ProductTransactionController {

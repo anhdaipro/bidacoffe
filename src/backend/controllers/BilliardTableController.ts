@@ -5,7 +5,7 @@ import TableOrderDetail from '../models/TableOrder';
 import { Op } from 'sequelize';
 import { LSTATUSACTIVE } from '@form/tableSession';
 import { LSESSIONACTIVE } from '@form/billiardTable';
-import User from '../models/Users';
+import User from '../models/User';
 import { ChangeLog } from '@/type/Model';
 import LogUpdate, { TYPE_TABLE } from '../models/LogUpdate';
 class BilliardTableController {

@@ -7,4 +7,5 @@ router.use(authenticateJWT);
 router.get('/anh', ReportController.bestSellingProduct)
 router.get('/export', ReportController.reportExport)
 router.get('/inventory', ReportController.inventory)
+router.get('/revenue/week', ReportController.getRevenueSummaryLast7Days)
 export default router;

@@ -1,20 +1,22 @@
 import { useQuery,useMutation,useQueryClient } from '@tanstack/react-query';
 import {fetchProducts, fetchProduct, createProduct, updateProduct, deleteProdcut, fetchProductsSearch, updateStatusProduct} from '../api/apiProduct'
-import { FormSearch } from '../conponent/product/Index';
-export const useProducts = (page: number, limit: number, formData:FormSearch ) => {
+import { ProductFormSearch } from '../type/model/Product';
+export const useProducts = (page: number, limit: number, formData:ProductFormSearch ) => {
   return useQuery({
     queryKey:['products',page, limit,formData],
     queryFn: async () =>{
         return await fetchProducts(page,limit,formData)
     },
-    staleTime:1000,
+    staleTime:1000*6,
+    refetchOnWindowFocus: false, // ✅ KHÔNG refetch khi quay lại tab
     })
 };
 export const useProductsSearch = () => {
   return useQuery({
     queryKey:['products-search'],
     queryFn: fetchProductsSearch,
-    staleTime:1000*60,
+    staleTime:1000*6,
+    refetchOnWindowFocus: false, // ✅ KHÔNG refetch khi quay lại tab
   })
 };
 export const useProduct = (id:number) => {
@@ -23,7 +25,8 @@ export const useProduct = (id:number) => {
         queryFn: async () => {
             return await fetchProduct(id)
         },
-        staleTime:1000*60*60,
+        staleTime:1000*6,
+        refetchOnWindowFocus: false, // ✅ KHÔNG refetch khi quay lại tab
     })
   };
 

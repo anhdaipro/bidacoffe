@@ -9,7 +9,7 @@ import TableSession from '../models/TableSession';
 import { STATUS_AVAILABLE, STATUS_PAID } from '@form/billiardTable';
 import BilliardTable from '../models/BilliardTable';
 import ProductTransaction from '../models/ProductTransaction';
-import User from '../models/Users';
+import User from '../models/User';
 import Reward from '../models/Reward';
 export const upload = multer({ dest: "uploads/" });
 class PaymentController {

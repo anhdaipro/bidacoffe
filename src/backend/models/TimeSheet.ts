@@ -1,6 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../database/db';
-import User from './Users';
+import User from './User';
 import Shift from './Shift';
 
 class TimeSheet extends Model {

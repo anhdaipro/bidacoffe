@@ -16,25 +16,22 @@ import { STATUS_SESSION_LABELS } from "@/form/billiardTable";
 import { PAYMENT_METHOD_LABELS } from "@/form/payment";
 import { useBilliardTables } from "@/app/query/useBilliardTable";
 import { Table } from "@/app/type/model/Table";
-
-export interface FormSearch {
-  status: string;
-  codeNo: string;
-  dateFrom: string;
-  dateTo: string;
-  tableId: number;
-  employeeId: number;
-  paymentMethod: number;
-}
+import { TableSessionFormSearch } from "@/app/type/model/TableSession";
+import SearchAutocomplete, { AutocompleteItem } from "../Autocomplete";
+import { apiSearchCustomer } from "@/app/api/apiUser";
 
 interface SearchProps {
-  setFormSearch: (data: FormSearch) => void;
-  form: FormSearch;
+  setFormSearch: (data: TableSessionFormSearch) => void;
+  form: TableSessionFormSearch;
 }
 
 const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
-  const [formData, setFormData] = useState<FormSearch>({ ...form });
-
+  const [formData, setFormData] = useState<TableSessionFormSearch>({ ...form });
+  const [item,setItem] = useState<AutocompleteItem|null>(null)
+  const selectItem = (item:AutocompleteItem|null) =>{
+      handleChange('uidLogin', item ? item?.id.toString() : '')
+      setItem(item)
+    }
   const { data, isLoading } = useBilliardTables();
   const tables = isLoading ? [] : data || [];
 
@@ -84,10 +81,9 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
 
         <Grid size={{xs:12, sm:6, md:4}}>
           <FormControl fullWidth size="small">
-            <InputLabel id="table-select-label">Bàn số</InputLabel>
+            <InputLabel>Bàn số</InputLabel>
             <Select
-              labelId="table-select-label"
-              value={formData.tableId ?? ""}
+              value={formData.tableId}
               label="Bàn số"
               onChange={(e) =>
                 handleChange("tableId", e.target.value)
@@ -105,10 +101,11 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
 
         <Grid size={{xs:12, sm:6, md:4}}>
           <FormControl fullWidth size="small">
-            <InputLabel id="status-select-label">Trạng thái</InputLabel>
+            <InputLabel>Trạng thái</InputLabel>
             <Select
-              labelId="status-select-label"
-              value={formData.status ?? ""}
+              
+              
+              value={formData.status}
               label="Trạng thái"
               onChange={(e) => handleChange("status", e.target.value)}
             >
@@ -124,10 +121,10 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
 
         <Grid size={{xs:12, sm:6, md:4}}>
           <FormControl fullWidth size="small">
-            <InputLabel id="payment-select-label">Phương thức thanh toán</InputLabel>
+            <InputLabel >Phương thức thanh toán</InputLabel>
             <Select
-              labelId="payment-select-label"
-              value={formData.paymentMethod ?? ""}
+              
+              value={formData.paymentMethod}
               label="Phương thức thanh toán"
               onChange={(e) =>
                 handleChange(
@@ -170,6 +167,17 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
           />
         </Grid>
       </Grid>
+      <Grid container spacing={2} alignItems="center" >
+        <Grid size={{xs:12, sm:6, md:4}}>
+          <SearchAutocomplete 
+              itemchoice={item}
+              label='Nhập tên người tạo'
+              fetcher={apiSearchCustomer}
+              onSelect={selectItem}
+            />
+        </Grid>
+      </Grid>
+      
       {/* Nút tìm kiếm tách riêng */}
         <Box sx={{  marginTop: 2 }}>
               <Button variant="contained" color="primary" onClick={searchData}>

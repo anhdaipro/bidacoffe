@@ -13,29 +13,34 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
   import dayjs from "dayjs";
   import { useState } from "react";
   import { TRANSACTION_TYPE_LABELS } from "@/form/transaction";
+import { TransactionFormSearch } from "@/app/type/model/Transaction";
+import SearchAutocomplete, { AutocompleteItem } from "../Autocomplete";
+import { apiSearchCustomer } from "@/app/api/apiUser";
   
-  export interface FormSearch {
-    status: string;
-    type: string;
-    codeNo: string;
-    dateFrom: string;
-    dateTo: string;
-  }
-  
+
   interface SearchProps {
-    setFormSearch: (data: FormSearch) => void;
-    form: FormSearch;
+    setFormSearch: (data: TransactionFormSearch) => void;
+    form: TransactionFormSearch;
   }
   
   const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
-    const [formData, setFormData] = useState<FormSearch>({
-      status: form.status,
-      type: form.type,
-      codeNo: form.codeNo,
-      dateFrom: form.dateFrom,
-      dateTo: form.dateTo,
+    const [formData, setFormData] = useState<TransactionFormSearch>({
+      ...form
     });
-  
+    const [item,setItem] = useState<AutocompleteItem|null>(null)
+    const selectItem = (item:AutocompleteItem|null) =>{
+        handleChange('uidLogin', item ? item?.id.toString() : '')
+        setItem(item)
+      }
+    const handleChange = (
+      key: string,
+      value: string | number
+    ) => {
+      setFormData((prev) => ({
+        ...prev,
+        [key]: value,
+      }));
+    };
     const setForm = (key: string, value: string) => {
       setFormData({ ...formData, [key]: value });
     };
@@ -54,7 +59,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
     mx: 'auto',
     p: 2
   }}>
-        <Grid container spacing={3}>
+        <Grid container spacing={2}>
           <Grid size={{xs:12, md:6}}>
             <TextField
               fullWidth
@@ -84,11 +89,11 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
   
           <Grid size={{xs:12, md:6}}>
             <FormControl fullWidth>
-              <label style={{ marginBottom: 4 }}>Từ ngày</label>
               <DatePicker
                 className="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-fullWidth"
                 value={formData.dateFrom ? dayjs(formData.dateFrom) : null}
                 format='DD/MM/YYYY'
+                label="Từ"
                 onChange={(date) => {
                   if (date) {
                     const dateString = dayjs(date).format("YYYY-MM-DD");
@@ -104,11 +109,11 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
   
           <Grid size={{xs:12, md:6}}>
             <FormControl fullWidth>
-              <label style={{ marginBottom: 4 }}>Đến ngày</label>
               <DatePicker
                 className="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-fullWidth"
                 value={formData.dateTo ? dayjs(formData.dateTo) : null}
                 format='DD/MM/YYYY'
+                label="Đến"
                 onChange={(date) => {
                   if (date) {
                     const dateString = dayjs(date).format("YYYY-MM-DD");
@@ -121,7 +126,14 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
               />
             </FormControl>
           </Grid>
-  
+          <Grid size={{xs:12, md:6}}>
+            <SearchAutocomplete 
+              itemchoice={item}
+              label='Nhập tên người tạo'
+              fetcher={apiSearchCustomer}
+              onSelect={selectItem}
+            />
+          </Grid>
           <Grid size={{xs:12}}>
             <Box >
               <Button variant="contained" color="primary" onClick={searchData}>

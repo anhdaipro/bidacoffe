@@ -32,6 +32,10 @@ export interface OrderDetail {
     categoryId: number;
     totalPrice:number;
 }
+
+export interface OrderForm {
+    orders: OrderDetailForm[];
+  }
 export interface OrderDetailForm {
     quantity: number;
     price:number;
@@ -57,5 +61,16 @@ export interface FinishSession{
 }
 export interface TableSessionIndex extends TableSession{
     rUidLogin:{name:string} | null;
+    createdAt:string;
     codeNo:string;
 }
+export interface TableSessionFormSearch {
+    status: string;
+    codeNo: string;
+    dateFrom: string;
+    dateTo: string;
+    tableId: string;
+    employeeId: string;
+    paymentMethod: string;
+    uidLogin:string;
+  }

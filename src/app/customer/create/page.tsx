@@ -1,5 +1,4 @@
-import CustomerForm from "@/app/conponent/customer/Form"
-
+import Form from "@/app/conponent/customer/Form"
 const Create = () =>{
     const customer = {
         name:'',
@@ -7,7 +6,7 @@ const Create = () =>{
         status:''
     }
     return (
-        <CustomerForm customer = {customer}/>
+        <Form customer = {customer}/>
     )
 }
 export default Create

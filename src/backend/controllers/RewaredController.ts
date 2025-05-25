@@ -5,7 +5,7 @@ import TableOrderDetail from '../models/TableOrder';
 import {Op} from 'sequelize'
 import { STATUS_AVAILABLE, STATUS_PAID, STATUS_PLAYING, STATUS_WAIT_PAID } from '@form/billiardTable';
 import { addDay } from '../Format';
-import User from '../models/Users';
+import User from '../models/User';
 
 class RewaredController {
   // Tạo một phiên chơi mới

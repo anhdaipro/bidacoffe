@@ -1,12 +1,11 @@
 import React, { useState, useTransition } from 'react';
 import { useTableStore } from '@/app/store/useTableStore';
 import { useProductsSearch } from '@/app/query/useProducts';
-import { Product } from '@/app/type/Model';
 import { formatNumber, normalizeString } from '@/app/helper';
 import { useOrderTableSession } from '@/app/query/useTableSession';
 import { useToastStore } from '@/app/store/toastStore';
 import { v4 as uuidv4 } from 'uuid';
-import { OrderDetail, TableSession } from '@/app/type/model/TableSession';
+import { OrderDetail, OrderForm, TableSession } from '@/app/type/model/TableSession';
 import { Table } from '@/app/type/model/Table';
 import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
 import {
@@ -28,16 +27,12 @@ import {
   useMediaQuery
 } from '@mui/material';
 import { Add, Remove, Delete } from '@mui/icons-material';
-import { Detail } from '../transaction/FormTransaction';
 import { styled } from '@mui/material/styles';
+import { Product } from '@/app/type/model/Product';
 interface OrderTabProps {
   selectedSession?: TableSession;
   tableSessions: TableSession[];
   selectedTable: Table;
-}
-
-interface FormInputs {
-  orders: Detail[];
 }
 
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
@@ -69,8 +64,8 @@ const OrderTab: React.FC<OrderTabProps> = ({ selectedSession, tableSessions, sel
   const addToast = useToastStore(state => state.addToast);
   const setTableSession = useTableStore(state => state.setTableSession);
   
-  const { register, handleSubmit, formState: { errors }, control, setValue, watch } = useForm<FormInputs>({
-    defaultValues: {
+  const { register, handleSubmit, formState: { errors }, control, setValue, watch } = useForm<OrderForm>({
+    values: {
       orders: selectedSession?.orders || [],
     }
   });

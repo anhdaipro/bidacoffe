@@ -15,6 +15,7 @@ router.post('/customer/create', UserController.createCustomer);
 router.post('/customer/update/:id', UserController.updateCustomer);
 router.post('/find-customer', UserController.getUserByPhone);
 router.get('/customer', UserController.getAllCustomer);
+router.get('/customer/search', UserController.searchCustomer);
 
 // // Lấy thông tin người dùng theo ID
 router.get('/user/:id', UserController.getUserById);

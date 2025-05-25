@@ -3,7 +3,7 @@ import sequelize from '../database/db';
 import ProductTransactionDetail from './ProductTransactionDetail';
 import Product from './Product';
 import { EXPORT, IMPORT } from '@form/transaction';
-import User from './Users';
+import User from './User';
 import TableSession from './TableSession';
 import TableOrder from './TableOrder';
 export default class ProductTransaction extends Model {

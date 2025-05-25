@@ -11,29 +11,13 @@ import { useControlStore } from '../../store/useStore';
 import { convertToSlashFormat } from '@/backend/Format';
 import { TRANSACTION_TYPE_LABELS } from '@/form/transaction';
 import { CATEGORY_LABELS } from '@/form/product';
-import Search, { FormSearch } from './Search';
+import Search from './Search';
 import { useAuthStore } from '@/app/store/useUserStore';
 import { ROLE_ADMIN } from '@/backend/BidaConst';
 import { Product } from '../../type/model/Product';
 import { Edit, Delete } from '@mui/icons-material';
-interface ProductTransactionDetail {
-  id: number;
-  productId: number;
-  quantity: number;
-  price: number;
-  totalPrice: number;
-}
-interface ProductTransaction {
-  id: number;
-  codeNo: string;
-  dateDelivery: string;
-  type: number;
-  totalAmount: number;
-  rUidLogin: { name: string } | null;
-  details: ProductTransactionDetail[];
-  codeSession: string;
-}
-interface PropsDetail extends ProductTransactionDetail {
+import { TransactionDetail, TransactionFormSearch, TransactionIndex } from '@/app/type/model/Transaction';
+interface PropsDetail extends TransactionDetail {
   products: Product[];
 }
 
@@ -68,7 +52,10 @@ const Detail: React.FC<PropsDetail> = ({ productId, products, quantity, price, t
 };
 
 const Index: React.FC = () => {
-  const [formData, setFormData] = useState<FormSearch>({ status: '', type: '', codeNo: '', dateFrom: '', dateTo: '' });
+  const [formData, setFormData] = useState<TransactionFormSearch>({ 
+    status: '', type: '', codeNo: '', dateFrom: '', dateTo: '',
+    uidLogin:''
+   });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
@@ -106,7 +93,7 @@ const Index: React.FC = () => {
     });
   };
 
-  const setFormSearch = (data: FormSearch) => {
+  const setFormSearch = (data: TransactionFormSearch) => {
     setFormData(prev => ({ ...prev, ...data }));
   };
 
@@ -141,7 +128,7 @@ const Index: React.FC = () => {
         </Grid>
       </Box>
 
-      {transactions.map((transaction: ProductTransaction) => (
+      {transactions.map((transaction: TransactionIndex) => (
         <Box key={transaction.id} mb={4} p={2} border="1px solid #ddd" borderRadius={2}>
           <Box display="flex" justifyContent="space-between" flexDirection={isMobile ? 'column' : 'row'} mb={2}>
             <Box>

@@ -3,7 +3,7 @@ import sequelize from '../database/db';
 import fs from 'fs';
 import path from 'path';
 import BaseModel from './Base';
-import User from './Users';
+import User from './User';
 import { ROLE_ADMIN, SENCOND_DAY } from '../BidaConst';
 import redisClient from '../redisClient';
 import { CATEGORY, CATEGORY_ORDER, LSTATUS ,STATUS_ACTIVE} from '@form/product';

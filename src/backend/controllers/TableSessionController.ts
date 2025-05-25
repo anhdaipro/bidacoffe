@@ -5,7 +5,7 @@ import TableOrderDetail from '../models/TableOrder';
 import {Op} from 'sequelize'
 import { STATUS_AVAILABLE, STATUS_PAID, STATUS_PLAYING, STATUS_WAIT_PAID } from '@form/billiardTable';
 import { addDay } from '../Format';
-import User from '../models/Users';
+import User from '../models/User';
 import Reward from '../models/Reward';
 import { ChangeLog } from '@/type/Model';
 import LogUpdate, { TYPE_SESSION } from '../models/LogUpdate';
@@ -47,6 +47,7 @@ class TableSessionController {
         playedMinutes: 0,
         status,
         paymentMethod,
+        uidLogin,
       })
       if(tableSession.endTime){
         const playedMinutes = tableSession.fnCalculatePlayedMinutes();
@@ -98,6 +99,11 @@ class TableSessionController {
   public static async startTableSession(req: Request, res: Response): Promise<void> {
     try {
       const { tableId} = req.body;
+      const uidLogin = req.user?.id
+      if (!uidLogin) {
+        res.status(400).json({ message: 'Không thể lấy ID người dùng' });
+        return;
+      }
       const startTime = new Date();
       const table = await BilliardTable.findByPk(tableId)
       if(!table){
@@ -113,6 +119,7 @@ class TableSessionController {
         createdAtBigint: Date.now(),
         playedMinutes: 0,
         status:STATUS_PLAYING,
+        uidLogin,
       });
       table.status =  STATUS_PLAYING
       await table.save()
@@ -237,19 +244,28 @@ class TableSessionController {
 
   // Cập nhật thông tin một phiên chơi
   public static async updateTableSession(req: Request, res: Response): Promise<void> {
+    const transaction = await TableSession.sequelize?.transaction(); // Sử dụng transaction để đảm bảo tính toàn vẹn dữ liệu
     try {
       const { id } = req.params;
-      const { playerName, phone, startTime, endTime, status } = req.body;
+      const { playerName, phone, startTime, endTime, status,orders,tableId,amountOrder } = req.body;
       const uidLogin = req.user?.id
       if (!uidLogin) {
         res.status(400).json({ message: 'Không thể lấy ID người dùng' });
         return;
       }
+      
       const tableSession = await TableSession.findByPk(id);
       if (!tableSession) {
         res.status(404).json({
           message: 'Table session not found',
         });
+        return;
+      }
+      const table = await BilliardTable.findByPk(tableId)
+      if(!table){
+        res.status(404).json({
+          message:'Bàn không thấy'
+        })
         return;
       }
       // 2. So sánh thay đổi
@@ -264,8 +280,34 @@ class TableSessionController {
           };
         }
       }
+      await TableOrderDetail.destroy({
+        where: { sessionId: id },
+      });
       Object.assign(tableSession, updates)
+      if(tableSession.endTime){
+        const playedMinutes = tableSession.fnCalculatePlayedMinutes();
+        tableSession.playedMinutes = playedMinutes;
+        const hourlyRate = table.hourlyRate
+        const price = (playedMinutes / 60) * hourlyRate;
+        const roundedPrice = Math.round(price / 1000) * 1000;
+        tableSession.amountTable = roundedPrice;
+        tableSession.totalAmount = amountOrder + roundedPrice
+      }
       await tableSession.save();
+      console.log(tableSession.playedMinutes)
+      const createdAt = new Date()
+      const aDetail = orders.map(({productId, quantity, price, categoryId}:TableOrderDetail)=>({
+        sessionId: tableSession.id,
+        productId,
+        quantity,
+        price,
+        categoryId,
+        createdAt,
+        createdAtBigint: createdAt.getTime(),
+        totalPrice: quantity * price,
+        uidLogin,
+      }))
+      await TableOrderDetail.bulkCreate(aDetail, {transaction});
       if (Object.keys(changes).length > 0) {
         await LogUpdate.create({
           userId: uidLogin,
@@ -275,6 +317,7 @@ class TableSessionController {
           changes,
         });
       }
+      await transaction?.commit()
       res.status(200).json({
         message: 'Table session updated successfully',
         data: tableSession,

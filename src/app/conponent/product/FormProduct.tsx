@@ -26,29 +26,14 @@ import {
 } from '@mui/material';
 
 import DeleteIcon from '@mui/icons-material/Delete';
-
-export interface FormInputs {
-  name: string;
-  price: number;
-  categoryId: number | string;
-  status: number;
-  image: File | null;
-}
-
-interface ProductProps {
-  id: number | null;
-  name: string;
-  price: number;
-  status: number;
-  image: string | null;
-  categoryId: number | string;
-}
+import { Product } from '@/app/type/Model';
+import { ProductForm } from '@/app/type/model/Product';
 
 interface Props {
-  product: ProductProps;
+  product: Product;
 }
 
-const FormProductPage: React.FC<Props> = ({ product }) => {
+const Form: React.FC<Props> = ({ product }) => {
   const { mutate: addProduct, error: errorCreate, isPending: isPendingCreate } = useCreateProduct();
   const { mutate: updateProduct, error: errorUpdate, isPending: isPendingUpdate } = useUpdateProduct();
   const {
@@ -57,8 +42,8 @@ const FormProductPage: React.FC<Props> = ({ product }) => {
     formState: { errors },
     watch,
     setValue,
-  } = useForm<FormInputs>({
-    defaultValues: { ...product, image: null },
+  } = useForm<ProductForm>({
+    values: { ...product, image: null },
   });
 
   const [showPending, setShowPending] = useState(false);
@@ -77,7 +62,7 @@ const FormProductPage: React.FC<Props> = ({ product }) => {
     }
   };
 
-  const sendData: SubmitHandler<FormInputs> = async (data) => {
+  const sendData: SubmitHandler<ProductForm> = async (data) => {
     const formData = new FormData();
     formData.append('name', data.name);
     formData.append('categoryId', data.categoryId.toString());
@@ -248,12 +233,14 @@ const FormProductPage: React.FC<Props> = ({ product }) => {
           <Select
             labelId="category-label"
             label="Loại sản phẩm *"
-            defaultValue={product.categoryId || ''}
-            {...register('categoryId', { required: 'Vui lòng chọn loại sản phẩm' })}
+            defaultValue={product.categoryId}
+            {...register('categoryId', { required: 'Vui lòng chọn loại sản phẩm',
+              validate: (value) => (Number(value) > 0 ? true : 'Vui lòng chọn loại sản phẩm'),
+             })}
             onChange={(e) => setValue('categoryId', e.target.value)}
           >
-            <MenuItem value="">
-              <em>Chọn loại</em>
+            <MenuItem value="0">
+              Chọn loại
             </MenuItem>
             {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
               <MenuItem key={key} value={key}>
@@ -276,10 +263,12 @@ const FormProductPage: React.FC<Props> = ({ product }) => {
             labelId="status-label"
             label="Trạng thái *"
             defaultValue={product.status || ''}
-            {...register('status', { required: 'Vui lòng chọn trạng thái' })}
+            {...register('status', { required: 'Vui lòng chọn trạng thái',
+              validate: (value) => (Number(value) > 0 ? true : 'Vui lòng chọn trạng thái'),
+            })}
             onChange={(e) => setValue('status', Number(e.target.value))}
           >
-            <MenuItem value="">
+            <MenuItem value="0">
               <em>Chọn trạng thái</em>
             </MenuItem>
             {Object.entries(STATUS_LABEL).map(([key, label]) => (
@@ -343,4 +332,4 @@ const FormProductPage: React.FC<Props> = ({ product }) => {
   );
 };
 
-export default FormProductPage;
+export default Form;

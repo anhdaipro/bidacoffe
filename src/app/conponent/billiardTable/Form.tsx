@@ -2,7 +2,6 @@
 import React, { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useRouter } from "next/navigation";
-
 import { formatNumber } from '@/app/helper';
 import { useCreateBilliardTable, useUpdateBilliardTable } from '@/app/query/useBilliardTable';
 import { useAuthStore } from '@/app/store/useUserStore';
@@ -18,19 +17,14 @@ import {
   Link,
   Stack,
 } from '@mui/material';
+import { BilliardTableForm } from '@/app/type/model/Table';
 
-export interface BilliardTableFormProps {
-  id?: number;
-  tableNumber: number;
-  status: number;
-  type: number | null;
-  hourlyRate: number;
-}
+
 interface Props{
-  table: BilliardTableFormProps;
+  table: BilliardTableForm;
 }
 
-const BilliardTableForm: React.FC<Props> = ({ table }) => {
+const Form: React.FC<Props> = ({ table }) => {
   const user = useAuthStore(state => state.user);
   const router = useRouter();
 
@@ -46,14 +40,14 @@ const BilliardTableForm: React.FC<Props> = ({ table }) => {
     watch,
     setValue,
     formState: { errors },
-  } = useForm<BilliardTableFormProps>({
-    defaultValues: { ...table },
+  } = useForm<BilliardTableForm>({
+    values: { ...table },
   });
 
   const { mutate: addBilliardTable } = useCreateBilliardTable();
   const { mutate: updateBilliardTable } = useUpdateBilliardTable();
 
-  const handleFormSubmit = (data: BilliardTableFormProps) => {
+  const handleFormSubmit = (data: BilliardTableForm) => {
     const payload = { ...data };
     if (table.id) {
       updateBilliardTable({ id: table.id, payload }, {
@@ -134,7 +128,7 @@ const BilliardTableForm: React.FC<Props> = ({ table }) => {
           name="status"
           control={control}
           rules={{ required: 'Trạng thái là bắt buộc' ,
-            validate: (value) => value != 0 || 'Trạng thái là bắt buộc',
+            validate: (value) => value > 0 || 'Trạng thái là bắt buộc',
           }}
           render={({ field }) => (
             <TextField
@@ -161,7 +155,7 @@ const BilliardTableForm: React.FC<Props> = ({ table }) => {
         <Controller
           name="type"
           control={control}
-          rules={{ required: 'Loại bàn là bắt buộc' }}
+          rules={{ required: 'Loại bàn là bắt buộc', validate: (value) => Number(value) > 0 || 'Loại bàn là bắt buộc', }}
           render={({ field }) => (
             <TextField
               {...field}
@@ -174,7 +168,7 @@ const BilliardTableForm: React.FC<Props> = ({ table }) => {
               value={field.value ?? ''}
               onChange={(e) => field.onChange(Number(e.target.value))}
             >
-              <MenuItem value="">Chọn loại bàn</MenuItem>
+              <MenuItem value="0">Chọn loại bàn</MenuItem>
               {Object.entries(TYPE_LABELS).map(([key, label]) => (
                 <MenuItem key={key} value={Number(key)}>
                   {label}
@@ -220,4 +214,4 @@ const BilliardTableForm: React.FC<Props> = ({ table }) => {
   );
 };
 
-export default BilliardTableForm;
+export default Form;

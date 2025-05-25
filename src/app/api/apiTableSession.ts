@@ -1,11 +1,7 @@
 
-
-import { FormSearch } from "../conponent/tableSession/Search";
-import { FormCreate } from "../conponent/tableSession/TableManager";
-import { Detail } from "../conponent/transaction/FormTransaction";
 import axiosInstance from "../hook/axiosInstance";
-import { FinishSession, TableSession, TableSessionForm } from "../type/model/TableSession";
-const fetchTableSessions = async (page:number, limit:number, data: FormSearch) => {
+import { FinishSession, OrderDetailForm, TableSession, TableSessionForm, TableSessionFormSearch } from "../type/model/TableSession";
+const fetchTableSessions = async (page:number, limit:number, data: TableSessionFormSearch) => {
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
@@ -14,7 +10,7 @@ const fetchTableSessions = async (page:number, limit:number, data: FormSearch) =
   const response = await axiosInstance.get(`/tablesession?${params}`);
   return response.data;
 };
-const fetchOrderTableSession = async ({id, payload}:{id:number, payload:Detail[]}) => {
+const fetchOrderTableSession = async ({id, payload}:{id:number, payload:OrderDetailForm[]}) => {
   const { data } = await axiosInstance.post(`/tablesession/order/${id}`, {orders:payload});
   return data.data;
 };
@@ -27,7 +23,7 @@ const createTableSession = async (payload: TableSessionForm) => {
     return data.data;
   };
 
-const startTableSession = async (dataSession: FormCreate) => {
+const startTableSession = async (dataSession: {tableId:number}) => {
   const { data } = await axiosInstance.post('/tablesession/start', dataSession);
   return data.data;
 };
