@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 import { formatNumber } from '../../helper';
 import { useToastStore } from '../../store/toastStore';
 import { v4 as uuidv4 } from 'uuid';
-
 import {
   Box,
   Button,
@@ -26,8 +25,7 @@ import {
 } from '@mui/material';
 
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Product } from '@/app/type/Model';
-import { ProductForm } from '@/app/type/model/Product';
+import { Product, ProductForm } from '@/app/type/model/Product';
 
 interface Props {
   product: Product;
