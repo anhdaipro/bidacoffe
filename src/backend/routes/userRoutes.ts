@@ -5,10 +5,6 @@ const router = Router();
 
 // Đăng nhập
 router.post('/login', UserController.login);
-
-// Tạo người dùng mới
-router.post('/signup', UserController.createUser);
-
 // Lấy danh sách tất cả người dùng
 router.post('/refresh', UserController.refreshToken);
 router.post('/customer/create', UserController.createCustomer);

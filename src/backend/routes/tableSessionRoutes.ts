@@ -3,13 +3,13 @@ import TableSessionController from '../controllers/TableSessionController';
 
 const router = Router();
 
-router.post('/tablesession/create', TableSessionController.createTableSession);
-router.post('/tablesession/start', TableSessionController.startTableSession);
-router.get('/tablesession', TableSessionController.getAllTableSessions);
-router.get('/tablesession/view/:id', TableSessionController.getTableSessionById);
-router.post('/tablesession/update/:id', TableSessionController.updateTableSession);
-router.post('/tablesession/delete/:id', TableSessionController.deleteTableSession);
-router.post('/tablesession/finish/:id', TableSessionController.finishTableSession);
-router.post('/tablesession/order/:id', TableSessionController.orderProductTableSession);
-router.post('/tablesession/reward/:id', TableSessionController.createRewardTableSession);
+router.post('/create', TableSessionController.createTableSession);
+router.post('/start', TableSessionController.startTableSession);
+router.get('', TableSessionController.getAllTableSessions);
+router.get('/view/:id', TableSessionController.getTableSessionById);
+router.post('/update/:id', TableSessionController.updateTableSession);
+router.post('/delete/:id', TableSessionController.deleteTableSession);
+router.post('/finish/:id', TableSessionController.finishTableSession);
+router.post('/order/:id', TableSessionController.orderProductTableSession);
+router.post('/reward/:id', TableSessionController.createRewardTableSession);
 export default router;

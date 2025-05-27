@@ -48,4 +48,6 @@ const apiGetAllCustomer = async (page:number, limit:number, data: CustomerFormSe
     const response = await axios.get(`/api/customer?${params}`);
     return response.data;
 }
+
+
 export {apiSearchCustomer, apiLogin,apiCreateCustomer,apiFindCustomer,apiGetAllCustomer,apiUpdateCustomer,apigetUser}

@@ -4,13 +4,12 @@ import { authenticateJWT } from '../middleware';
 
 const router = Router();
 
-router.post('/payment/create', PaymentController.createPayment);
-router.get('/payment', PaymentController.getAllPayments);
-router.get('/payment/view/:id', PaymentController.getPaymentById);
-router.post('/payment/update/:id', PaymentController.updatePayment);
-router.post('/payment/delete/:id', PaymentController.deletePayment);
-router.get('/payment/method/:method', PaymentController.getPaymentsByMethod);
-router.post('/payment-qr', PaymentController.createQrCode)
-router.post('/excel',upload.single('excel'), PaymentController.uploadExcel)
+router.post('/create', PaymentController.createPayment);
+router.get('', PaymentController.getAllPayments);
+router.get('/view/:id', PaymentController.getPaymentById);
+router.post('/update/:id', PaymentController.updatePayment);
+router.post('/delete/:id', PaymentController.deletePayment);
+router.get('/method/:method', PaymentController.getPaymentsByMethod);
+router.post('/create-qr', PaymentController.createQrCode)
 // router.use(authenticateJWT);
 export default router;

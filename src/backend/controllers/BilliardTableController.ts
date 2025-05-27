@@ -6,9 +6,36 @@ import { Op } from 'sequelize';
 import { LSTATUSACTIVE } from '@form/tableSession';
 import { LSESSIONACTIVE } from '@form/billiardTable';
 import User from '../models/User';
-import { ChangeLog } from '@/type/Model';
+import { ChangeLog } from '@/types/Model';
 import LogUpdate, { TYPE_TABLE } from '../models/LogUpdate';
+import { PageTitlesMap } from '@/types/controller';
 class BilliardTableController {
+    static pageTitles: PageTitlesMap = {
+        createProductTransaction: 'Tạo giao dịch sản phẩm',
+        updateProductTransaction: 'Cập nhật giao dịch sản phẩm',
+        getAllProductTransactions: 'Danh sách giao dịch',
+        getProductTransactionById: 'Thông tin giao dịch',
+        deleteProductTransaction: 'Xóa giao dịch',
+    
+        // Các action khác
+        createBilliardTable: 'Tạo bàn billiard',
+        updateBilliardTable: 'Cập nhật bàn billiard',
+        getAllBilliardTables: 'Danh sách bàn billiard',
+        getBilliardTableById: 'Thông tin bàn billiard',
+        deleteBilliardTable: 'Xóa bàn billiard',
+    
+        createTableSession: 'Tạo phiên chơi',
+        updateTableSession: 'Cập nhật phiên chơi',
+        getAllTableSessions: 'Danh sách phiên chơi',
+        getTableSessionById: 'Thông tin phiên chơi',
+        deleteTableSession: 'Xóa phiên chơi',
+    
+        createTableOrder: 'Tạo đơn hàng bàn',
+        updateTableOrder: 'Cập nhật đơn hàng bàn',
+        getAllTableOrders: 'Danh sách đơn hàng bàn',
+        getTableOrderById: 'Thông tin đơn hàng bàn',
+        deleteTableOrder: 'Xóa đơn hàng bàn',
+    };
   // Lấy danh sách tất cả bàn billiard
     public static async getAll(req: Request, res: Response): Promise<void> {
         try {
@@ -44,14 +71,6 @@ class BilliardTableController {
             tables:aTable,
             tableSessions: aTableSession
         }
-        // console.log(aTableSession)
-        // const aData = aTable.map((table) => {
-        //     const session = aTableSession.find((session) => session.tableId === table.id);
-        //     return {
-        //         ...table.toJSON(),
-        //         currentSession: session ? session : null,
-        //     };
-        // })
         res.status(201).json({data:aData, message: 'Lấy danh sách bàn billiard thành công'});
         } catch (error) {
         console.error(error);

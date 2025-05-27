@@ -7,8 +7,9 @@ import { STATUS_AVAILABLE, STATUS_PAID, STATUS_PLAYING, STATUS_WAIT_PAID } from 
 import { addDay } from '../Format';
 import User from '../models/User';
 import Reward from '../models/Reward';
-import { ChangeLog } from '@/type/Model';
+import { ChangeLog } from '@/types/Model';
 import LogUpdate, { TYPE_SESSION } from '../models/LogUpdate';
+import { PageTitlesMap } from '@/types/controller';
 type TableOrderItem = {
   sessionId: string;
   productId: number;
@@ -21,6 +22,16 @@ type TableOrderItem = {
   uidLogin: number;
 };
 class TableSessionController {
+  static pageTitles: PageTitlesMap = {
+    createTableSession: 'Tạo phiên chơi',
+    updateTableSession: 'Cập nhật phiên chơi',
+    getAllTableSessions: 'Danh sách phiên chơi',
+    getTableSessionById: 'Thông tin phiên chơi',
+    deleteTableSession: 'Xóa phiên chơi',
+    startTableSession: 'Bắt đầu phiên chơi',
+    orderProductTableSession:'Đặt món trong phiên chơi',
+    finishTableSession:'Kết thúc phiên chơi',
+};
   // Tạo một phiên chơi mới
   public static async createTableSession(req: Request, res: Response): Promise<void> {
     const transaction = await TableSession.sequelize?.transaction(); // Sử dụng transaction để đảm bảo tính toàn vẹn dữ liệu
@@ -135,26 +146,7 @@ class TableSessionController {
       });
     }
   }
-  public static async getTablePlaying(req: Request, res: Response): Promise<void> {
-    try {
-      const tableSessions = await TableSession.findAll({
-        where: {
-          isActive: true,
-        },
-      });
-      console.log(123)
-      res.status(201).json({
-        message: 'Table sessions retrieved successfully',
-        data: tableSessions,
-      });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      res.status(500).json({
-        message: 'Error retrieving table sessions',
-        error: errorMessage,
-      });
-    }
-  }
+  
   // Lấy danh sách tất cả các phiên chơi
   public static async getAllTableSessions(req: Request, res: Response): Promise<void> {
     try {
@@ -294,7 +286,6 @@ class TableSessionController {
         tableSession.totalAmount = amountOrder + roundedPrice
       }
       await tableSession.save();
-      console.log(tableSession.playedMinutes)
       const createdAt = new Date()
       const aDetail = orders.map(({productId, quantity, price, categoryId}:TableOrderDetail)=>({
         sessionId: tableSession.id,

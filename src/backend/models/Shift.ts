@@ -14,33 +14,14 @@ export const SHIFT_LABELS: Record<SHIFT_TYPES, string> = {
   };
 class Shift extends Model {
   public id!: number;
-  public employeeId!: number;
-  public startTime!: Date;
-  public endTime!: Date;
-  public shiftType!: number; // 1: Ca sáng, 2: Ca chiều, 3: Ca tối
+  public name!: string;
+  public startTime!: string; // format: "HH:mm:ss"
+  public endTime!: string;   // format: "HH:mm:ss"
+  public description!: string;
+  public status!:number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
-  // Phương thức tĩnh để tính lương
-  public static async calculateMonthlySalary(
-    employeeId: number,
-    startDate: Date,
-    endDate: Date,
-    salaryPerShift: number
-  ): Promise<number> {
-    // Đếm số ca làm việc của nhân viên trong khoảng thời gian
-    const shiftCount = await Shift.count({
-      where: {
-        employeeId,
-        startTime: {
-          [Op.between]: [startDate, endDate],
-        },
-      },
-    });
-
-    // Tính tổng lương
-    return shiftCount * salaryPerShift;
-  }
 }
 
 Shift.init(
@@ -50,26 +31,25 @@ Shift.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    employeeId: {
-      type: DataTypes.INTEGER,
+    name: {
+      type: DataTypes.STRING,
       allowNull: false,
-      references:{
-        model:User,
-        key:'id',
-      }
+    },
+    description: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
     startTime: {
-      type: DataTypes.DATE,
+      type: DataTypes.TIME,
       allowNull: false,
     },
     endTime: {
-      type: DataTypes.DATE,
+      type: DataTypes.TIME,
       allowNull: false,
     },
-    shiftType: {
+    status: {
       type: DataTypes.TINYINT,
       allowNull: false,
-      defaultValue: SHIFT_TYPES.MORNING,
     },
   },
   {

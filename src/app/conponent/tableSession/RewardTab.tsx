@@ -116,7 +116,7 @@ const RewardTab:React.FC<RewardTabProps> = ({tableSessions,selectedSession}) => 
       })
       },
       onError: (error: any) => {
-          console.log(error)
+
           addToast({
               id: uuidv4(),
               message: error.response.data.message,

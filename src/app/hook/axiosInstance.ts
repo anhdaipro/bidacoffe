@@ -9,9 +9,7 @@ const axiosInstance = axios.create({
 const isTokenExpired = (token: string): boolean => {
   try {
     const decoded = jwtDecode<{ exp: number }>(token);
-    console.log(decoded)
     const currentTime = Math.floor(Date.now() / 1000); // Thời gian hiện tại (giây)
-    console.log(decoded.exp < currentTime)
     return decoded.exp < currentTime; // Token đã hết hạn
   } catch (error) {
     return true; // Token không hợp lệ
@@ -27,7 +25,6 @@ axiosInstance.interceptors.request.use(
     
     // Nếu accessToken hết hạn
     if (token && isTokenExpired(token)) {
-      console.log(isTokenExpired(token))
       // Nếu refreshToken còn hạn thì cố gắng refresh
       if (refreshToken && !isTokenExpired(refreshToken)) {
         try {

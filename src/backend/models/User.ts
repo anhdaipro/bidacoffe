@@ -1,6 +1,7 @@
 import { DataTypes, Model,ValidationError, ValidationErrorItem } from 'sequelize';
 import sequelize from '../database/db';
 import bcrypt from 'bcrypt'
+import UserProfile from './UserProfile';
 const ROLE_ADMIN = 1
 const ROLE_EMPLOYEE = 2
 const ROLE_CUSTOMER = 3
@@ -23,13 +24,17 @@ export const ROLE_LABELS: Record<number, string> = {
 class User extends Model {
   public id!: number;
   public name!: string;
+  public email!: string;
   public username!: string;
   public roleId!: number;//tài khoản
   public password!: string;
+  public hashedPassword!: string;
   public phone!: string;//số điện thoại
   public status!: number;
   public address!: string;
   public point!: number;
+  public baseSalary!:number;
+  public dateOfBirth!:Date;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
   public async createCustomer(phone:string){
@@ -62,6 +67,10 @@ User.init(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     username: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -79,6 +88,10 @@ User.init(
       allowNull: true,
     },
     password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    hashedPassword: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -105,6 +118,10 @@ User.init(
 );
 User.afterValidate(async (transaction, options) =>{
 
+})
+User.hasOne(UserProfile,{
+  foreignKey:'userId',
+  as:'rProfile'
 })
 User.beforeValidate(async (user, options) => {
   if(user.roleId == ROLE_CUSTOMER){

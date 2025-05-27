@@ -70,7 +70,7 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
   } = useForm<TableSessionForm>({
     values: tableSession,
   });
-  console.log(watch())
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'orders',
@@ -78,8 +78,7 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
   const {tableId,status,paymentMethod,startTime,endTime} = watch()
   const details = watch('orders');
   const amountOrder = details.reduce((acc, detail) => acc + detail.price * detail.quantity, 0);
-  console.log(tableSession)
-  console.log(startTime)
+
   // Loading state
   if (isLoading || isLoadingTable) {
     return (

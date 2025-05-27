@@ -1,29 +1,29 @@
 import { Request, Response } from 'express';
+import Shift from '../models/Shift'; // Đường dẫn tới model Shift
 import { Op } from 'sequelize';
-import Shift from '../models/Shift';
 
 class ShiftController {
-  // Tạo một ca làm việc mới
+  // Tạo mới một ca làm việc
   public static async createShift(req: Request, res: Response): Promise<void> {
     try {
-      const { employeeId, startTime, endTime, shiftType } = req.body;
+      const { name, description, startTime, endTime, status } = req.body;
 
-      const shift = await Shift.create({
-        employeeId,
+      const newShift = await Shift.create({
+        name,
+        description,
         startTime,
         endTime,
-        shiftType,
+        status,
       });
 
       res.status(201).json({
-        message: 'Shift created successfully',
-        data: shift,
+        message: 'Tạo ca làm việc thành công.',
+        data: newShift,
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       res.status(500).json({
-        message: 'Error creating shift',
-        error: errorMessage,
+        message: 'Lỗi khi tạo ca làm việc.',
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -34,19 +34,18 @@ class ShiftController {
       const shifts = await Shift.findAll();
 
       res.status(200).json({
-        message: 'Shifts retrieved successfully',
+        message: 'Lấy danh sách ca làm việc thành công.',
         data: shifts,
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       res.status(500).json({
-        message: 'Error retrieving shifts',
-        error: errorMessage,
+        message: 'Lỗi khi lấy danh sách ca làm việc.',
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
 
-  // Lấy thông tin một ca làm việc theo ID
+  // Lấy thông tin chi tiết một ca làm việc theo ID
   public static async getShiftById(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
@@ -55,20 +54,19 @@ class ShiftController {
 
       if (!shift) {
         res.status(404).json({
-          message: 'Shift not found',
+          message: 'Không tìm thấy ca làm việc.',
         });
         return;
       }
 
       res.status(200).json({
-        message: 'Shift retrieved successfully',
+        message: 'Lấy thông tin ca làm việc thành công.',
         data: shift,
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       res.status(500).json({
-        message: 'Error retrieving shift',
-        error: errorMessage,
+        message: 'Lỗi khi lấy thông tin ca làm việc.',
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -77,33 +75,33 @@ class ShiftController {
   public static async updateShift(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const { employeeId, startTime, endTime, shiftType } = req.body;
+      const { name, description, startTime, endTime, status } = req.body;
 
       const shift = await Shift.findByPk(id);
 
       if (!shift) {
         res.status(404).json({
-          message: 'Shift not found',
+          message: 'Không tìm thấy ca làm việc.',
         });
         return;
       }
 
       await shift.update({
-        employeeId,
+        name,
+        description,
         startTime,
         endTime,
-        shiftType,
+        status,
       });
 
       res.status(200).json({
-        message: 'Shift updated successfully',
+        message: 'Cập nhật ca làm việc thành công.',
         data: shift,
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       res.status(500).json({
-        message: 'Error updating shift',
-        error: errorMessage,
+        message: 'Lỗi khi cập nhật ca làm việc.',
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }
@@ -117,7 +115,7 @@ class ShiftController {
 
       if (!shift) {
         res.status(404).json({
-          message: 'Shift not found',
+          message: 'Không tìm thấy ca làm việc.',
         });
         return;
       }
@@ -125,99 +123,12 @@ class ShiftController {
       await shift.destroy();
 
       res.status(200).json({
-        message: 'Shift deleted successfully',
+        message: 'Xóa ca làm việc thành công.',
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       res.status(500).json({
-        message: 'Error deleting shift',
-        error: errorMessage,
-      });
-    }
-  }
-
-  // Tính lương hàng tháng cho nhân viên
-  public static async calculateMonthlySalary(req: Request, res: Response): Promise<void> {
-    try {
-      const { employeeId, month, year, salaryPerShift } = req.body;
-
-      // Tính ngày đầu tiên và ngày cuối cùng của tháng
-      const startDate = new Date(year, month - 1, 1); // Ngày đầu tiên của tháng
-      const endDate = new Date(year, month, 0); // Ngày cuối cùng của tháng
-
-      // Đếm số ca làm việc của nhân viên trong tháng
-      const shifts = await Shift.count({
-        where: {
-          employeeId,
-          startTime: {
-            [Op.between]: [startDate, endDate], // Lọc theo tháng
-          },
-        },
-      });
-
-      // Tính tổng lương
-      const totalSalary = shifts * salaryPerShift;
-
-      res.status(200).json({
-        message: 'Monthly salary calculated successfully',
-        data: {
-          employeeId,
-          month,
-          year,
-          totalSalary,
-        },
-      });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      res.status(500).json({
-        message: 'Error calculating monthly salary',
-        error: errorMessage,
-      });
-    }
-  }
-  public static async calculateMonthlySalaryForAll(req: Request, res: Response): Promise<void> {
-    try {
-      const { month, year, salaryPerShift } = req.body;
-
-      // Tính ngày đầu tiên và ngày cuối cùng của tháng
-      const startDate = new Date(year, month - 1, 1); // Ngày đầu tiên của tháng
-      const endDate = new Date(year, month, 0); // Ngày cuối cùng của tháng
-
-      // Lấy danh sách tất cả các nhân viên có ca làm việc trong tháng
-      const shifts = await Shift.findAll({
-        where: {
-          startTime: {
-            [Op.between]: [startDate, endDate], // Lọc theo tháng
-          },
-        },
-        attributes: ['employeeId'], // Chỉ lấy employeeId
-        group: ['employeeId'], // Nhóm theo employeeId
-      });
-
-      // Tính lương cho từng nhân viên
-      // const salaries = await Promise.all(
-      //   shifts.map(async (shift) => {
-      //     const employeeId = shift.employeeId;
-
-      //     // Gọi phương thức calculateMonthlySalary từ model
-      //     const totalSalary = await Shift.calculateMonthlySalary(employeeId, startDate, endDate, salaryPerShift);
-
-      //     return {
-      //       employeeId,
-      //       totalSalary,
-      //     };
-      //   })
-      // );
-
-      res.status(200).json({
-        message: 'Monthly salaries calculated successfully',
-        // data: salaries,
-      });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      res.status(500).json({
-        message: 'Error calculating monthly salaries',
-        error: errorMessage,
+        message: 'Lỗi khi xóa ca làm việc.',
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
   }

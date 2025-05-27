@@ -8,28 +8,20 @@ import { addDay, convertDate } from '../Format';
 import User from '../models/User';
 import redisClient from '../redisClient';
 import { SENCOND_DAY } from '../BidaConst';
-import { ChangeLog } from '@/type/Model';
+import { ChangeLog } from '@/types/Model';
 import LogUpdate, { TYPE_PRODUCT } from '../models/LogUpdate';
-const folder = '/uploads/product'
-
-// Cấu hình multer để lưu file vào thư mục "uploads"
-const uploadDir = path.join(__dirname, `../../..${folder}`);
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // Tạo thư mục nếu chưa tồn tại
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-      cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-      cb(null, uniqueSuffix + '-' + file.originalname);
-    },
-  });
-const upload = multer({ storage,limits:{fileSize: 1 *1024 * 1024} });
-
+import { PageTitlesMap } from '@/types/controller';
+import { folder } from '../routes/productRoutes';
 class ProductController {
+  static pageTitles: PageTitlesMap = {
+    createProduct: 'Tạo sản phẩm',
+    updateProduct: 'Cập nhật sản phẩm',
+    getAllProducts: 'Danh sách sản phẩm',
+    getAllProductsSearch: 'Danh sách sản phẩm',
+    getProductById: 'Thông tin sản phẩm',
+    deleteProduct: 'Xóa sản phẩm',
+    setStatus:'Cập nhật trạng thái'
+  }
   // Tạo một sản phẩm mới
   public static async createProduct(req: Request, res: Response): Promise<void> {
     try {
@@ -320,4 +312,4 @@ class ProductController {
   }
 }
 
-export  {ProductController, upload};
+export default ProductController;

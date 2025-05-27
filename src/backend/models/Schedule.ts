@@ -1,6 +1,9 @@
 import { DataTypes, Model, Op } from 'sequelize';
 import sequelize from '../database/db';
 import User from './User';
+import dayjs from 'dayjs';
+import { ROLE_EMPLOYEE } from '../BidaConst';
+import Shift from './Shift';
 class Schedule extends Model {
   public id!: number;
   public employeeId!: number;
@@ -54,7 +57,59 @@ class Schedule extends Model {
         console.error('Error calculating salary:', error);
         throw new Error('Không thể tính lương');
         }
+  }
+  public async cronGenerateWeeklySchedule(){
+    const today = dayjs();
+    const startOfNextWeek = today.add(1, 'week').startOf('week'); // CN
+    const endOfNextWeek = startOfNextWeek.add(6, 'day');
+
+    // Lấy danh sách nhân viên
+    const employees = await User.findAll({
+      where:{
+        roleId:ROLE_EMPLOYEE
+      }
+    });
+
+    for (const emp of employees) {
+      const lastWeek = await Schedule.findAll({
+        where: {
+          employeeId: emp.id,
+          date: {
+            $between: [
+              startOfNextWeek.subtract(7, 'day').format('YYYY-MM-DD'),
+              startOfNextWeek.subtract(1, 'day').format('YYYY-MM-DD'),
+            ],
+          },
+        },
+      });
+      const shifts = await Shift.findAll({
+        attributes:['id']
+      })
+      const aShiftId = shifts.map(shift=>{
+        return shift.get('id')
+      })
+      const usedShifts = lastWeek.map(s => s.shiftId); // để tránh lặp
+
+      for (let i = 0; i < 7; i++) {
+        const workDay = startOfNextWeek.add(i, 'day').format('YYYY-MM-DD');
+
+        // logic: xoay vòng ca làm, hoặc random không trùng ca
+        const possibleShifts = aShiftId.filter(
+          s => !usedShifts.includes(s)
+        );
+
+        const randomShift = possibleShifts[Math.floor(Math.random() * possibleShifts.length)];
+
+        await Schedule.create({
+          employeeId: emp.id,
+          shift: randomShift,
+          workDay,
+        });
+
+        usedShifts.push(randomShift); // tránh bị trùng trong tuần mới
+      }
     }
+  }
 }
 
 Schedule.init(

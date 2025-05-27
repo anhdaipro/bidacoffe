@@ -25,6 +25,7 @@ import {
   CircularProgress,
   Link as MuiLink,
   Alert,
+  FormHelperText,
   styled
 } from '@mui/material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
@@ -182,7 +183,6 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
       </Box>
     );
   }
-  console.log(searchInput)
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Box display="flex" justifyContent="flex-end" mb={4}>
@@ -215,7 +215,7 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
 
         <Grid container spacing={3} component="form">
           <Grid size={{xs:12, md:6}}>
-            <FormControl fullWidth>
+            <FormControl fullWidth error={!!errors.type} >
               <InputLabel id="transaction-type-label">Loại giao dịch</InputLabel>
               <Controller
                 name="type"
@@ -230,8 +230,15 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
                     labelId="transaction-type-label"
                     label="Loại giao dịch"
                     error={!!errors.type}
+                    renderValue={(selected:any) =>
+                      selected == 0 ? (
+                        <span style={{ color: errors.type ? 'red' : 'inherit' }}>Loại giao dịch</span>
+                      ) : (
+                        TRANSACTION_TYPE_LABELS[selected]
+                      )
+                    }
                   >
-                    <MenuItem value="0">Chọn loại giao dịch</MenuItem>
+                    <MenuItem value="0">Loại giao dịch</MenuItem>
                     {Object.entries(TRANSACTION_TYPE_LABELS).map(([key, value]) => (
                       <MenuItem key={key} value={key}>
                         {value}
@@ -240,11 +247,7 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
                   </Select>
                 )}
               />
-              {errors.type && (
-                <Typography color="error" variant="body2" mt={1}>
-                  {errors.type.message}
-                </Typography>
-              )}
+              <FormHelperText>{errors.type?.message}</FormHelperText>
             </FormControl>
           </Grid>
 
@@ -255,7 +258,7 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
                   name="dateDelivery"
                   control={control}
                   rules={{required:'Ngày giao dịch không để trống'}}
-                  render={({ field }) => (
+                  render={({ field, fieldState: { error }}) => (
                     <DatePicker
                     className="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-fullWidth"
                     value={dateDelivery ? dayjs(dateDelivery) : null}
@@ -268,6 +271,8 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
                     format='DD/MM/YYYY'
                     slotProps={{
                       textField: {
+                        error: !!error,
+                        helperText: error?.message,
                         inputProps: {
                           onKeyDown: (e:any) => e.preventDefault(), // chặn nhập bàn phím
                         },
@@ -277,10 +282,6 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
                   
                   )}
                 />
-                {errors.dateDelivery && (
-                    <Typography color="error" variant="body2" mt={1}>
-                      {errors.dateDelivery.message}
-                    </Typography>)}
               </Box>
             </FormControl>
           </Grid>

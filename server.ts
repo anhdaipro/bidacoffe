@@ -9,6 +9,9 @@ import billiardTableRoutes from '@backend/routes/billiardTableRouter';
 import tableSessionRoutes from '@backend/routes/tableSessionRoutes';
 import reportRoutes from '@backend/routes/reportRouter';
 import paymentRoutes from '@backend/routes/paymentRoutes'
+import employeeRoutes from '@backend/routes/employeeRoute'
+import shiftRoutes from '@backend/routes/shiftRoutes'
+import scheduleRoutes from '@backend/routes/scheduleRouter'
 import bodyParser from  'body-parser';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -29,12 +32,15 @@ app.prepare().then(() => {
   server.use(bodyParser.urlencoded({ extended: true })); 
   //form-urlencoded
   server.use('/api', userRoutes)
-  server.use('/api', productTransactionRoutes)
-  server.use('/api', productRoutes);
-  server.use('/api', paymentRoutes);
-  server.use('/api', tableSessionRoutes);
+  server.use('/api/employee', employeeRoutes)
+  server.use('/api/product-transactions', productTransactionRoutes)
+  server.use('/api/products', productRoutes);
+  server.use('/api/payment', paymentRoutes);
+  server.use('/api/tablesession', tableSessionRoutes);
   server.use('/api/report', reportRoutes);
   server.use('/api/billiard-table', billiardTableRoutes);
+  server.use('/api/shifts', shiftRoutes);
+  server.use('/api/shifts', scheduleRoutes);
   // Route test đơn giản
   server.get('/hello', (_req: Request, res: Response) => {
     res.send('Hello World!');
@@ -50,7 +56,6 @@ app.prepare().then(() => {
   });
 
   httpServer.listen(port, () => {
-    console.log(process.env.JWT_SECRET)
     console.log(`✅ Server running at http://localhost:${port}`);
   });
 })

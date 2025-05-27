@@ -122,7 +122,6 @@ class RewaredController {
           isActive: true,
         },
       });
-      console.log(123)
       res.status(201).json({
         message: 'Table sessions retrieved successfully',
         data: tableSessions,

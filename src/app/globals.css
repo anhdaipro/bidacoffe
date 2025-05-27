@@ -54,6 +54,9 @@ a {
     border-color: #ddd;
     box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
 }
+input[type="file"] {
+  display: none;
+}
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;

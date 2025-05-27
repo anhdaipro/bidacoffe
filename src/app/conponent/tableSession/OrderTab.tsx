@@ -132,7 +132,7 @@ const OrderTab: React.FC<OrderTabProps> = ({ selectedSession, tableSessions, sel
         setTableSession(tableSessionsUpdate);
       },
       onError: (error: any) => {
-        console.log(error);
+
         addToast({
           id: uuidv4(),
           message: error.response.data.message,

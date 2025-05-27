@@ -15,7 +15,7 @@ export interface TransactionDetailForm {
 }
 export interface TransactionForm {
     id?: number;
-    type: number;
+    type: number | string;
     totalAmount: number;
     dateDelivery: string;
     details: TransactionDetailForm[];

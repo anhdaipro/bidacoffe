@@ -1,106 +1,27 @@
 "use client"
-import { formatNumber } from '@/app/helper';
-import { useCreateBilliardTable,useUpdateBilliardTable } from '@/app/query/useBilliardTable';
+import {
+  Box,
+  Button,
+  Grid,
+  MenuItem,
+  Select,
+  TextField,
+  Typography,
+  FormControl,
+  InputLabel,
+  FormHelperText,
+  Link,
+} from '@mui/material';
 import { useAuthStore } from '@/app/store/useUserStore';
-import { FlexBox, Title } from '@/app/type/styles';
 import { ROLE_ADMIN } from '@/backend/BidaConst';
 import { STATUS_LABELS } from '@/form/user';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import styled from 'styled-components';
 import { useRouter } from "next/navigation";
 import { useCreateCustomer, useUpdateCustomer } from '@/app/query/useUser';
 import { useToastStore } from '../../store/toastStore';
 import { v4 as uuidv4 } from 'uuid'
 import { CustomerForm } from '@/app/type/model/Customer';
-export const FormContainer = styled.div`
-  background-color: #f9f9f9;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-`;
-
-export const InputGroup = styled.div`
-  margin-bottom: 16px;
-`;
-
-export const Input = styled.input`
-  width: 100%;
-  padding: 8px;
-  margin-top: 4px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 14px;
-
-  &:focus {
-    border-color: #007bff;
-    outline: none;
-  }
-
-  &.error {
-    border-color: #ff4d4d;
-  }
-`;
-
-export const Label = styled.label`
-  font-size: 14px;
-  font-weight: bold;
-  color: #333;
-`;
-
-export const SubmitButton = styled.button`
-  background-color: #4caf50;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #45a049;
-  }
-`;
-
-export const ErrorMessage = styled.p`
-  color: #ff4d4d;
-  font-size: 12px;
-  margin-top: 4px;
-`;
-export const Select = styled.select`
-  width: 100%;
-  padding: 8px;
-  margin-top: 4px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  font-size: 14px;
-
-  &:focus {
-    border-color: #007bff;
-    outline: none;
-  }
-
-  &.error {
-    border-color: #ff4d4d;
-  }
-`;
-export const StyledLink = styled.a`
-  text-decoration: none; /* Loại bỏ gạch chân */
-  color: #007bff; /* Màu xanh cho liên kết */
-  font-size: 14px; /* Kích thước chữ */
-  font-weight: bold; /* Chữ đậm */
-  padding: 8px 12px; /* Khoảng cách bên trong */
-  border: 1px solid #007bff; /* Viền xanh */
-  border-radius: 5px; /* Bo góc */
-  transition: background-color 0.3s ease, color 0.3s ease; /* Hiệu ứng hover */
-
-  &:hover {
-    background-color: #007bff; /* Nền xanh khi hover */
-    color: white; /* Chữ trắng khi hover */
-  }
-`;
-
 interface Props{
   customer: CustomerForm;
 }
@@ -168,56 +89,77 @@ const Form: React.FC<Props> = ({ customer }) => {
   
   const title = customer.id ? 'Cập nhật' : 'Tạo mới';
   return (
-    <FormContainer>
-      <FlexBox justify='flex-end' padding='24px'>
-      <StyledLink href='/customer'>Danh sách</StyledLink>
-      </FlexBox>
-      <Title align='center'>{title} khách hàng</Title>
-      <form onSubmit={handleSubmit(handleFormSubmit)}>
-        {/* Input Group for Table Number */}
-        <InputGroup>
-          <Label htmlFor="name">Tên</Label>
-          <Input
-            id="name"
-            {...register('name', {  })}
-          />
-          {errors.name && <ErrorMessage>{errors.name.message}</ErrorMessage>}
-        </InputGroup>
+    <Box sx={{ maxWidth: 600, margin: 'auto', p: { xs: 2, sm: 3, md: 4 } }}>
+      <Box display="flex" justifyContent="flex-end" mb={2}>
+        
+        <Button variant="outlined" size="small" component={Link} href="/customer">
+            Danh sách
+          </Button>
+        
+      </Box>
 
-        {/* Input Group for Status */}
-        <InputGroup>
-          <Label htmlFor="status">Trạng thái</Label>
-          <Select
-            id="status"
-            {...register('status', { required: 'Trạng thái là bắt buộc',
-              validate: (value) => (Number(value) > 0 ? true : 'Trạng thái là bắt buộc'),
-             })}
-          >
-            <option value="0">Chọn trạng thái</option>
-            {Object.entries(STATUS_LABELS).map(([key, value]) => (
-              <option key={key} value={key}>
-                {value}
-              </option>
-            ))}
-          </Select>
-          {errors.status && <ErrorMessage>{errors.status.message}</ErrorMessage>}
-        </InputGroup>
+      <Typography variant="h5" align="center" gutterBottom>
+        {title} khách hàng
+      </Typography>
 
-        {/* Input Group for Type */}
-        <InputGroup>
-          <Label htmlFor="phone">Số điện thoại</Label>
-          <Input
-            id="phone"
-            {...register('phone', {required: 'SĐT không để trống'  })}
-          />
-          {errors.phone && <ErrorMessage>{errors.phone.message}</ErrorMessage>}
-        </InputGroup>
+      <Box component="form" onSubmit={handleSubmit(handleFormSubmit)} noValidate>
+        <Grid container spacing={2}>
+          {/* Tên */}
+          <Grid size={{xs:12}}>
+            <TextField
+              fullWidth
+              label="Tên"
+              {...register('name')}
+              error={Boolean(errors.name)}
+              helperText={errors.name?.message}
+            />
+          </Grid>
 
-        {/* Input Group for Hourly Rate */}
-       
-        <SubmitButton type="submit">{title}</SubmitButton>
-      </form>
-    </FormContainer>
+          {/* Trạng thái */}
+          <Grid size={{xs:12}}>
+            <FormControl fullWidth error={Boolean(errors.status)}>
+              <InputLabel id="status-label">Trạng thái</InputLabel>
+              <Select
+                labelId="status-label"
+                id="status"
+                defaultValue=""
+                {...register('status', {
+                  required: 'Trạng thái là bắt buộc',
+                  validate: (value) =>
+                    Number(value) > 0 ? true : 'Trạng thái là bắt buộc',
+                })}
+              >
+                <MenuItem value={0}>Chọn trạng thái</MenuItem>
+                {Object.entries(STATUS_LABELS).map(([key, value]) => (
+                  <MenuItem key={key} value={key}>
+                    {value}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>{errors.status?.message}</FormHelperText>
+            </FormControl>
+          </Grid>
+
+          {/* Số điện thoại */}
+          <Grid size={{xs:12}}>
+            <TextField
+              fullWidth
+              label="Số điện thoại"
+              {...register('phone', { required: 'SĐT không để trống' })}
+              error={Boolean(errors.phone)}
+              helperText={errors.phone?.message}
+            />
+          </Grid>
+
+          {/* Nút Submit */}
+          <Grid size={{xs:12}}>
+            <Button type="submit" fullWidth variant="contained">
+              {title}
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
   );
 };
 

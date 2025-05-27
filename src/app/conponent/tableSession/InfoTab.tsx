@@ -76,7 +76,6 @@ const InfoTab:React.FC<InfoTab> = ({selectedSession, tableSessions,selectedTable
   if(!selectedTable){
     return <div></div>
   }
-  console.log('selectedSession',selectedSession)
   useEffect(() => {
     if (!selectedSession) return;
     timeoutRef.current = setInterval(() => {
@@ -87,7 +86,6 @@ const InfoTab:React.FC<InfoTab> = ({selectedSession, tableSessions,selectedTable
       const hours = Math.floor(minutes / 60);
       const mins = minutes % 60;
       setElapsedTime(`${hours} giờ ${mins} phút`);
-      console.log('elapsedTime', mins);
     }, 60*1000);
     return () => {
       if (timeoutRef.current) clearInterval(timeoutRef.current);
@@ -121,7 +119,6 @@ const InfoTab:React.FC<InfoTab> = ({selectedSession, tableSessions,selectedTable
         // );
       },
       onError: (error: any) => {
-        console.log(error)
         addToast({
           id: uuidv4(),
           message: error.response.data.message,
@@ -156,7 +153,6 @@ const InfoTab:React.FC<InfoTab> = ({selectedSession, tableSessions,selectedTable
         setTable({...selectedTable, status: STATUS_WAIT_PAID})
       },
       onError: (error: any) => {
-        console.log(error)
         addToast({
           id: uuidv4(),
           message: error.response.data.message,

@@ -24,20 +24,7 @@ import {
 } from '@mui/material';
 
 import Search from './Search';
-import { ProductFormSearch } from '@/app/type/model/Product';
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  status: number;
-  image: string;
-  categoryId: number;
-  canUpdate: boolean;
-  canDelete: boolean;
-  createdAt: string;
-  rUidLogin: { name: string };
-}
+import { ProductFormSearch, ProductIndex } from '@/app/type/model/Product';
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -141,7 +128,7 @@ const Index = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {products.map((product: Product, index: number) => (
+            {products.map((product: ProductIndex, index: number) => (
               <TableRow key={product.id}>
                 <TableCell>{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                 <TableCell>{product.name}</TableCell>

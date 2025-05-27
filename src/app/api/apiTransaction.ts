@@ -19,9 +19,8 @@ const createTransaction = async (dataTransaction: TransactionForm) => {
     return data.data;
   };
 const updateTransaction= async ({ id, payload }: { id: number, payload: TransactionForm }) => {
-  console.log(payload)
-const { data } = await axiosInstance.post(`/product-transactions/update/${id}`, payload);
-return data.data;
+  const { data } = await axiosInstance.post(`/product-transactions/update/${id}`, payload);
+  return data.data;
 };
 const deleteTransaction = async (id:number) =>{
     const { data } = await axiosInstance.post(`/product-transactions/delete/${id}`);

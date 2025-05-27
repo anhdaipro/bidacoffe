@@ -21,3 +21,22 @@ export const addDay = (dateStr: string | Date, num: number): Date => {
     date.setDate(date.getDate() + num);
     return date;
   };
+
+export function slugify(str:string) {
+    return str
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")   // bỏ dấu
+      .replace(/[^a-z]/g, "");           // chỉ giữ chữ cái thường
+  }
+ export function generateUsername(fullName:string) {
+    const parts = fullName.trim().split(/\s+/); // tách tên theo khoảng trắng
+    const lastName = slugify(parts[parts.length - 1]); // phần cuối là tên chính
+    const initials = parts
+      .slice(0, -1)                      // phần còn lại là họ và tên đệm
+      .map(word => slugify(word)[0])    // lấy chữ cái đầu
+      .join('');
+  
+    return `${lastName}${initials}`;
+}
+  

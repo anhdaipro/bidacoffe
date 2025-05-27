@@ -204,7 +204,7 @@ class ReportController {
                 group: ['productId'],
                 // order: [[fn('SUM', col('quantity')), 'DESC']],
             });
-            console.log(data)
+
             const formattedData = data.map((item) => {
                 const itemJson = item.toJSON()
                 return {

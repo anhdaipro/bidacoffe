@@ -13,7 +13,7 @@ class BilliardTable extends Model {
     return await BilliardTable.count();
   }
   public async countTablePlaying(){
-    return await BilliardTable.findAll({
+    const aTable = await BilliardTable.findAll({
       where:{
         status:STATUS_PLAYING
       },

@@ -54,7 +54,6 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
     handleChange('uidLogin', item ? item?.id.toString() : '')
     setItem(item)
   }
-  console.log(formData)
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box sx={{

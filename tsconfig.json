@@ -22,10 +22,11 @@
     "paths": {
       "@/*": ["./src/*"],
       "@backend/*": ["src/backend/*"],
-      "@form/*": ["src/form/*"]
+      "@form/*": ["src/form/*"],
+      "@uploads/*": ["uploads/*"],
     }
   },
   "typeRoots": ["./node_modules/@types", "./src/types"],
-  "include": ["src/**/*","next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/type/express.d.ts "],
+  "include": ["src/**/*","next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/types/express.d.ts "],
   "exclude": ["node_modules"]
 }

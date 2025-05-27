@@ -2,16 +2,29 @@
 'use client';
 import React, { useState,useEffect } from 'react';
 import Link from 'next/link';
-import {useProducts, useUpdateStatusProduct } from '../../query/useProducts';
 import { useControlStore } from '../../store/useStore';
 import { STATUS_ACTIVE, STATUS_INACTIVE, STATUS_LABELS } from '@/form/user';
 import { formatDate, formatNumber } from '../../helper';
-import { FlexBox } from '../../type/styles';
 import { useAuthStore } from '../../store/useUserStore';
 import { ROLE_ADMIN } from '@/backend/BidaConst';
 import { usegetAllUsers } from '@/app/query/useUser';
 import Search from './Search';
 import { Customer, CustomerFormSearch } from '@/app/type/model/Customer';
+import {
+    Box,
+    Button,
+    Link as MuiLink,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography,
+    Paper,
+    Pagination,
+    Stack,
+  } from '@mui/material';
 const Index = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 20; // Số sản phẩm trên mỗi trang
@@ -20,9 +33,8 @@ const Index = () => {
         uidLogin:'',
     });
     const { data, isLoading } = usegetAllUsers(currentPage, itemsPerPage,formData);
-    const updateStore  = useControlStore(state=>state.updateStore);
+    
     const user = useAuthStore(state=>state.user)
-    const {mutate: updateStatus, error} = useUpdateStatusProduct();
     
     if (isLoading || !user) {
         return (
@@ -56,74 +68,82 @@ const Index = () => {
         setCurrentPage(page);
         }
     };
-    // Lấy dữ liệu sản phẩm từ API (giả sử API trả về dữ liệu sản phẩm)
-    const handleUpdate = (id:number,statusCurrent:number) =>{
-        const status = statusCurrent == STATUS_ACTIVE ? STATUS_INACTIVE : STATUS_ACTIVE
-        updateStatus({id,status}, {
-        })
-    }
+    
     const setFormSearch = (data:CustomerFormSearch)=>{
         setFormData(prev => ({ ...prev, ...data }));
-        console.log(formData)
     }
-    console.log(formData)
     return (
-        <div className="product-container">
-            <Search setFormSearch={setFormSearch} form={formData}/>
-            {user?.roleId == ROLE_ADMIN && <FlexBox justify='flex-end' padding='24px'>
-                <Link href="/customer/create" className="create-btn">Tạo mới</Link>
-            </FlexBox>}
-            
-            <h1 className="product-title">Danh sách khách hàng</h1>
-            <table className="product-table">
-                <thead>
-                    <tr>
-                        <th>STT</th>
-                        <th>Tên Kh</th>
-                        <th>Số điện thoại</th>
-                        <th>Trạng thái</th>
-                        <th>Điểm tích lũy</th>
-                        <th>Ngày tạo</th>
-                        <th>Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {aCustomer.map((customer:Customer,index:number) => (
-                    <tr key={customer.id}>
-                        <td>{index+1}</td>
-                        <td>{customer.name}</td>
-                        <td>{customer.phone}</td>
-                        <td>{STATUS_LABELS[customer.status]}</td>
-                        <td>{customer.point}</td>
-                        <td>{formatDate(customer.createdAt)}</td>
-                        <td>
-                            <div style={{display:'flex', flexDirection:'column', gap:'6px'}}>
-                            {user.roleId == ROLE_ADMIN && <Link href={`/customer/update/${customer.id}`} className="edit-btn">Chỉnh sửa</Link>}
-                            {/* {user.roleId == ROLE_ADMIN && <button
-                            onClick={() => handleDelete(product.id)}
-                            className="delete-btn"
-                            >
-                            Xóa
-                            </button>} */}
-                            </div>
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
-            {/* Phân trang */}
-            <div className="pagination">
-                {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                    key={i}
-                    onClick={() => handlePageChange(i + 1)}
-                    className={`pagination-btn ${currentPage === i + 1 ? 'active' : ''}`}
+        <Box className="product-container" sx={{ p: { xs: 2, md: 4 } }}>
+        <Search setFormSearch={setFormSearch} form={formData} />
+
+        {user?.roleId === ROLE_ADMIN && (
+            <Box display="flex" justifyContent="flex-end" mb={2}>
+                <Button
+                    component={Link}
+                    href="/customer/create"
+                    variant="contained"
+                    color="primary"
+                    size="large"
                 >
-                    {i + 1}
-                </button>
+                Tạo mới
+            </Button>
+            </Box>
+        )}
+
+        <Typography variant="h5" gutterBottom fontWeight={600}>
+            Danh sách khách hàng
+        </Typography>
+
+        <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
+            <Table size="small">
+            <TableHead>
+                <TableRow>
+                <TableCell>STT</TableCell>
+                <TableCell>Tên KH</TableCell>
+                <TableCell>Số điện thoại</TableCell>
+                <TableCell>Trạng thái</TableCell>
+                <TableCell>Điểm tích lũy</TableCell>
+                <TableCell>Ngày tạo</TableCell>
+                <TableCell>Hành động</TableCell>
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                {aCustomer.map((customer: Customer, index: number) => (
+                <TableRow key={customer.id}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{customer.name}</TableCell>
+                    <TableCell>{customer.phone}</TableCell>
+                    <TableCell>{STATUS_LABELS[customer.status]}</TableCell>
+                    <TableCell>{customer.point}</TableCell>
+                    <TableCell>{formatDate(customer.createdAt)}</TableCell>
+                    <TableCell>
+                    <Stack spacing={1} direction="column">
+                        {user.roleId === ROLE_ADMIN && (
+                        <Link href={`/customer/update/${customer.id}`} passHref legacyBehavior>
+                            <MuiLink underline="none">
+                            <Button variant="outlined" size="small">Chỉnh sửa</Button>
+                            </MuiLink>
+                        </Link>
+                        )}
+                        {/* <Button variant="outlined" color="error" size="small" onClick={() => handleDelete(customer.id)}>Xóa</Button> */}
+                    </Stack>
+                    </TableCell>
+                </TableRow>
                 ))}
-            </div>
-        </div>
+            </TableBody>
+            </Table>
+        </TableContainer>
+
+        {/* Phân trang */}
+        <Box display="flex" justifyContent="center" mt={4}>
+            <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={(_, page) => handlePageChange(page)}
+            color="primary"
+            />
+        </Box>
+    </Box>
     );
 };
 

@@ -74,7 +74,6 @@ const Modal: React.FC = () => {
     const handleConfirm = async () => {
         switch (action) {
             case 'delete-transaction':
-              console.log('delete')
                 deleteTransaction(id,{
                   onSuccess :() =>{
                     

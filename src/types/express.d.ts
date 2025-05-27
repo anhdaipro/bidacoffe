@@ -8,6 +8,8 @@ declare global {
   namespace Express {
     interface Request {
       user?: User;
+      controllerName?: string;
+      actionName?: string;
     }
   }
 }

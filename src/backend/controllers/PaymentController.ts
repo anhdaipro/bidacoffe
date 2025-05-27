@@ -11,8 +11,16 @@ import BilliardTable from '../models/BilliardTable';
 import ProductTransaction from '../models/ProductTransaction';
 import User from '../models/User';
 import Reward from '../models/Reward';
+import { PageTitlesMap } from '@/types/controller';
 export const upload = multer({ dest: "uploads/" });
 class PaymentController {
+  static pageTitles: PageTitlesMap = {
+    createPayment: 'Tạo thanh toán',
+    updatePayment: 'Cập nhật thanh toán',
+    getAllPayments: 'Danh sách thanh toán',
+    getPaymentById: 'Thông tin thanh toán',
+    deletePayment: 'Xóa thanh toán',
+};
   // Tạo một thanh toán mới
   public static async createPayment(req: Request, res: Response): Promise<void> {
     try {

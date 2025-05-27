@@ -27,10 +27,8 @@ export const  authenticateJWT = async (
     return;
   }
   try {
-      console.log('TOKEN:', token);
         const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
-        console.log(decoded)
-        const user = await User.findByPk(decoded.id )
+        const user = await User.findByPk(decoded.id)
         if (!user) {
             throw new Error()
         }

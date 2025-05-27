@@ -19,6 +19,7 @@ class UserController {
             const existingUser = await User.findOne({
                 where: {
                     [Op.or]: [{ phone }, { phone }],
+                    roleId:ROLE_CUSTOMER
                 },
             });
 
@@ -36,7 +37,8 @@ class UserController {
                 phone,
                 name,
                 status,
-                password: hashedPassword,
+                password,
+                hashedPassword,
                 roleId,
             });
 
@@ -54,15 +56,12 @@ class UserController {
                 res.status(404).json({ message: 'Người dùng không tồn tại' });
                 return;
             }
-            const { phone,name } = req.body;
-            const username = phone
-            const password = '123123'
-            const roleId = ROLE_CUSTOMER;
-            const status = STATUS_ACTIVE
+            const { phone,name,status } = req.body;
             // Kiểm tra xem username hoặc phone đã tồn tại chưa
             const existingUser = await User.findOne({
                 where: {
                     phone: phone,
+                    roleId:ROLE_CUSTOMER,
                     id: {
                     [Op.ne]: id
                     }
@@ -88,7 +87,7 @@ class UserController {
     }
     public static async createUser(req: Request, res: Response): Promise<void> {
         try {
-            const { username, phone, password, roleId, address,name } = req.body;
+            const { username, phone, password, roleId, address, name, baseSalary,dateOfBirth } = req.body;
             
             // Kiểm tra xem username hoặc phone đã tồn tại chưa
             const existingUser = await User.findOne({
@@ -96,7 +95,6 @@ class UserController {
                     [Op.or]: [{ username }, { phone }],
                 },
             });
-            console.log(existingUser)
             if (existingUser) {
                 res.status(400).json({ message: 'Tên người dùng hoặc số điện thoại đã tồn tại' });
                 return;
@@ -109,7 +107,11 @@ class UserController {
             const newUser = await User.create({
                 username,
                 phone,
-                password: hashedPassword,
+                name,
+                password,
+                baseSalary,
+                dateOfBirth,
+                hashedPassword,
                 roleId,
                 address
             });
@@ -121,39 +123,41 @@ class UserController {
         }
     }
     public static async login(req: Request, res: Response): Promise<void> {
-    try {
-        const { identifier, password } = req.body;
-        const user = await User.findOne({
-            where: {
-            [Op.or]: [{ username: identifier }, { phone: identifier }],
-            },
-            // attributes:['id', 'name', 'username', 'roleId', 'phone', 'status', 'address'],
-        });
-    
-        if (!user) {
-            res.status(404).json({ message: 'Người dùng không tồn tại' });
-            return;
-        }
-        const isPasswordValid = user.password && await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            res.status(401).json({ message: 'Mật khẩu không chính xác' });
-            return;
-        }
-    
-        const accessToken = jwt.sign(
-            { id: user.id, roleId: user.roleId },
-            JWT_SECRET,
-            { expiresIn: '1h' } // Access token hết hạn sau 45 phút
-        );
-        const refreshToken = jwt.sign(
-            { id: user.id,roleId: user.roleId },
-            REFRESH_TOKEN_SECRET,
-        );
-        // const refreshToken = crypto.randomBytes(64).toString('hex'); // Tạo refresh token
-        res.json({ accessToken, refreshToken, user});
+        try {
+            const { identifier, password } = req.body;
+            const user = await User.findOne({
+                where: {
+                [Op.or]: [{ username: identifier }, { phone: identifier }],
+                },
+                // attributes:['id', 'name', 'username', 'roleId', 'phone', 'status', 'address'],
+            });
+        
+            if (!user) {
+                res.status(404).json({ message: 'Người dùng không tồn tại' });
+                return;
+            }
+            const isPasswordValid = user.password && await bcrypt.compare(password, user.hashedPassword);
+            if (!isPasswordValid) {
+                res.status(401).json({ message: 'Mật khẩu không chính xác' });
+                return;
+            }
+        
+            const accessToken = jwt.sign(
+                { id: user.id, roleId: user.roleId },
+                JWT_SECRET,
+                { expiresIn: '1h' } // Access token hết hạn sau 45 phút
+            );
+            const refreshToken = jwt.sign(
+                { id: user.id,roleId: user.roleId },
+                REFRESH_TOKEN_SECRET,
+            );
+            // const refreshToken = crypto.randomBytes(64).toString('hex'); // Tạo refresh token
+            const { password:passUser,hashedPassword, createdAt, updatedAt, ...safeUser } = user.toJSON();
+
+            res.json({ accessToken, refreshToken, user:safeUser});
         } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: error });
+            console.error(error);
+            res.status(500).json({ message: error });
         }
     }
     public static async refreshToken(req: Request, res: Response): Promise<void> {
@@ -175,7 +179,6 @@ class UserController {
                 JWT_SECRET, {
                 expiresIn: '1h',
             });
-            console.log(newAccessToken)
             res.status(201).json({ accessToken: newAccessToken });
         }catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
@@ -197,7 +200,7 @@ class UserController {
     public static async getUserById(req: Request, res: Response): Promise<void> {
         try {
         const { id } = req.params;
-        const user = await User.findByPk(id);
+        const user = await User.findByPk(id,{attributes:{exclude:['password, hashedPassword']}});
 
         if (!user) {
             res.status(404).json({ message: 'Người dùng không tồn tại' });
@@ -214,12 +217,13 @@ class UserController {
         try {
         const { phone } = req.body;
         const user = await User.findOne({
-            where:{phone:phone}
+            where:{phone:phone},
+            attributes:{exclude:['password, hashedPassword']}
         });
 
         if (!user) {
             const newUser = await (new User).createCustomer(phone)
-            res.status(200).json({data:null, message:'Chưa có khách hàng'});
+            res.status(200).json({data:newUser, message:'Chưa có khách hàng'});
             return;
         }
 
@@ -233,7 +237,7 @@ class UserController {
     public static async updateUser(req: Request, res: Response): Promise<void> {
         try {
         const { id } = req.params;
-        const { username, phone, password, roleId } = req.body;
+        const { username, phone, roleId } = req.body;
 
         const user = await User.findByPk(id);
 
@@ -246,7 +250,6 @@ class UserController {
         await user.update({
             username: username || user.username,
             phone: phone || user.phone,
-            password: password ? await bcrypt.hash(password, 10) : user.password,
             roleId: roleId || user.roleId,
         });
 
@@ -370,6 +373,22 @@ class UserController {
                 return {id:item.id, name:item.name, label: `${item.name} - ${item.phone}`}
             })
             res.status(200).json(aData);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Đã xảy ra lỗi khi tìm kiếm người dùng' });
+        }
+    }
+    public static async resetPassword(req: Request, res: Response): Promise<void> {
+        try {
+            const {passwordNew} = req.body;
+            const user = req.user
+            if (!user) {
+                res.status(400).json({ message: 'Người dùng không tồn tại' });
+                return;
+            }
+            const hashedPassword = await bcrypt.hash(passwordNew, 10);
+            user.password = hashedPassword;
+            await user.save();
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Đã xảy ra lỗi khi tìm kiếm người dùng' });

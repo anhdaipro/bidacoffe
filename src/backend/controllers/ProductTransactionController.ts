@@ -4,10 +4,20 @@ import ProductTransactionDetail from '../models/ProductTransactionDetail';
 import { addDay, convertDate, convertDateFormat } from '../Format';
 import { Op } from 'sequelize';
 import User from '../models/User';
-import { ChangeLog } from '@/type/Model';
+import { ChangeLog } from '@/types/Model';
 import LogUpdate, { TYPE_TRANSACTION } from '../models/LogUpdate';
+import { PageTitlesMap } from '@/types/controller';
 class ProductTransactionController {
   // Tạo một ProductTransaction và các ProductTransactionDetail liên quan
+  static pageTitles: PageTitlesMap = {
+    createProductTransaction: 'Tạo giao dịch sản phẩm',
+    updateProductTransaction: 'Cập nhật giao dịch sản phẩm',
+    getAllProductTransactions: 'Danh sách giao dịch',
+    getProductTransactionById:'Thông tin giao dịch',
+    deleteProductTransaction:'Xóa giao dịch',
+
+    // ... các action khác
+  };
   public static async createProductTransaction(req: Request, res: Response): Promise<void> {
     const transaction = await ProductTransaction.sequelize?.transaction(); // Sử dụng transaction để đảm bảo tính toàn vẹn dữ liệu
     try {
@@ -90,7 +100,6 @@ class ProductTransactionController {
           ...(dateTo && { [Op.lte]: addDay(dateTo as string,1)  }), // Ngày kết thúc
         };
       }
-      console.log(where)
       // Truy vấn cơ sở dữ liệu với phân trang và điều kiện tìm kiếm
       const { rows: productTransactions, count: total } = await ProductTransaction.findAndCountAll({
         where,
@@ -279,5 +288,8 @@ class ProductTransactionController {
     }
   }
 }
-
+ProductTransactionController.pageTitles = {
+  createProductTransaction: 'Tạo giao dịch sản phẩm',
+  updateProductTransaction: 'Cập nhật giao dịch sản phẩm',
+};
 export default ProductTransactionController;
