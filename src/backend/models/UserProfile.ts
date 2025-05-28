@@ -52,9 +52,9 @@ UserProfile.init({
     type: DataTypes.DATE,
     allowNull: true,
   },
-  position: {
+  typeEducation: {
     type: DataTypes.TINYINT,
-    allowNull: false,
+    allowNull: true,
   },
   cccdBack: {
     type: DataTypes.STRING,
@@ -72,7 +72,7 @@ UserProfile.init({
     type: DataTypes.TINYINT,
     allowNull: true,
   },
-  bankFullName: {
+  bankFullname: {
     type: DataTypes.STRING,
     allowNull: true,
   },

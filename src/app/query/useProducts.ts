@@ -26,6 +26,7 @@ export const useProduct = (id:number) => {
             return await fetchProduct(id)
         },
         staleTime:1000*6,
+        
         refetchOnWindowFocus: false, // ✅ KHÔNG refetch khi quay lại tab
     })
   };

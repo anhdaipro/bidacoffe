@@ -1,6 +1,8 @@
 import { DataTypes, Model, Op } from 'sequelize';
 import sequelize from '../database/db';
 import User from './User';
+import redisClient from '../redisClient';
+import { SENCOND_DAY } from '../BidaConst';
   // Định nghĩa các loại ca làm việc
 export enum SHIFT_TYPES {
     MORNING= 1,
@@ -21,7 +23,18 @@ class Shift extends Model {
   public status!:number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
-
+  public async getAllShift(){
+    const cacheKey = 'shifts'
+    const cachedData = await redisClient.get(cacheKey);
+    if (cachedData) {
+      const parsedData = JSON.parse(cachedData);
+      return parsedData;
+    }
+    const shifts = await Shift.findAll({});
+    // Lưu kết quả vào cache
+    await redisClient.set(cacheKey, JSON.stringify(shifts), 'EX', SENCOND_DAY); // Cache trong 1 giờ
+    return shifts;
+  }
 }
 
 Shift.init(

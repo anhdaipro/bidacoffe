@@ -19,13 +19,44 @@ import React,{useState} from 'react'
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import {Save} from '@mui/icons-material'
+import { useGetEmployeeSchedule } from '@/app/query/useEmployee';
+import { Employee } from '@/app/type/model/Employee';
+import { usegetAllShift } from '@/app/query/useShift';
+import { Shift } from '@/app/type/model/Shift';
 const AssignmentPanel = () => {
     const [selectedDate, setSelectedDate] = useState('');
-    
-    const [employees, setEmployees] = useState([
-      { id: 1, name: 'Nguyễn Văn A', shifts: { '2023-11-20': 'Ca sáng' } },
-      { id: 2, name: 'Trần Thị B', shifts: { '2023-11-20': 'Ca chiều' } }
-    ]);
+    const {data:employees, isLoading,error} = useGetEmployeeSchedule();
+    const {data:shifts,isLoading:isLoadingShift,error:errorShif} = usegetAllShift();
+    if(isLoading || error || isLoadingShift || errorShif){ 
+      return (
+        <div className="loading-container">
+          <svg
+            className="loading-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 100 100"
+            fill="none"
+          >
+            <circle
+              cx="50"
+              cy="50"
+              r="45"
+              stroke="#007bff"
+              strokeWidth="10"
+              strokeLinecap="round"
+              strokeDasharray="283"
+              strokeDashoffset="75"
+              className="loading-circle"
+            />
+          </svg>
+          <p className="loading-text">Đang tải dữ liệu...</p>
+        </div>
+      );
+    }
+    console.log(shifts)
+    // const [employees, setEmployees] = useState([
+    //   { id: 1, name: 'Nguyễn Văn A', shifts: { '2023-11-20': 'Ca sáng' } },
+    //   { id: 2, name: 'Trần Thị B', shifts: { '2023-11-20': 'Ca chiều' } }
+    // ]);
   
     return (
       <Box>
@@ -56,7 +87,7 @@ const AssignmentPanel = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {employees.map(employee => (
+              {employees.map((employee:Employee) => (
                 <TableRow key={employee.id}>
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -69,13 +100,15 @@ const AssignmentPanel = () => {
                   <TableCell align="center">
                     <Select
                       size="small"
-                      value={''}
+                      defaultValue={''}
                       sx={{ minWidth: 120 }}
                     >
-                      <MenuItem value="">-- Chọn ca --</MenuItem>
-                      <MenuItem value="Ca sáng">Ca sáng (8h-12h)</MenuItem>
-                      <MenuItem value="Ca chiều">Ca chiều (13h-17h)</MenuItem>
-                      <MenuItem value="Ca tối">Ca tối (18h-22h)</MenuItem>
+                      <MenuItem value={0}>-- Chọn ca --</MenuItem>
+                      {shifts.map((shift:Shift) => (
+                        <MenuItem key={shift.id} value={shift.id}>
+                          {shift.name} {shift.startTime} - {shift.endTime}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </TableCell>
                   <TableCell align="center">

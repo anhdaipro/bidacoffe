@@ -6,6 +6,7 @@ import { EXPORT, IMPORT } from '@form/transaction';
 import User from './User';
 import TableSession from './TableSession';
 import TableOrder from './TableOrder';
+import dayjs from 'dayjs';
 export default class ProductTransaction extends Model {
   public id!: number;//db
   public codeNo!: string;//db
@@ -125,7 +126,7 @@ ProductTransaction.beforeCreate(async (transaction) => {
     }
   }
   //set dateDeliveryBigint
-  transaction.dateDeliveryBigint = new Date(transaction.dateDelivery).getTime();
+  transaction.dateDeliveryBigint = dayjs(transaction.dateDelivery).unix();
 });
 ProductTransaction.beforeDestroy(async (transaction, options) => {
     await ProductTransactionDetail.destroy({

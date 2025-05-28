@@ -9,7 +9,7 @@ import { useAuthStore } from '../../store/useUserStore';
 import { ROLE_ADMIN } from '@/backend/BidaConst';
 import { usegetAllUsers } from '@/app/query/useUser';
 import Search from './Search';
-import { Customer, CustomerFormSearch } from '@/app/type/model/Customer';
+import { Customer, CustomerFormSearch, CustomerIndex } from '@/app/type/model/Customer';
 import {
     Box,
     Button,
@@ -108,7 +108,7 @@ const Index = () => {
                 </TableRow>
             </TableHead>
             <TableBody>
-                {aCustomer.map((customer: Customer, index: number) => (
+                {aCustomer.map((customer: CustomerIndex, index: number) => (
                 <TableRow key={customer.id}>
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{customer.name}</TableCell>

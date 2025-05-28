@@ -9,14 +9,19 @@ class ScheduleController {
   // Tạo nhiều bản ghi lịch làm việc
   public static async createSchedules(req: Request, res: Response): Promise<void> {
     try {
-      const schedules = req.body.schedules; // Mảng các bản ghi lịch làm việc
+      const {schedules, workDate} = req.body.schedules; // Mảng các bản ghi lịch làm việc
 
       if (!Array.isArray(schedules) || schedules.length === 0) {
         res.status(400).json({ message: 'Dữ liệu không hợp lệ.' });
         return;
       }
-
-      const createdSchedules = await Schedule.bulkCreate(schedules);
+      const schedulesWithDefaults = schedules.map((schedule:any) => {
+        return {
+          ...schedule,
+          workDate,
+        };
+      })
+      const createdSchedules = await Schedule.bulkCreate(schedulesWithDefaults);
       
       res.status(201).json({
         message: 'Tạo lịch làm việc thành công.',

@@ -8,6 +8,7 @@ import crypto from 'crypto';
 import { addDay, generateUsername, slugify } from '../Format';
 import UserProfile from '../models/UserProfile';
 import { folder } from '../routes/employeeRoute';
+import { ROLES_EMPLOYEE } from '@/form/user';
 const refreshTokens: Record<string, number> = {}; // Bộ nhớ tạm (thay bằng DB trong thực tế)
 class EmployeeController {
     
@@ -18,7 +19,7 @@ class EmployeeController {
             const existingUser = await User.findOne({
                 where: {
                     [Op.or]: [{ phone }],
-                    roleId:ROLE_EMPLOYEE
+                    roleId:{[Op.in]: ROLES_EMPLOYEE},
                 },
             });
             if (existingUser) {
@@ -42,7 +43,7 @@ class EmployeeController {
               };
             const cccdFront = `${folder}/${files?.cccdFront?.[0]?.filename}`  || '';
             const cccdBack = `${folder}/${files?.cccdBack?.[0]?.filename}`  || '';
-            const avatar = `${folder}/${files?.avatar?.[0]?.filename}` || '';
+            const avatar = files?.avatar ? `${folder}/${files?.avatar?.[0]?.filename}` : '';
             Object.assign(profile, {
                 phone,
                 name,
@@ -85,7 +86,7 @@ class EmployeeController {
     public static async updateEmployee(req: Request, res: Response): Promise<void> {
         try {
         const { id } = req.params;
-        const { username, phone, roleId, address, name, baseSalary,dateOfBirth } = req.body;
+        const { phone, roleId, address, name, baseSalary,dateOfBirth,position,bankNo,bankId,bankFullname,dateLeave,dateBeginJob } = req.body;
 
         const user = await User.findByPk(id);
 
@@ -96,7 +97,7 @@ class EmployeeController {
         const existingUser = await User.findOne({
             where: {
                 phone: phone,
-                roleId:ROLE_EMPLOYEE,
+                roleId:{[Op.in]: ROLES_EMPLOYEE},
                 id: {
                 [Op.ne]: id
                 }
@@ -110,7 +111,6 @@ class EmployeeController {
         }
         // Cập nhật thông tin người dùng
         await user.update({
-            username,
             phone,
             roleId,
             address,
@@ -118,7 +118,37 @@ class EmployeeController {
             baseSalary,
             dateOfBirth,
         });
-
+        const userProfile = await UserProfile.findOne({
+            where: {
+                userId: id,
+            },
+        });
+        if(!userProfile) {
+            res.status(404).json({ message: 'Thông tin người dùng không tồn tại' });
+            return;
+        }
+        const files = req.files as {
+            [fieldname: string]: Express.Multer.File[];
+          };
+        const cccdFront = `${folder}/${files?.cccdFront?.[0]?.filename}`  || '';
+        const cccdBack = `${folder}/${files?.cccdBack?.[0]?.filename}`  || '';
+        const avatar = files?.avatar ? `${folder}/${files?.avatar?.[0]?.filename}` : '';
+        Object.assign(userProfile, {
+            phone,
+            name,
+            dateOfBirth,
+            baseSalary,
+            position,
+            bankNo,
+            bankId,
+            bankFullname,
+            dateLeave,
+            dateBeginJob,
+            ...(files?.cccdFront?.[0] && {cccdFront}),
+            ...(files?.cccdBack?.[0] && {cccdBack}),
+            ...(files?.avatar?.[0] && {avatar}),
+        });
+        await userProfile.save();
         res.status(200).json({ message: 'Cập nhật thông tin người dùng thành công', user });
         } catch (error) {
         console.error(error);
@@ -136,7 +166,7 @@ class EmployeeController {
         const offset = (pageNumber - 1) * limitNumber;
 
         const where:any = {};
-        where.roleId = ROLE_EMPLOYEE
+        where.roleId = { [Op.in]: ROLES_EMPLOYEE }; // Chỉ lấy nhân viên
         if (name) {
             where.name = { [Op.like]: `%${name}%` }; // Tìm kiếm theo tên (LIKE '%name%')
         }
@@ -165,7 +195,7 @@ class EmployeeController {
         include.push({
         model: UserProfile,
         as: 'rProfile',
-        attributes:['baseSalary,'],
+        // attributes:['baseSalary'],
         required: Object.keys(userProfileWhere).length > 0, // required = true nếu có điều kiện
         ...(Object.keys(userProfileWhere).length > 0 && { where: userProfileWhere }),
         });
@@ -173,8 +203,9 @@ class EmployeeController {
         const { rows: users, count: total } = await User.findAndCountAll({
             where,
             limit: limitNumber,
+            include,
             offset,
-            attributes:['phone', 'point', 'name','createdAt', 'status','id','baseSalary', 'dateOfBirth'],
+            attributes:['phone', 'name','createdAt', 'status','id', 'createdAt', 'address', 'roleId'],
         });
         // Tính tổng số trang
         const totalPages = Math.ceil(total / limitNumber);
@@ -197,6 +228,43 @@ class EmployeeController {
         } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Đã xảy ra lỗi khi xóa người dùng' });
+        }
+    }
+    public static getEmployeeById = async (req: Request, res: Response): Promise<void> => {
+        const { id } = req.params;
+        try {
+            const user = await User.findByPk(id, {
+                include: [{
+                    model: UserProfile,
+                    as: 'rProfile',
+                }],
+            }) as User & { rProfile?: UserProfile };
+            if (!user) {
+                res.status(404).json({ message: 'Người dùng không tồn tại' });
+                return;
+            }
+            const userData = user.toJSON();
+            const {id:profileId,createdAt, ...rest} = userData.rProfile || {};
+            const data = Object.assign(userData, { ...rest });
+            res.status(200).json({ message: 'Lấy thông tin người dùng thành công', data:data });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Đã xảy ra lỗi khi lấy thông tin người dùng' });
+        }
+    }
+    public static getEmployeeSchedule = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const aEmployee = await User.findAll({
+                where: {
+                    roleId:{[Op.in]: ROLES_EMPLOYEE},
+                    status:STATUS_ACTIVE,
+                },
+               attributes:['id', 'name', 'phone', 'email', 'roleId',],
+            })
+            res.status(200).json({ message: 'Lấy thông tin người dùng thành công', data:aEmployee });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Đã xảy ra lỗi khi lấy thông tin người dùng' });
         }
     }
 }

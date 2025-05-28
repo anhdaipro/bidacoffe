@@ -1,21 +1,21 @@
-import { CustomerForm,CustomerFormSearch,Customer } from "./Customer";
+import { CustomerForm,CustomerFormSearch,Customer, CustomerIndex } from "./Customer";
 
 export interface EmployeeForm extends CustomerForm{
     email: string;
+    roleId:number | string;
     dateOfBirth: string;
     dateLeave: string;
     dateBeginJob: string;
-    position: number;
     cccdBack: File | null;
     cccdFront: File | null;
     avatar: File | null;
     bankId: number;
-    bankFullName: string;
+    bankFullname: string;
     bankNo: string;
     baseSalary:number;
+    typeEducation: number;
 }
 export interface Employee extends Customer{
-    position:number;
     roleId:number;
     cccdBack: string;
     cccdFront: string;
@@ -25,13 +25,26 @@ export interface Employee extends Customer{
     dateLeave: string;
     dateBeginJob: string;
     bankId: number;
-    bankFullName: string;
+    bankFullname: string;
     bankNo: string;
     baseSalary:number;
+    typeEducation: number;
+}
+export interface EmployeeIndex extends CustomerIndex{
+    roleId:number;
+    cccdBack: string;
+    cccdFront: string;
+    avatar: string;
+    email: string;
+    dateOfBirth: string;
+    dateLeave: string;
+    dateBeginJob: string;
+    bankId: number;
+    bankFullname: string;
+    bankNo: string;
+    baseSalary:number;
+    typeEducation: number;
 }
 export interface EmployeeFormSearch extends CustomerFormSearch{
-    position:string;
-    dateBeginJob:string;
-    dateLeave:string;
-    dateOfBirth:string;
+   
 }

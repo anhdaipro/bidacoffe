@@ -31,8 +31,7 @@ class ShiftController {
   // Lấy danh sách tất cả các ca làm việc
   public static async getAllShifts(req: Request, res: Response): Promise<void> {
     try {
-      const shifts = await Shift.findAll();
-
+      const shifts = await (new Shift).getAllShift();
       res.status(200).json({
         message: 'Lấy danh sách ca làm việc thành công.',
         data: shifts,

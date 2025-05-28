@@ -19,4 +19,10 @@ const CloseIcon:React.FC<Props> = ({width  = '12px'}) => (
     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
 </svg>
 );
-export {PlusIcon,MinusIcon,CloseIcon}
+const RequiredLable:React.FC<{required:boolean}> = ({required}) =>{
+  if(!required) return <></>;
+  return(
+      <span style={{ color: 'red' }}> *</span>
+  )
+}
+export {PlusIcon,MinusIcon,CloseIcon,RequiredLable}

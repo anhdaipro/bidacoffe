@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import { useAuthStore } from '@/app/store/useUserStore';
 import { ROLE_ADMIN } from '@/backend/BidaConst';
-import { STATUS_LABELS } from '@/form/user';
+import { BANK_LABELS, POSITION_LABELS, STATUS_LABELS, TYPE_EDUCATION_LABELS } from '@/form/user';
 import React, { useEffect,useState,useRef } from 'react';
 import { useForm,Controller } from 'react-hook-form';
 import { useRouter } from "next/navigation";
@@ -26,25 +26,47 @@ import { EmployeeForm,Employee } from '@/app/type/model/Employee';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useCreateEmployee, useUpdateEmployee } from '@/app/query/useEmployee';
+import { formatNumber } from '@/app/helper';
+import { RequiredLable } from '../Icon';
 interface Props{
   employee: Employee;
 }
+
 const Form: React.FC<Props> = ({ employee }) => {
+  console.log(employee);
     const user = useAuthStore(state=>state.user)
     const router = useRouter();
     const [images, setImages] = useState<{
-        avatar?: { file?: File; preview?: string };
-        cccdFront?: { file?: File; preview?: string };
-        cccdBack?: { file?: File; preview?: string };
+        avatar: { file?: File; preview?: string };
+        cccdFront: { file?: File; preview?: string };
+        cccdBack: { file?: File; preview?: string };
       }>({
+        avatar: {},
+        cccdFront: {},
+        cccdBack: {},
+      });
+    useEffect(() => {
+      setImages({
         avatar: employee.avatar ? { preview: employee.avatar } : {},
         cccdFront: employee.cccdFront ? { preview: employee.cccdFront } : {},
         cccdBack: employee.cccdBack ? { preview: employee.cccdBack } : {},
       });
+    }, [employee.avatar, employee.cccdFront, employee.cccdBack]);
     const inputAvatarRef = useRef<HTMLInputElement | null>(null);
     const inputCccdFrontRef = useRef<HTMLInputElement | null>(null);
     const inputCccdBackRef = useRef<HTMLInputElement | null>(null);
     const addToast = useToastStore(state=>state.addToast)
+    useEffect(() => {
+      // Cleanup preview URLs when component unmounts or images change
+      return () => {
+        Object.values(images).forEach((imageObj) => {
+          if (imageObj.preview) {
+            URL.revokeObjectURL(imageObj.preview);
+          }
+        });
+      };
+    },[])
     useEffect(()=>{
         if(user && user.roleId != ROLE_ADMIN){
         router.push('/employee')
@@ -73,51 +95,66 @@ const Form: React.FC<Props> = ({ employee }) => {
       [key]: { file, preview },
     }));
   };
-  const { dateOfBirth,dateBeginJob,dateLeave,bankFullName,bankId,bankNo } = watch();
-  const { mutate: addCustomer } = useCreateCustomer();
-  const { mutate: updateCustomer } = useUpdateCustomer();
-  const handleFormSubmit = (data: EmployeeForm) => {
-    const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('categoryId', data.categoryId.toString());
-    formData.append('status', data.status.toString());
-    formData.append('price', data.price.toString());
-    if (image) formData.append('image', image);
-    const payload = {
-      ...data
-    };
+  const { dateOfBirth,dateBeginJob,dateLeave,bankFullname,bankId,typeEducation,bankNo,baseSalary,status,roleId } = watch();
+  const { mutate: addEmployee } = useCreateEmployee();
+  const { mutate: updateEmployee } = useUpdateEmployee();
+  const handleRequest = (formData: FormData) => {
     if (employee.id) {
       const id = employee.id;
-      updateCustomer({ id, payload }, {
-        onSuccess: () => {
+      updateEmployee(
+        { id, formData },
+        {
+          onSuccess: () => {
             addToast({
-                id: uuidv4(),
-                message: 'Cập nhật thành công',
-                type: 'success',
-                
-              })
-            window.location.href = '/employee';
-        },
-        onError: (error: any) => {
-          console.error('Error updating billiard table:', error);
-        },
-      });
+              id: uuidv4(),
+              message: 'Cập nhật thành công',
+              type: 'success',
+            });
+            router.push('/employee');
+          },
+          onError: (error: any) => {
+            addToast({
+              id: uuidv4(),
+              message: error.response?.data?.message || 'Lỗi cập nhật',
+              type: 'error',
+            });
+          },
+        }
+      );
     } else {
-        addCustomer(payload, {
+      addEmployee(formData, {
         onSuccess: () => {
-            addToast({
-                id: uuidv4(),
-                message: 'Thêm mới thành công',
-                type: 'success',
-                
-              })
-            window.location.href = '/employee';
+          addToast({
+            id: uuidv4(),
+            message: 'Thêm mới thành công',
+            type: 'success',
+          });
+          router.push('/employee');
         },
         onError: (error: any) => {
-          console.error('Error creating billiard table:', error);
+          addToast({
+            id: uuidv4(),
+            message: error.response?.data?.message,
+            type: 'error',
+          });
         },
       });
     }
+  };
+  const handleFormSubmit = (data: EmployeeForm) => {
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      // Nếu value là số thì convert sang string
+      if (value) {
+        formData.append(key, value.toString());
+      }
+    });
+    Object.entries(images).forEach(([key, imageObj]) => {
+      if (imageObj.file) {
+        formData.append(key, imageObj.file);
+      }
+    });
+    handleRequest(formData);
     
   };
   
@@ -139,31 +176,39 @@ const Form: React.FC<Props> = ({ employee }) => {
       <Box component="form" onSubmit={handleSubmit(handleFormSubmit)} noValidate>
         <Grid container spacing={2}>
           {/* Tên */}
-          <Grid size={{xs:12}}>
+          <Grid size={{xs:12,sm:6}}>
+            {/* <InputLabel id="name" >Tên<span style={{ color: 'red' }}> * </span></InputLabel> */}
             <TextField
               fullWidth
-              label="Tên"
-              {...register('name')}
+              
+              id='name-controlled'
+              label={
+                <span>
+                  Tên<span style={{ color: 'red' }}> *</span>
+                </span>
+              }
+              {...register('name',{required: 'Tên không để trống',})}
               error={Boolean(errors.name)}
               helperText={errors.name?.message}
             />
           </Grid>
 
           {/* Trạng thái */}
-          <Grid size={{xs:12}}>
+          <Grid size={{xs:12,sm:6}}>
             <FormControl fullWidth error={Boolean(errors.status)}>
-              <InputLabel id="status-label">Trạng thái</InputLabel>
+            <InputLabel id="typeEducation-label">Trạng thái<RequiredLable required/></InputLabel>
               <Select
-                labelId="status-label"
-                id="status"
-                defaultValue=""
+                labelId="typeEducation-label"
+                id="typeEducation"
+                label="Trạng thái"
+                value={status}
                 {...register('status', {
-                  required: 'Trạng thái là bắt buộc',
+                  required: 'Trạng thái không để trống',
                   validate: (value) =>
-                    Number(value) > 0 ? true : 'Trạng thái là bắt buộc',
+                    value != '0' || 'Vui lòng chọn trạng thái',
                 })}
               >
-                <MenuItem value={0}>Chọn trạng thái</MenuItem>
+                <MenuItem value='0'>Trạng thái</MenuItem>
                 {Object.entries(STATUS_LABELS).map(([key, value]) => (
                   <MenuItem key={key} value={key}>
                     {value}
@@ -173,26 +218,55 @@ const Form: React.FC<Props> = ({ employee }) => {
               <FormHelperText>{errors.status?.message}</FormHelperText>
             </FormControl>
           </Grid>
+          <Grid size={{xs:12,sm:6}}>
+            <FormControl fullWidth error={Boolean(errors.roleId)}>
+              <InputLabel id="typeEducation-label" >Chức vụ<RequiredLable required /></InputLabel>
+              <Select
+                labelId="typeEducation-label"
+                id="typeEducation"
+                label="Chức vụ"
+                value={roleId}
+                {...register('roleId', {
+                  required: 'Chức vụ không để trống',
+                  validate: (value) =>
+                    Number(value) > 0 || 'Vui lòng chọn chức vụ',
+                })}
+              >
+                <MenuItem value={0}>Chức vụ</MenuItem>
+                {Object.entries(POSITION_LABELS).map(([key, value]) => (
+                  <MenuItem key={key} value={key}>
+                    {value}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>{errors.roleId?.message}</FormHelperText>
+            </FormControl>
+          </Grid>
+
 
           {/* Số điện thoại */}
-          <Grid size={{xs:12}}>
+          <Grid size={{xs:12,sm:6}}>
             <TextField
               fullWidth
-              label="Số điện thoại"
+              label={
+                <span>
+                  Số điện thoại<RequiredLable required />
+                </span>
+              }
               {...register('phone', { required: 'SĐT không để trống' })}
               error={Boolean(errors.phone)}
               helperText={errors.phone?.message}
             />
           </Grid>
             {/* Ngày sinh */}
-            <Grid size={{xs:12}}>
+            <Grid size={{xs:12,sm:6}}>
             <FormControl fullWidth>
               <Box>
                 <Controller
                   name="dateOfBirth"
                   control={control}
                   rules={{required:'Ngày sinh không để trống'}}
-                  render={({ field }) => (
+                  render={({ field,fieldState:{error} }) => (
                     <DatePicker
                     className="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-fullWidth"
                     value={dateOfBirth ? dayjs(dateOfBirth) : null}
@@ -201,10 +275,17 @@ const Form: React.FC<Props> = ({ employee }) => {
                     }}
                     maxDate={dayjs().add(-16, 'y')}
                     minDate={dayjs().add(-60, 'y')}
-                    label="Ngày sinh"
+                    label={
+                      <span>
+                        Ngày sinh<RequiredLable required />
+                      </span>
+                    }
                     format='DD/MM/YYYY'
                     slotProps={{
                       textField: {
+                        fullWidth: true, 
+                        error: !!error,
+                        helperText: error?.message,
                         inputProps: {
                           onKeyDown: (e:any) => e.preventDefault(), // chặn nhập bàn phím
                         },
@@ -214,36 +295,39 @@ const Form: React.FC<Props> = ({ employee }) => {
                   
                   )}
                 />
-                {errors.dateOfBirth && (
-                    <Typography color="error" variant="body2" mt={1}>
-                      {errors.dateOfBirth.message}
-                    </Typography>)}
               </Box>
             </FormControl>
             </Grid>
 
             {/* Ngày bắt đầu làm việc */}
-            <Grid size={{xs:12}}>
+            <Grid size={{xs:12,sm:6}}>
             <FormControl fullWidth>
               <Box>
                 <Controller
                   name="dateBeginJob"
                   control={control}
                   rules={{required:'Ngày bắt đầu làm không để trống'}}
-                  render={({ field }) => (
+                  render={({ field,fieldState:{error} }) => (
                     <DatePicker
                     className="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-fullWidth"
                     value={dateBeginJob ? dayjs(dateBeginJob) : null}
                     onChange={(date) => {
                       setValue('dateBeginJob', dayjs(date).format('YYYY-MM-DD'))
                     }}
-                    maxDate={dayjs().add(-16, 'y')}
-                    minDate={dayjs().add(-60, 'y')}
-                    label="Ngày bắt đầu làm"
+                   
+                    label={
+                      <span>
+                        Ngày bắt đầu làm việc<RequiredLable required />
+                      </span>
+                    }
                     format='DD/MM/YYYY'
                     slotProps={{
                       textField: {
+                        fullWidth: true, 
+                        error: !!error,
+                        helperText: error?.message,
                         inputProps: {
+                          
                           onKeyDown: (e:any) => e.preventDefault(), // chặn nhập bàn phím
                         },
                       },
@@ -252,35 +336,34 @@ const Form: React.FC<Props> = ({ employee }) => {
                   
                   )}
                 />
-                {errors.dateBeginJob && (
-                    <Typography color="error" variant="body2" mt={1}>
-                      {errors.dateBeginJob.message}
-                    </Typography>)}
               </Box>
             </FormControl>
             </Grid>
 
             {/* Ngày nghỉ việc */}
-            <Grid size={{xs:12}}>
+            <Grid size={{xs:12,sm:6}}>
             <FormControl fullWidth>
               <Box>
                 <Controller
                   name="dateLeave"
                   control={control}
-                  render={({ field }) => (
+                  render={({ field, fieldState:{error} }) => (
                     <DatePicker
-                    className="MuiInputBase-input MuiOutlinedInput-input MuiInputBase-fullWidth"
+                    
                     value={dateLeave ? dayjs(dateLeave) : null}
                     onChange={(date) => {
                       setValue('dateLeave', dayjs(date).format('YYYY-MM-DD'))
                     }}
-                    maxDate={dayjs().add(-16, 'y')}
-                    minDate={dayjs().add(-60, 'y')}
-                    label="Ngày bắt đầu làm"
+                    
+                    label="Ngày nghỉ việc"
                     format='DD/MM/YYYY'
                     slotProps={{
                       textField: {
+                        fullWidth: true, 
+                        error: !!error,
+                          helperText: error?.message,
                         inputProps: {
+                          
                           onKeyDown: (e:any) => e.preventDefault(), // chặn nhập bàn phím
                         },
                       },
@@ -298,22 +381,111 @@ const Form: React.FC<Props> = ({ employee }) => {
             </Grid>
 
             {/* Vị trí */}
-            <Grid size={{xs:12}}>
+            <Grid size={{xs:12,sm:6}}>
+            <FormControl fullWidth error={Boolean(errors.typeEducation)}>
+              <InputLabel id="typeEducation-label">Học vấn</InputLabel>
+              <Select
+                labelId="typeEducation-label"
+                id="typeEducation"
+                label="Học vấn"
+                value={typeEducation}
+                {...register('typeEducation', {
+                })}
+              >
+                <MenuItem value={0}>Học vấn</MenuItem>
+                {Object.entries(TYPE_EDUCATION_LABELS).map(([key, value]) => (
+                  <MenuItem key={key} value={key}>
+                    {value}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>{errors.typeEducation?.message}</FormHelperText>
+            </FormControl>
+            </Grid>
+          {/* Ngân hàng */}
+          <Grid size={{xs:12,sm:6}}>
+          <FormControl fullWidth error={Boolean(errors.bankId)}>
+              <InputLabel id="bank-label">Ngân hàng<RequiredLable required/></InputLabel>
+              <Select
+                labelId="bank-label"
+                id="bank"
+                label="Ngân hàng"
+                value={bankId}
+                {...register('bankId', {
+                  required: 'Vui lòng chọn ngân hàng',
+                  validate: (value) =>
+                    Number(value) > 0 ? true : 'Vui lòng chọn ngân hàng',
+                })}
+              >
+                <MenuItem value={0}>Chọn ngân hàng</MenuItem>
+                {Object.entries(BANK_LABELS).map(([key, value]) => (
+                  <MenuItem key={key} value={key}>
+                    {value}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>{errors.bankId?.message}</FormHelperText>
+            </FormControl>
+            </Grid>
+
+            <Grid size={{xs:12,sm:6}}>
             <TextField
                 fullWidth
-                label="Vị trí"
-                type="number"
-                {...register('position', { required: 'Vị trí không được để trống' })}
-                error={Boolean(errors.position)}
-                helperText={errors.position?.message}
+                label={
+                  <span>
+                    Tên chủ tài khoản ngân hàng<RequiredLable required />
+                  </span>
+                }
+                {...register('bankFullname', { required: 'Tên chủ tài khoản không được để trống' })}
+                error={Boolean(errors.bankFullname)}
+                helperText={errors.bankFullname?.message}
             />
             </Grid>
 
+            <Grid size={{xs:12,sm:6}}>
+            <TextField
+                fullWidth
+                label={
+                  <span>
+                    Số tài khoản ngân hàng<RequiredLable required />
+                  </span>
+                }
+                {...register('bankNo', { required: 'Số tài khoản ngân hàng không được để trống' })}
+                error={Boolean(errors.bankNo)}
+                helperText={errors.bankNo?.message}
+            />
+            </Grid>
+            <Grid size={{xs:12,sm:6}}>
+              {/* Price */}
+              <TextField
+                label={
+                  <span>
+                    Lương cơ bản<RequiredLable required />
+                  </span>
+                }
+                fullWidth
+                value={formatNumber(baseSalary)}
+                {...register('baseSalary', {
+                  required: 'Lương cơ bản không hợp lệ',
+                  setValueAs: (value) => {
+                    return value ? Number(String(value).replace(/,/g, '')) : 0;
+                  },
+                  validate: (value) => value > 0 || 'Lương cơ bản lớn hơn 0',
+                })}
+                onChange={(e)=>{
+                  const raw = e.target.value.replace(/,/g, '');
+                  const numeric = Number(raw);
+                  setValue('baseSalary',isNaN(numeric) ? 0 : numeric);
+                }}
+                error={!!errors.baseSalary}
+                helperText={errors.baseSalary?.message}
+              />
+            </Grid>
             {/* CCCD Mặt Trước */}
-            <Grid size={{xs:12}}>
-              <FormControl fullWidth>
+            <Grid size={{xs:6,sm:6}}>
+              <FormControl fullWidth error={!!images.cccdFront.file}>
                 <Typography variant="subtitle1" gutterBottom>
-                    CCDD Mặt Trước
+                    CCDD Mặt Trước<RequiredLable required />
                     </Typography>
                     <input
                     type="file"
@@ -324,42 +496,61 @@ const Form: React.FC<Props> = ({ employee }) => {
                         if (file) handleImageChange('cccdFront', file);
                       }}
                     />
+                   
                 </FormControl>
-                <Button variant="contained" onClick={() => inputCccdFrontRef.current?.click()}>
+                {!images.cccdFront.preview && <Button variant="contained" onClick={() => inputCccdFrontRef.current?.click()}>
                   Chọn file
-                </Button>
+                </Button>}
                 {images.cccdFront?.preview && (
-                <Box mt={2} display="flex" alignItems="center" gap={2}>
+                <Box mt={2} 
+                sx={{
+                  width: '100%',
+                  height:200,
+                  '&:hover .delete-btn': { opacity: 1 } // 👈 hover mới hiện nút
+                }}
+                display="flex" alignItems="center" gap={2} position={'relative'}>
                 <Box
                     component="img"
                     src={images.cccdFront.preview}
                     alt="Preview"
                     sx={{
-                    width: 100,
-                    height: 100,
-                    objectFit: 'cover',
-                    borderRadius: 1,
-                    border: '1px solid #ccc',
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      borderRadius: 1,
+                      border: '1px solid #ccc',
                     }}
                 />
                 <IconButton
-                    color="error"
-                    onClick={()=>handleImageChange('cccdFront', null)}
+                    className="delete-btn"
+                    onClick={() => handleImageChange('cccdFront', null)}
                     aria-label="Xóa file"
-                    size="large"
-                >
-                    <DeleteIcon />
-                </IconButton>
+                    sx={{
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                      backgroundColor: 'rgba(255,255,255,0.8)',
+                      opacity: 0,
+                      transition: 'opacity 0.3s',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255,255,255,1)',
+                      },
+                    }}
+                    size="small"
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                  
                 </Box>
                 )}
             </Grid>
 
             {/* CCCD Mặt Sau */}
-            <Grid size={{xs:12}}>
+            <Grid size={{xs:6,sm:6}}>
             
                 <FormControl fullWidth>
                     <Typography variant="subtitle1" gutterBottom>
-                    CCDD Mặt Sau
+                      CCDD Mặt Sau<RequiredLable required />
                     </Typography>
                     <input
                     type="file"
@@ -371,38 +562,55 @@ const Form: React.FC<Props> = ({ employee }) => {
                       }}
                     />
                 </FormControl>
-                <Button variant="contained" onClick={() => inputCccdBackRef.current?.click()}>
+                {!images.cccdBack.preview && <Button variant="contained" onClick={() => inputCccdBackRef.current?.click()}>
                   Chọn file
-                </Button>
+                </Button>}
                 {images.cccdBack?.preview && (
-                <Box mt={2} display="flex" alignItems="center" gap={2}>
-                <Box
-                    component="img"
-                    src={images.cccdBack.preview}
-                    alt="Preview"
-                    sx={{
-                    width: 100,
-                    height: 100,
-                    objectFit: 'cover',
-                    borderRadius: 1,
-                    border: '1px solid #ccc',
-                    }}
-                />
-                <IconButton
-                    color="error"
-                    onClick={()=>handleImageChange('cccdBack', null)}
+                <Box mt={2} display="flex" 
+                sx={{
+                  width: '100%',
+                  height: 200,
+                  '&:hover .delete-btn': { opacity: 1 } // 👈 hover mới hiện nút
+                }}
+                 alignItems="center" gap={2} position="relative">
+                  <Box
+                      component="img"
+                      src={images.cccdBack.preview}
+                      alt="Preview"
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        borderRadius: 1,
+                        border: '1px solid #ccc',
+                      }}
+                  />
+                  <IconButton
+                    className="delete-btn"
+                    onClick={() => handleImageChange('cccdBack', null)}
                     aria-label="Xóa file"
-                    size="large"
-                >
-                    <DeleteIcon />
-                </IconButton>
+                    sx={{
+                      position: 'absolute',
+                      top: 8,
+                      right: 8,
+                      backgroundColor: 'rgba(255,255,255,0.8)',
+                      opacity: 0,
+                      transition: 'opacity 0.3s',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255,255,255,1)',
+                      },
+                    }}
+                    size="small"
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
                 </Box>
                 )}
             
             </Grid>
 
             {/* Ảnh đại diện */}
-            <Grid size={{xs:12}}>
+            <Grid size={{xs:6,sm:4}}>
                 <FormControl fullWidth>
                     <Typography variant="subtitle1" gutterBottom>
                     Ảnh đại diện
@@ -417,9 +625,9 @@ const Form: React.FC<Props> = ({ employee }) => {
                       }}
                     />
                 </FormControl>
-                <Button variant="contained" onClick={() => inputAvatarRef.current?.click()}>
+                {!images.avatar.preview && <Button variant="contained" onClick={() => inputAvatarRef.current?.click()}>
                   Chọn file
-                </Button>
+                </Button>}
                 {images.avatar?.preview && (
                 <Box mt={2} display="flex" alignItems="center" gap={2}>
                 <Box
@@ -446,34 +654,7 @@ const Form: React.FC<Props> = ({ employee }) => {
                 )}
             </Grid>
 
-            {/* Ngân hàng */}
-            <Grid size={{xs:12}}>
-            <TextField
-                fullWidth
-                label="Mã ngân hàng"
-                type="number"
-                {...register('bankId',{ required: 'Mã ngân hàng không được để trống' })}
-                helperText={errors.bankId?.message}
-            />
-            </Grid>
-
-            <Grid size={{xs:12}}>
-            <TextField
-                fullWidth
-                label="Tên chủ tài khoản"
-                {...register('bankFullName', { required: 'Tên chủ tài khoản không được để trống' })}
-                helperText={errors.bankFullName?.message}
-            />
-            </Grid>
-
-            <Grid size={{xs:12}}>
-            <TextField
-                fullWidth
-                label="Số tài khoản ngân hàng"
-                {...register('bankNo', { required: 'Số tài khoản ngân hàng không được để trống' })}
-                helperText={errors.bankNo?.message}
-            />
-            </Grid>
+            
           {/* Nút Submit */}
           <Grid size={{xs:12}}>
             <Button type="submit" fullWidth variant="contained">

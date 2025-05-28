@@ -42,6 +42,7 @@ import { STATUS_SESSION_LABELS } from '@/form/billiardTable';
 import { PAYMENT_METHOD_LABELS } from '@/form/payment';
 import { TableSessionForm } from '@/app/type/model/TableSession';
 import { Product } from '@/app/type/model/Product';
+import { RequiredLable } from '../Icon';
 interface Props {
   tableSession: TableSessionForm;
 }
@@ -214,7 +215,7 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
             {/* Status */}
             <Grid size={{xs:12, sm:6}}>
               <FormControl fullWidth error={!!errors.status}>
-                <InputLabel>Trạng thái</InputLabel>
+                <InputLabel>Trạng thái <RequiredLable required /></InputLabel>
                 <Select value={status} {...register('status', { required: 'Trạng thái không để trống',
                   validate: (value) => (Number(value) > 0 ? true : 'Trạng thái không để trống'),
                  })} label="Trạng thái">
@@ -251,7 +252,7 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
             {/* Table Number */}
             <Grid size={{xs:12, sm:6}}>
               <FormControl fullWidth error={!!errors.tableId}>
-                <InputLabel>Bàn số</InputLabel>
+                <InputLabel>Bàn số <RequiredLable required /></InputLabel>
                 <Select value={tableId} {...register('tableId', { required: 'Bàn không để trống' })} label="Bàn số">
                   
                   {tables.map((table: any) => (
@@ -273,7 +274,11 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
                 render={({ field, fieldState: { error } }) => (
                   <DateTimePicker
                   
-                    label="Bắt đầu"
+                    label={
+                      <span>
+                        Bắt đầu <RequiredLable required />
+                      </span>
+                    }
                     format='DD/MM/YYYY HH:mm'
                     value={startTime ? dayjs(startTime) : null}
                     onChange={(date) => field.onChange(date ? date.format('YYYY-MM-DD HH:mm') : '')}

@@ -3,13 +3,13 @@
 import React, { useState,useEffect } from 'react';
 import Link from 'next/link';
 import { useControlStore } from '../../store/useStore';
-import { STATUS_ACTIVE, STATUS_INACTIVE, STATUS_LABELS } from '@/form/user';
+import { POSITION_LABELS, ROLES_EMPLOYEE, STATUS_ACTIVE, STATUS_INACTIVE, STATUS_LABELS } from '@/form/user';
 import { formatDate, formatNumber } from '../../helper';
 import { useAuthStore } from '../../store/useUserStore';
 import { ROLE_ADMIN } from '@/backend/BidaConst';
 import { usegetAllUsers } from '@/app/query/useUser';
 import Search from './Search';
-import { Customer, CustomerFormSearch } from '@/app/type/model/Customer';
+import { Customer, CustomerFormSearch, CustomerIndex } from '@/app/type/model/Customer';
 import {
     Box,
     Button,
@@ -25,15 +25,18 @@ import {
     Pagination,
     Stack,
   } from '@mui/material';
+import { Employee, EmployeeFormSearch, EmployeeIndex } from '@/app/type/model/Employee';
+import { usegetAllEmployee } from '@/app/query/useEmployee';
+import dayjs from 'dayjs';
 const Index = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 20; // Số sản phẩm trên mỗi trang
-    const [formData, setFormData] = useState<CustomerFormSearch>({
+    const [formData, setFormData] = useState<EmployeeFormSearch>({
         status:'',phone: '',dateFrom: '', dateTo:'',
         uidLogin:'',
     });
-    const { data, isLoading } = usegetAllUsers(currentPage, itemsPerPage,formData);
-    const updateStore  = useControlStore(state=>state.updateStore);
+    const { data, isLoading } = usegetAllEmployee(currentPage, itemsPerPage,formData);
+    console.log(data);
     const user = useAuthStore(state=>state.user)
     
     if (isLoading || !user) {
@@ -80,7 +83,7 @@ const Index = () => {
             <Box display="flex" justifyContent="flex-end" mb={2}>
                 <Button
                     component={Link}
-                    href="/customer/create"
+                    href="/employee/create"
                     variant="contained"
                     color="primary"
                     size="large"
@@ -109,22 +112,21 @@ const Index = () => {
                 </TableRow>
             </TableHead>
             <TableBody>
-                {aEmployee.map((customer: Customer, index: number) => (
+                {aEmployee.map((customer: EmployeeIndex, index: number) => (
                 <TableRow key={customer.id}>
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>{customer.name}</TableCell>
                     <TableCell>{customer.phone}</TableCell>
                     <TableCell>{STATUS_LABELS[customer.status]}</TableCell>
-                    <TableCell>{customer.point}</TableCell>
+                    <TableCell>{POSITION_LABELS[customer.roleId]}</TableCell>
                     <TableCell>{formatDate(customer.createdAt)}</TableCell>
+                    <TableCell>{dayjs(customer.dateOfBirth).format('DD/MM/YYYY')}</TableCell>
                     <TableCell>
                     <Stack spacing={1} direction="column">
                         {user.roleId === ROLE_ADMIN && (
-                        <Link href={`/customer/update/${customer.id}`} passHref legacyBehavior>
-                            <MuiLink underline="none">
-                            <Button variant="outlined" size="small">Chỉnh sửa</Button>
-                            </MuiLink>
-                        </Link>
+                        
+                            <Button component={Link} href={`/employee/update/${customer.id}`} variant="outlined" size="small">Chỉnh sửa</Button>
+                            
                         )}
                         {/* <Button variant="outlined" color="error" size="small" onClick={() => handleDelete(customer.id)}>Xóa</Button> */}
                     </Stack>

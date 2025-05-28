@@ -7,6 +7,7 @@ import User from '../models/User';
 import { ChangeLog } from '@/types/Model';
 import LogUpdate, { TYPE_TRANSACTION } from '../models/LogUpdate';
 import { PageTitlesMap } from '@/types/controller';
+import dayjs from 'dayjs';
 class ProductTransactionController {
   // Tạo một ProductTransaction và các ProductTransactionDetail liên quan
   static pageTitles: PageTitlesMap = {
@@ -27,15 +28,19 @@ class ProductTransactionController {
         res.status(400).json({ message: 'Không thể lấy ID người dùng' });
         return;
       }
+      if(details.length == 0) {
+        res.status(400).json({ message: 'Vui lòng nhập ít nhất 1 dòng chi tiết' });
+        return;
+      }
       // Tạo ProductTransaction
-      const date = new Date(dateDelivery);
-
+      const date = dayjs(dateDelivery);
+      const dateDeliveryBigint = date.unix();
       const productTransaction = new ProductTransaction();
       Object.assign(productTransaction, {
         type,
         totalAmount,
         dateDelivery: date,
-        dateDeliveryBigint: date.getTime(),
+        dateDeliveryBigint,
         uidLogin,
       });
 
@@ -50,7 +55,7 @@ class ProductTransactionController {
         price,
         totalPrice: quantity * price,
         dateDelivery:date,
-        dateDeliveryBigint:date.getTime(),
+        dateDeliveryBigint,
         uidLogin,
       }));
       await ProductTransactionDetail.bulkCreate(productTransactionDetails, { transaction });
@@ -197,8 +202,8 @@ class ProductTransactionController {
           };
         }
       }
-      const date = new Date(dateDelivery);
-      const dateDeliveryBigint = new Date(dateDelivery).getTime()
+      const date = dayjs(dateDelivery);
+      const dateDeliveryBigint = date.unix();
       Object.assign(productTransaction,{type,totalAmount,dateDelivery: date,dateDeliveryBigint})
       // Cập nhật ProductTransaction
       await productTransaction.save()
@@ -227,7 +232,7 @@ class ProductTransactionController {
         totalPrice: quantity * price,
         type,
         dateDelivery:date,
-        dateDeliveryBigint:date.getTime(),
+        dateDeliveryBigint,
         uidLogin,
       }));
 

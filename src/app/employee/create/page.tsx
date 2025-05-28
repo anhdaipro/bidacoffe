@@ -9,13 +9,16 @@ const Create = () => {
         dateOfBirth: '',
         dateLeave: '',
         dateBeginJob: '',
-        position: 0,
+        typeEducation: 0,
         cccdBack: '',
         cccdFront: '',
+        roleId: 0,
+        id:0,
+        point: 0,
         avatar: '',
         bankId: 0,
-        status:'',
-        bankFullName: '',
+        status:0,
+        bankFullname: '',
         bankNo: '',
         baseSalary: 0,
     };
@@ -23,3 +26,4 @@ const Create = () => {
         <Form employee={employee} />
     );
 }
+export default Create;

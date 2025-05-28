@@ -2,6 +2,7 @@ import { DataTypes, Model } from 'sequelize';
 import sequelize from '../database/db';
 import TableSession from './TableSession'; // phiên chơi bàn
 import Product from './Product'; // sản phẩm như mì, nước ngọt, thuốc lá...
+import dayjs from 'dayjs';
 
 class TableOrderDetail extends Model {
   public id!: number;
@@ -62,5 +63,7 @@ TableOrderDetail.init(
     timestamps: true,
   }
 );
-
+TableOrderDetail.beforeCreate((tableOrderDetail) => {
+  tableOrderDetail.createdAtBigint = dayjs(tableOrderDetail.createdAt).unix(); // Lưu thời gian tạo phiên làm việc
+})
 export default TableOrderDetail;

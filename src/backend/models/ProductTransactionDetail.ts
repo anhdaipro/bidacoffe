@@ -1,6 +1,7 @@
 import { DataTypes, Model,Sequelize } from 'sequelize';
 import sequelize from '../database/db';
 import Product from './Product';
+import dayjs from 'dayjs';
 export default class ProductTransactionDetail extends Model {
   //db
   public id!: number;
@@ -93,6 +94,9 @@ ProductTransactionDetail.init(
     timestamps: true,
   },
 );
+ProductTransactionDetail.beforeCreate((detail) => {
+  detail.dateDeliveryBigint = dayjs(detail.dateDelivery).unix();
+});
 
 
 

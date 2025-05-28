@@ -22,6 +22,7 @@ import { useCreateCustomer, useUpdateCustomer } from '@/app/query/useUser';
 import { useToastStore } from '../../store/toastStore';
 import { v4 as uuidv4 } from 'uuid'
 import { CustomerForm } from '@/app/type/model/Customer';
+import { RequiredLable } from '../Icon';
 interface Props{
   customer: CustomerForm;
 }
@@ -108,7 +109,11 @@ const Form: React.FC<Props> = ({ customer }) => {
           <Grid size={{xs:12}}>
             <TextField
               fullWidth
-              label="Tên"
+              label={
+                <span>
+                  Tên khách hàng<RequiredLable required />
+                </span>
+              }
               {...register('name')}
               error={Boolean(errors.name)}
               helperText={errors.name?.message}
@@ -118,7 +123,7 @@ const Form: React.FC<Props> = ({ customer }) => {
           {/* Trạng thái */}
           <Grid size={{xs:12}}>
             <FormControl fullWidth error={Boolean(errors.status)}>
-              <InputLabel id="status-label">Trạng thái</InputLabel>
+              <InputLabel id="status-label">Trạng thái<RequiredLable required /></InputLabel>
               <Select
                 labelId="status-label"
                 id="status"
@@ -144,7 +149,11 @@ const Form: React.FC<Props> = ({ customer }) => {
           <Grid size={{xs:12}}>
             <TextField
               fullWidth
-              label="Số điện thoại"
+              label={
+                <span>
+                  Số điện thoại<RequiredLable required />
+                </span>
+              }
               {...register('phone', { required: 'SĐT không để trống' })}
               error={Boolean(errors.phone)}
               helperText={errors.phone?.message}

@@ -6,4 +6,4 @@ export const ROLE_CUSTOMER = 3;
 export const ROLE_MANAGE = 4;
 
 export const STATUS_ACTIVE = 1;
-export const SENCOND_DAY = 86400;
+export const SENCOND_DAY = 3600*24*10;

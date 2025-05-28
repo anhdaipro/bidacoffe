@@ -14,6 +14,7 @@ class Schedule extends Model {
   public checkOut!: Date;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+  public createdAtBigint!: number;
   public async calculateSalary(employeeId: number, startDate: Date, endDate: Date): Promise<number> {
     try {
         // Bảng ánh xạ mức lương theo ca
@@ -60,53 +61,50 @@ class Schedule extends Model {
   }
   public async cronGenerateWeeklySchedule(){
     const today = dayjs();
-    const startOfNextWeek = today.add(1, 'week').startOf('week'); // CN
+    const startOfNextWeek = today.add(1, 'week').startOf('week');
     const endOfNextWeek = startOfNextWeek.add(6, 'day');
 
-    // Lấy danh sách nhân viên
     const employees = await User.findAll({
-      where:{
-        roleId:ROLE_EMPLOYEE
-      }
+      where: {
+        roleId: ROLE_EMPLOYEE,
+      },
     });
+
+    const shifts = await Shift.findAll({ attributes: ['id'] });
+    const aShiftId = shifts.map(shift => shift.get('id'));
 
     for (const emp of employees) {
       const lastWeek = await Schedule.findAll({
         where: {
           employeeId: emp.id,
-          date: {
-            $between: [
-              startOfNextWeek.subtract(7, 'day').format('YYYY-MM-DD'),
-              startOfNextWeek.subtract(1, 'day').format('YYYY-MM-DD'),
+          workDate: {
+            [Op.between]: [
+              startOfNextWeek.clone().subtract(7, 'day').format('YYYY-MM-DD'),
+              startOfNextWeek.clone().subtract(1, 'day').format('YYYY-MM-DD'),
             ],
           },
         },
       });
-      const shifts = await Shift.findAll({
-        attributes:['id']
-      })
-      const aShiftId = shifts.map(shift=>{
-        return shift.get('id')
-      })
-      const usedShifts = lastWeek.map(s => s.shiftId); // để tránh lặp
+
+      const usedShifts = lastWeek.map(s => s.shiftId);
 
       for (let i = 0; i < 7; i++) {
-        const workDay = startOfNextWeek.add(i, 'day').format('YYYY-MM-DD');
+        const workDate = dayjs(startOfNextWeek).add(i, 'day').format('YYYY-MM-DD');
 
-        // logic: xoay vòng ca làm, hoặc random không trùng ca
-        const possibleShifts = aShiftId.filter(
-          s => !usedShifts.includes(s)
-        );
+        let possibleShifts = aShiftId.filter(s => !usedShifts.includes(s));
+        if (possibleShifts.length === 0) {
+          possibleShifts = aShiftId; // fallback nếu hết ca khác
+        }
 
         const randomShift = possibleShifts[Math.floor(Math.random() * possibleShifts.length)];
 
         await Schedule.create({
           employeeId: emp.id,
-          shift: randomShift,
-          workDay,
+          shiftId: randomShift,
+          workDate,
         });
 
-        usedShifts.push(randomShift); // tránh bị trùng trong tuần mới
+        usedShifts.push(randomShift);
       }
     }
   }
@@ -130,6 +128,10 @@ Schedule.init(
     shiftId: {
         type: DataTypes.TINYINT,
         allowNull: false,
+    },
+    createdAtBigint: {
+      type: DataTypes.BIGINT,
+      allowNull: false,
     },
     workDate: {
       type: DataTypes.DATE,

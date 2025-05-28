@@ -10,9 +10,6 @@ export interface Customer{
     status:number;
     phone:string;
     point:number;
-    canUpdate:boolean;
-    canDelete:boolean;
-    createdAt: string;
 }
 export interface CustomerFormSearch{
   status:string;
@@ -20,6 +17,11 @@ export interface CustomerFormSearch{
   dateFrom:string;
   dateTo:string;
   uidLogin:string;
+}
+export interface CustomerIndex extends Customer{
+    canUpdate:boolean;
+    canDelete:boolean;
+    createdAt: string;
 }
 export interface LoginForm{
     identifier:string;

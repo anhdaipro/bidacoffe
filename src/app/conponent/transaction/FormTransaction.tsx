@@ -41,6 +41,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EventIcon from '@mui/icons-material/Event';
 import { Transaction, TransactionDetailForm, TransactionForm } from '@/app/type/model/Transaction';
 import { Product } from '@/app/type/model/Product';
+import { RequiredLable } from '../Icon';
 
 interface Props {
   transaction: TransactionForm;
@@ -216,7 +217,7 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
         <Grid container spacing={3} component="form">
           <Grid size={{xs:12, md:6}}>
             <FormControl fullWidth error={!!errors.type} >
-              <InputLabel id="transaction-type-label">Loại giao dịch</InputLabel>
+              <InputLabel id="transaction-type-label">Loại giao dịch <RequiredLable required /></InputLabel>
               <Controller
                 name="type"
                 control={control}
@@ -228,7 +229,7 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
                     {...field}
                     value={type}
                     labelId="transaction-type-label"
-                    label="Loại giao dịch"
+                    label="Loại giao dịch *"
                     error={!!errors.type}
                     renderValue={(selected:any) =>
                       selected == 0 ? (
@@ -267,7 +268,12 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
                     }}
                     maxDate={dayjs().add(40, 'day')}
                     minDate={dayjs().add(-10, 'day')}
-                    label="Ngày giao dịch"
+                    
+                    label={
+                      <span>
+                        Ngày giao dịch <RequiredLable required />
+                      </span>
+                    }
                     format='DD/MM/YYYY'
                     slotProps={{
                       textField: {

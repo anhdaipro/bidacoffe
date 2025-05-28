@@ -9,7 +9,7 @@ class Payment extends Model {
   public onlineAmount!: number;//tiền chuyển khaonr
   public method!: number;//loại thanh toán
   public paidAt!: Date;//thanh toán lúc
-  public paidAtBigint!: Date;//thanh toán lúc
+  public paidAtBigint!: number;//thanh toán lúc
   public note?: string;//ghi chú
   public employeeId?:string;
   public async countInvoice(){
@@ -77,5 +77,7 @@ Payment.init(
     underscored: true,
   }
 );
-
+Payment.beforeCreate((payment) => {
+  payment.paidAtBigint = dayjs(payment.paidAt).unix();
+})
 export default Payment;

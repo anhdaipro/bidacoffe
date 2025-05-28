@@ -26,6 +26,7 @@ import {
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Product, ProductForm } from '@/app/type/model/Product';
+import { RequiredLable } from '../Icon';
 
 interface Props {
   product: Product;
@@ -46,11 +47,16 @@ const Form: React.FC<Props> = ({ product }) => {
 
   const [showPending, setShowPending] = useState(false);
   const [image, setImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(product.image);
+  const [preview, setPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
   const addToast = useToastStore((state) => state.addToast);
-
+  useEffect(() => {
+    if (product.image) {
+      setPreview(product.image);
+    }
+    console.log('product', product);
+  },[product.image])
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -189,7 +195,11 @@ const Form: React.FC<Props> = ({ product }) => {
       <Box component="form" noValidate onSubmit={handleSubmit(sendData)}>
         {/* Name */}
         <TextField
-          label="Tên sản phẩm *"
+          label={
+            <span>
+              Tên sản phẩm <RequiredLable required />
+            </span>
+          }
           fullWidth
           margin="normal"
           {...register('name', {
@@ -204,7 +214,11 @@ const Form: React.FC<Props> = ({ product }) => {
 
         {/* Price */}
         <TextField
-          label="Giá *"
+          label={
+            <span>
+              Giá sản phẩm <RequiredLable required />
+            </span>
+          }
           fullWidth
           margin="normal"
           value={formatNumber(price)}
@@ -230,7 +244,11 @@ const Form: React.FC<Props> = ({ product }) => {
           <InputLabel id="category-label">Loại sản phẩm</InputLabel>
           <Select
             labelId="category-label"
-            label="Loại sản phẩm *"
+            label={
+              <span>
+                Loại sản phẩm <RequiredLable  required />
+              </span>
+            }
             defaultValue={product.categoryId}
             {...register('categoryId', { required: 'Vui lòng chọn loại sản phẩm',
               validate: (value) => (Number(value) > 0 ? true : 'Vui lòng chọn loại sản phẩm'),
@@ -256,7 +274,7 @@ const Form: React.FC<Props> = ({ product }) => {
           error={!!errors.status}
           required
         >
-          <InputLabel id="status-label">Trạng thái</InputLabel>
+          <InputLabel id="status-label">Trạng thái <RequiredLable required /></InputLabel>
           <Select
             labelId="status-label"
             label="Trạng thái *"

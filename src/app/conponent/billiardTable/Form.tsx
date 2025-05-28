@@ -18,6 +18,7 @@ import {
   Stack,
 } from '@mui/material';
 import { BilliardTableForm } from '@/app/type/model/Table';
+import { RequiredLable } from '../Icon';
 
 
 interface Props{
@@ -112,13 +113,17 @@ const Form: React.FC<Props> = ({ table }) => {
           render={({ field }) => (
             <TextField
               {...field}
-              label="Số bàn"
+              label={
+                <span>
+                  Số bàn <RequiredLable required />
+                </span>
+              }
               fullWidth
               margin="normal"
               error={!!errors.tableNumber}
               helperText={errors.tableNumber?.message}
               type="number"
-              inputProps={{ min: 1 }}
+             
             />
           )}
         />
@@ -137,6 +142,11 @@ const Form: React.FC<Props> = ({ table }) => {
               fullWidth
               margin="normal"
               error={!!errors.status}
+              label={
+                <span>
+                  Trạng thái <RequiredLable required />
+                </span>
+              }
               helperText={errors.status?.message}
               value={field.value}
               onChange={(e) => field.onChange(Number(e.target.value))}
@@ -159,7 +169,11 @@ const Form: React.FC<Props> = ({ table }) => {
           render={({ field }) => (
             <TextField
               {...field}
-              label="Loại bàn"
+              label={
+                <span>
+                  Loại bàn <RequiredLable required />
+                </span>
+              }
               select
               fullWidth
               margin="normal"
@@ -189,7 +203,11 @@ const Form: React.FC<Props> = ({ table }) => {
           render={({ field }) => (
             <TextField
               {...field}
-              label="Giá theo giờ"
+              label={
+                <span>
+                  Giá theo giờ <RequiredLable required />
+                </span>
+              }
               fullWidth
               margin="normal"
               error={!!errors.hourlyRate}

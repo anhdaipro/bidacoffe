@@ -240,10 +240,12 @@ class ReportController {
         try {
             const today = dayjs();
             const todayStr = today.format('YYYY-MM-DD'); // "2025-05-24"
+            
             const todayBigint = dayjs(todayStr).unix();      // UNIX timestamp (giây)
             const sevenDaysAgo = today.subtract(7, 'day');
             const seventDaysAgoStr = sevenDaysAgo.format('YYYY-MM-DD')
             const sevenDaysAgoBigint = dayjs(seventDaysAgoStr).unix(); 
+            console.log(todayBigint)
             const dateCol = fn('DATE', col('paid_at')); // Hoặc 'paidAt' nếu model mapping đúng
             const countInvoice = await Payment.count({
                 where:{

@@ -7,6 +7,7 @@ import { ROLE_ADMIN } from '../BidaConst';
 import { STATUS_AVAILABLE, STATUS_PAID, STATUS_PLAYING, STATUS_WAIT_PAID } from '@form/billiardTable';
 import { PAYMENT_METHOD } from '@form/payment';
 import Reward from './Reward';
+import dayjs from 'dayjs';
 const DEBIT = 1;
 const NO_DEBIT = 2
 const STATUS_DEBIT = [
@@ -177,6 +178,7 @@ TableSession.init(
 TableSession.beforeCreate(async (tableSession) => {
   let isUnique = false;
   let randomString = '';
+  tableSession.createdAtBigint = dayjs(tableSession.createdAt).unix(); // Lưu thời gian tạo phiên làm việc
   const currentYear = new Date().getFullYear(); // Lấy năm hiện tại
   while (!isUnique) {
     // Tạo chuỗi ngẫu nhiên chỉ chứa chữ cái

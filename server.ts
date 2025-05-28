@@ -39,8 +39,8 @@ app.prepare().then(() => {
   server.use('/api/tablesession', tableSessionRoutes);
   server.use('/api/report', reportRoutes);
   server.use('/api/billiard-table', billiardTableRoutes);
-  server.use('/api/shifts', shiftRoutes);
-  server.use('/api/shifts', scheduleRoutes);
+  server.use('/api/shift', shiftRoutes);
+  server.use('/api/schedule', scheduleRoutes);
   // Route test đơn giản
   server.get('/hello', (_req: Request, res: Response) => {
     res.send('Hello World!');

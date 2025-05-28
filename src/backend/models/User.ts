@@ -2,6 +2,7 @@ import { DataTypes, Model,ValidationError, ValidationErrorItem } from 'sequelize
 import sequelize from '../database/db';
 import bcrypt from 'bcrypt'
 import UserProfile from './UserProfile';
+import dayjs from 'dayjs';
 const ROLE_ADMIN = 1
 const ROLE_EMPLOYEE = 2
 const ROLE_CUSTOMER = 3
@@ -33,8 +34,8 @@ class User extends Model {
   public status!: number;
   public address!: string;
   public point!: number;
-  public baseSalary!:number;
   public dateOfBirth!:Date;
+  public  createdAtBigint!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
   public async createCustomer(phone:string){
@@ -83,6 +84,10 @@ User.init(
         type: DataTypes.TINYINT,
         allowNull: false,
     },
+    createdAtBigint: {
+      type: DataTypes.TINYINT,
+      allowNull: false,
+    },
     point: {
       type: DataTypes.TINYINT,
       allowNull: true,
@@ -119,6 +124,9 @@ User.init(
 User.afterValidate(async (transaction, options) =>{
 
 })
+User.beforeCreate(async (user, options) => {
+  user.createdAtBigint = dayjs(user.createdAt).unix(); // Lưu thời gian tạo người dùng
+});
 User.hasOne(UserProfile,{
   foreignKey:'userId',
   as:'rProfile'
