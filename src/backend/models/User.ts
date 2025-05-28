@@ -85,7 +85,7 @@ User.init(
         allowNull: false,
     },
     createdAtBigint: {
-      type: DataTypes.TINYINT,
+      type: DataTypes.BIGINT,
       allowNull: false,
     },
     point: {

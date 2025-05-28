@@ -4,6 +4,8 @@ import User from './User';
 import dayjs from 'dayjs';
 import { ROLE_EMPLOYEE } from '../BidaConst';
 import Shift from './Shift';
+import isoWeek from 'dayjs/plugin/isoWeek';
+dayjs.extend(isoWeek);
 class Schedule extends Model {
   public id!: number;
   public employeeId!: number;
@@ -61,7 +63,7 @@ class Schedule extends Model {
   }
   public async cronGenerateWeeklySchedule(){
     const today = dayjs();
-    const startOfNextWeek = today.add(1, 'week').startOf('week');
+    const startOfNextWeek = today.add(1, 'week').startOf('isoWeek'); // Thứ 2
     const endOfNextWeek = startOfNextWeek.add(6, 'day');
 
     const employees = await User.findAll({
@@ -72,7 +74,16 @@ class Schedule extends Model {
 
     const shifts = await Shift.findAll({ attributes: ['id'] });
     const aShiftId = shifts.map(shift => shift.get('id'));
-
+    const lastWeek = await Schedule.findAll({
+      where: {
+        workDate: {
+          [Op.between]: [
+            startOfNextWeek.clone().subtract(7, 'day').format('YYYY-MM-DD'),
+            startOfNextWeek.clone().subtract(1, 'day').format('YYYY-MM-DD'),
+          ],
+        },
+      },
+    });
     for (const emp of employees) {
       const lastWeek = await Schedule.findAll({
         where: {
@@ -88,7 +99,7 @@ class Schedule extends Model {
 
       const usedShifts = lastWeek.map(s => s.shiftId);
 
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < 6; i++) {
         const workDate = dayjs(startOfNextWeek).add(i, 'day').format('YYYY-MM-DD');
 
         let possibleShifts = aShiftId.filter(s => !usedShifts.includes(s));
