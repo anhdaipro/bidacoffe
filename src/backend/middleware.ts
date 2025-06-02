@@ -10,12 +10,6 @@ declare global {
     }
   }
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
-interface UserPayload {
-    id: number;
-    username: string;
-    roleId: number;
-    // thêm các field khác nếu token có, ví dụ: email, role,...
-  }
   
 export const  authenticateJWT = async (
   req: Request,

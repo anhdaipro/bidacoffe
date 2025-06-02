@@ -122,19 +122,20 @@ const Form: React.FC<Props> = ({ customer }) => {
 
           {/* Trạng thái */}
           <Grid size={{xs:12}}>
-            <FormControl fullWidth error={Boolean(errors.status)}>
-              <InputLabel id="status-label">Trạng thái<RequiredLable required /></InputLabel>
+          <FormControl fullWidth error={Boolean(errors.status)}>
+            <InputLabel id="typeEducation-label">Trạng thái<RequiredLable required/></InputLabel>
               <Select
-                labelId="status-label"
-                id="status"
-                defaultValue=""
+                labelId="typeEducation-label"
+                id="typeEducation"
+                label="Trạng thái"
+                value={watch('status')}
                 {...register('status', {
-                  required: 'Trạng thái là bắt buộc',
+                  required: 'Trạng thái không để trống',
                   validate: (value) =>
-                    Number(value) > 0 ? true : 'Trạng thái là bắt buộc',
+                    value != '0' || 'Vui lòng chọn trạng thái',
                 })}
               >
-                <MenuItem value={0}>Chọn trạng thái</MenuItem>
+                <MenuItem value='0'>Trạng thái</MenuItem>
                 {Object.entries(STATUS_LABELS).map(([key, value]) => (
                   <MenuItem key={key} value={key}>
                     {value}

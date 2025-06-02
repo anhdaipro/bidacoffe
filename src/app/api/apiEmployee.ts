@@ -1,4 +1,3 @@
-import axios from 'axios'
 
 import { EmployeeForm, EmployeeFormSearch } from '../type/model/Employee';
 import axiosInstance from '../hook/axiosInstance';

@@ -12,6 +12,8 @@ class Payment extends Model {
   public paidAtBigint!: number;//thanh toán lúc
   public note?: string;//ghi chú
   public employeeId?:string;
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
   public async countInvoice(){
     const today = dayjs();
     const todayStr = today.format('YYYY-MM-DD'); // "2025-05-24"

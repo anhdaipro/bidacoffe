@@ -34,10 +34,21 @@ class User extends Model {
   public status!: number;
   public address!: string;
   public point!: number;
+  public shiftId!: number;
   public dateOfBirth!:Date;
+  public salaryType!: number; // Loại lương (theo giờ, theo tháng, theo sản phẩm)
   public  createdAtBigint!: number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+  public async getUserByRole(roleId:number|string){
+    const users = await User.findAll({
+      where:{
+        roleId:roleId
+      }
+    })
+    const aId = users.map(item=>item.id)
+    return aId
+  }
   public async createCustomer(phone:string){
     const username = phone
     const password = '123123'
@@ -84,11 +95,18 @@ User.init(
         type: DataTypes.TINYINT,
         allowNull: false,
     },
+    shiftId: {
+      type: DataTypes.TINYINT,
+    },
     createdAtBigint: {
       type: DataTypes.BIGINT,
-      allowNull: false,
+      allowNull: true,
     },
     point: {
+      type: DataTypes.TINYINT,
+      allowNull: true,
+    },
+    salaryType:{
       type: DataTypes.TINYINT,
       allowNull: true,
     },
@@ -103,7 +121,6 @@ User.init(
     phone: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
     address:{
       type: DataTypes.STRING,

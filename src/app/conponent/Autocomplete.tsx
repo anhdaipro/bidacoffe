@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Autocomplete, TextField, CircularProgress, AutocompleteInputChangeReason ,Box} from '@mui/material';
+import { Autocomplete, TextField, CircularProgress ,Box} from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 
 export interface AutocompleteItem {
@@ -33,7 +33,7 @@ function SearchAutocomplete<T extends AutocompleteItem>({
   itemchoice,
   minSearchLength = 2,
 }: Props) {
-  const [inputValue, setInputValue] = useState('');
+    const [inputValue, setInputValue] = useState('');
     const [item,setItem] = useState<AutocompleteItem|null>(itemchoice)
     const [isCheck, setIsCheck] = useState(false)
     const debouncedInput = useDebounce(inputValue, 500); // debounce 300ms

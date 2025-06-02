@@ -1,12 +1,28 @@
 import { createTheme } from '@mui/material/styles';
 import type {} from '@mui/x-date-pickers/themeAugmentation';
 export const theme = createTheme({
+  typography: {
+    fontSize: 14, // 14px = 0.875rem
+    h2: {
+      fontSize: 20,      // Tuỳ chỉnh kích thước chữ
+      textTransform: 'uppercase', // Chữ hoa
+      margin:'0 !important', // Bỏ margin mặc định
+      fontWeight: 600,       // Tuỳ chỉnh độ đậm (400 = normal, 600 = semi-bold, 700 = bold)
+    },
+  },
   components: {
     MuiInputBase: {
       styleOverrides: {
         root: {
           height: 36,
           
+        },
+      },
+    },
+    MuiCssBaseline: {
+      styleOverrides: {
+        html: {
+          fontSize: '14px',  // đổi font-size gốc của html để rem = 14px
         },
       },
     },

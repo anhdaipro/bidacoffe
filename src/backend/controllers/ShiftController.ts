@@ -6,7 +6,7 @@ class ShiftController {
   // Tạo mới một ca làm việc
   public static async createShift(req: Request, res: Response): Promise<void> {
     try {
-      const { name, description, startTime, endTime, status } = req.body;
+      const { name, description, startTime, endTime, status,numEmployee,salaryHour } = req.body;
 
       const newShift = await Shift.create({
         name,
@@ -14,8 +14,10 @@ class ShiftController {
         startTime,
         endTime,
         status,
+        numEmployee,
+        salaryHour,
       });
-
+      await newShift.deleteCache(); // Xóa cache sau khi tạo mới
       res.status(201).json({
         message: 'Tạo ca làm việc thành công.',
         data: newShift,
@@ -74,7 +76,7 @@ class ShiftController {
   public static async updateShift(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const { name, description, startTime, endTime, status } = req.body;
+      const { name, description, startTime, endTime, status,numEmployee,salaryHour } = req.body;
 
       const shift = await Shift.findByPk(id);
 
@@ -91,8 +93,10 @@ class ShiftController {
         startTime,
         endTime,
         status,
+        numEmployee,
+        salaryHour,
       });
-
+      await shift.deleteCache(); // Xóa cache sau khi update
       res.status(200).json({
         message: 'Cập nhật ca làm việc thành công.',
         data: shift,

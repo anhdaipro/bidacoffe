@@ -5,7 +5,7 @@ import { formatNumber, normalizeString } from '@/app/helper';
 import { useOrderTableSession } from '@/app/query/useTableSession';
 import { useToastStore } from '@/app/store/toastStore';
 import { v4 as uuidv4 } from 'uuid';
-import { OrderDetail, OrderForm, TableSession } from '@/app/type/model/TableSession';
+import { OrderForm, TableSession } from '@/app/type/model/TableSession';
 import { Table } from '@/app/type/model/Table';
 import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
 import {
@@ -22,7 +22,8 @@ import {
   Paper,
   IconButton,
   Typography,
-
+  Stack,
+  Grid,
   useTheme,
   useMediaQuery
 } from '@mui/material';
@@ -39,9 +40,9 @@ const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   maxHeight: 400,
 }));
 
-const StickyHeaderCell = styled(TableCell)(({ theme }) => ({
+export const StickyHeaderCell = styled(TableCell)(({ theme }) => ({
   position: 'sticky',
-  top: 0,
+  top: 40,
   backgroundColor: theme.palette.background.paper,
   zIndex: 1,
   fontWeight: 'bold'
@@ -50,7 +51,7 @@ const StickyHeaderCell = styled(TableCell)(({ theme }) => ({
 const QuantityInputContainer = styled(Box)({
   display: 'flex',
   alignItems: 'center',
-  gap: '8px'
+  
 });
 
 const OrderTab: React.FC<OrderTabProps> = ({ selectedSession, tableSessions, selectedTable }) => {
@@ -63,7 +64,7 @@ const OrderTab: React.FC<OrderTabProps> = ({ selectedSession, tableSessions, sel
   const { mutate: orderProduct } = useOrderTableSession();
   const addToast = useToastStore(state => state.addToast);
   const setTableSession = useTableStore(state => state.setTableSession);
-  
+  const [item,setItem] = useState<Product|null>(null);
   const { register, handleSubmit, formState: { errors }, control, setValue, watch } = useForm<OrderForm>({
     values: {
       orders: selectedSession?.orders || [],
@@ -151,11 +152,17 @@ const OrderTab: React.FC<OrderTabProps> = ({ selectedSession, tableSessions, sel
         options={filteredProducts}
         getOptionLabel={(option) => (option as Product).name || ''}
         inputValue={productSearch}
+        value={item}
         onInputChange={(_, newValue) => setProductSearch(newValue)}
         onChange={(_, newValue) => {
           if (newValue && typeof newValue !== 'string') {
             addProductToDetails(newValue as Product);
+            setItem(newValue as Product);
           }
+        }}
+        onClose={() => {
+          setProductSearch('');
+          setItem(null);
         }}
         renderInput={(params) => (
           <TextField
@@ -171,35 +178,123 @@ const OrderTab: React.FC<OrderTabProps> = ({ selectedSession, tableSessions, sel
           </li>
         )}
       />
+      {isSmallScreen ? <Stack spacing={2}>
+      {orders.map((detail, index) => {
+      const product = menu.find((p: Product) => p.id === detail.productId);
+      if (!product) return null;
 
-<TableContainer
-  component={Paper}
-  sx={{
-    maxHeight: 400,
-    overflowY: 'auto',
-    '&::-webkit-scrollbar': {
-      width: '8px',
-    },
-    '&::-webkit-scrollbar-track': {
-      backgroundColor: '#f1f1f1',
-      borderRadius: '4px',
-    },
-    '&::-webkit-scrollbar-thumb': {
-      backgroundColor: '#bdbdbd',
-      borderRadius: '4px',
-    },
-    '&::-webkit-scrollbar-thumb:hover': {
-      backgroundColor: '#9e9e9e',
-    },
-    scrollbarWidth: 'thin',
-    scrollbarColor: '#bdbdbd #f1f1f1',
-  }}
->
+      return (
+        <Paper key={index} variant="outlined" sx={{ p: 2 }}>
+          <Grid container spacing={1}>
+            <Grid size={{xs:6}}><b>{index + 1}. {product.name}</b></Grid>
+            <Grid size={{xs:6}} textAlign="right">{formatNumber(product.price)} đ</Grid>
+            <Grid container alignItems={'center'} size={{xs:6}}><b>Số lượng</b></Grid>
+            <Grid size={{xs:6}}>
+              <Controller
+                name={`orders.${index}.quantity`}
+                control={control}
+                rules={{
+                  required: 'Số lượng không hợp lệ',
+                  validate: (value) => value > 0 || 'Số lượng phải lớn hơn 0',
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        overflow: 'hidden',
+                        width: 'fit-content',
+                        marginLeft: 'auto',
+                      }}
+                    >
+                    <IconButton
+                      size="small"
+                      onClick={() => onChange(Math.max(1, value - 1))}
+                    >
+                      <Remove fontSize="small" />
+                    </IconButton>
+                    <TextField
+                      size="small"
+                      value={value}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/,/g, '');
+                        const numeric = Number(raw);
+                        onChange(isNaN(numeric) ? 0 : numeric);
+                      }}
+                      error={!!errors.orders?.[index]?.quantity}
+                      helperText={errors.orders?.[index]?.quantity?.message}
+                      sx={{ width: 60,
+                        '& .MuiOutlinedInput-root': {
+        borderRadius: 0,
+        '& fieldset': {
+          borderTop: 'none',
+          borderBottom: 'none',
+        },
+        input: {
+          textAlign: 'center',
+          p: '6px',
+        },
+      },
+                       }}
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={() => onChange(Math.min(100, value + 1))}
+                    >
+                      <Add fontSize="small" />
+                    </IconButton>
+                  </Box>
+                )}
+              />
+            </Grid>
+
+            <Grid size={{xs:6}} sx={{fontWeight:'bold'}}>Thành tiền</Grid>
+            <Grid size={{xs:6}} textAlign="right">{formatNumber(detail.price * detail.quantity)} đ</Grid>
+
+            <Grid size={{xs:12}} textAlign="right">
+              <IconButton onClick={() => removeDetail(index)} color="error">
+                <Delete fontSize="small" />
+              </IconButton>
+            </Grid>
+          </Grid>
+        </Paper>
+      );
+    })}
+
+    <Paper variant="outlined" sx={{ p: 2, fontWeight: 'bold' }}>
+      Tổng tiền: {formatNumber(totalAmount)} đ
+    </Paper>
+    </Stack>:
+      <TableContainer
+          component={Paper}
+          sx={{
+            maxHeight: 400,
+            overflowY: 'auto',
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              backgroundColor: '#f1f1f1',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: '#bdbdbd',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              backgroundColor: '#9e9e9e',
+            },
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#bdbdbd #f1f1f1',
+          }}
+        >
         <MuiTable stickyHeader size={isSmallScreen ? 'small' : 'medium'}>
           <TableHead>
             <TableRow>
               {headers.map((header, index) => (
-                <StickyHeaderCell key={index}>{header}</StickyHeaderCell>
+                <TableCell key={index}>{header}</TableCell>
               ))}
             </TableRow>
           </TableHead>
@@ -222,32 +317,54 @@ const OrderTab: React.FC<OrderTabProps> = ({ selectedSession, tableSessions, sel
                         validate: (value) => value > 0 || 'Số lượng phải lớn hơn 0',
                       }}
                       render={({ field: { onChange, value } }) => (
-                        <QuantityInputContainer>
-                          <IconButton
-                            size="small"
-                            onClick={() => onChange(Math.max(1, value - 1))}
-                          >
-                            <Remove fontSize="small" />
-                          </IconButton>
-                          <TextField
-                            size="small"
-                            value={value}
-                            onChange={(e) => {
-                              const raw = e.target.value.replace(/,/g, '');
-                              const numeric = Number(raw);
-                              onChange(isNaN(numeric) ? 0 : numeric);
-                            }}
-                            error={!!errors.orders?.[index]?.quantity}
-                            helperText={errors.orders?.[index]?.quantity?.message}
-                            sx={{ width: '60px' }}
-                          />
-                          <IconButton
-                            size="small"
-                            onClick={() => onChange(Math.min(100, value + 1))}
-                          >
-                            <Add fontSize="small" />
-                          </IconButton>
-                        </QuantityInputContainer>
+                        <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        border: '1px solid #ccc',
+                        borderRadius: '4px',
+                        overflow: 'hidden',
+                        width: 'fit-content',
+                        marginLeft: 'auto',
+                      }}
+                    >
+                    <IconButton
+                      size="small"
+                      onClick={() => onChange(Math.max(1, value - 1))}
+                    >
+                      <Remove fontSize="small" />
+                    </IconButton>
+                    <TextField
+                      size="small"
+                      value={value}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/,/g, '');
+                        const numeric = Number(raw);
+                        onChange(isNaN(numeric) ? 0 : numeric);
+                      }}
+                      error={!!errors.orders?.[index]?.quantity}
+                      helperText={errors.orders?.[index]?.quantity?.message}
+                      sx={{ width: 60,
+                        '& .MuiOutlinedInput-root': {
+        borderRadius: 0,
+        '& fieldset': {
+          borderTop: 'none',
+          borderBottom: 'none',
+        },
+        input: {
+          textAlign: 'center',
+          p: '6px',
+        },
+      },
+                       }}
+                    />
+                    <IconButton
+                      size="small"
+                      onClick={() => onChange(Math.min(100, value + 1))}
+                    >
+                      <Add fontSize="small" />
+                    </IconButton>
+                  </Box>
                       )}
                     />
                   </TableCell>
@@ -269,7 +386,7 @@ const OrderTab: React.FC<OrderTabProps> = ({ selectedSession, tableSessions, sel
           </TableBody>
         </MuiTable>
       </TableContainer>
-
+      }
       <Button
         variant="contained"
         color="primary"

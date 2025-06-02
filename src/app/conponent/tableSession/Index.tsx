@@ -140,16 +140,15 @@ const Index: React.FC = () => {
   return (
     <Box sx={{ maxWidth: 1200, mx: "auto", px: 2, py: 3,background:'#fff' }}>
       {/* Giữ nguyên phần Search component */}
-      <Box sx={{ marginBottom: 3 }}>
+      <Box sx={{  }}>
         <Search setFormSearch={setFormSearch} form={formData} />
       </Box>
 
-      <Typography variant="h4" gutterBottom>
-        Phiên chơi
-      </Typography>
-
       {user?.roleId === ROLE_ADMIN && (
-        <Box display={'flex'} justifyContent={'flex-end'} sx={{ mb: 2 }}>
+        <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} sx={{ mb: 2 }}>
+           <Typography variant="h2"  gutterBottom>
+          Phiên chơi
+        </Typography>
           <Button variant="contained" color="primary" href="/tableSession/create" component={Link}>
             Tạo mới
           </Button>
@@ -224,19 +223,20 @@ const Index: React.FC = () => {
               sx={{
                 mt: 2,
                 display: "flex",
-                gap: 1,
-                justifyContent: { xs: "center", md: "flex-end" },
+                gap: 2,
+                
+                // justifyContent: { xs: "center", md: "flex-end" },
               }}
             >
               
-                <Button variant="outlined" color="primary" href={`/tableSession/update/${tableSession.id}`} component={Link} size="small">
+                <Button variant="outlined" color="primary" href={`/tableSession/update/${tableSession.id}`} component={Link} >
                   Chỉnh sửa
                 </Button>
               
               <Button
                 variant="outlined"
                 color="error"
-                size="small"
+               
                 onClick={() => handleDelete(tableSession.id)}
               >
                 Xóa

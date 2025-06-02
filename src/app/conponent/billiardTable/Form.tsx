@@ -63,8 +63,7 @@ const Form: React.FC<Props> = ({ table }) => {
     }
   };
 
-  const hourlyRate = watch('hourlyRate');
-  const {status} = watch()
+  
   // Handle number input formatting
   const handleHourlyRateChange = (value: string) => {
     let numericValue = value.replace(/[^0-9]/g, '');

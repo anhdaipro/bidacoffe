@@ -16,6 +16,16 @@ const TYPE_EDUCATION_4 = 4
 const BANK_BIDV = 1;
 const BANK_VIETCOMBANK = 2;
 const BANK_TELECOM = 3;
+const SALARY_TYPE_HOUR = 1; // Lương theo giờ
+const SALARY_TYPE_MONTH = 2; // Lương theo tháng
+export const SALARY_TYPE_LABEL: Record<number, string> = {
+  [SALARY_TYPE_HOUR]: 'Lương theo giờ',
+  [SALARY_TYPE_MONTH]: 'Lương theo tháng',
+};
+export const STATUS_LABEL: Record<number, string> = {
+  [STATUS_ACTIVE]: 'Hoạt động',
+  [STATUS_INACTIVE]: 'Không hoạt động',
+}
 export const BANK_LABELS: Record<number, string> = {
   [BANK_BIDV]: 'Ngân hàng BIDV',
   [BANK_VIETCOMBANK]: 'Ngân hàng Vietcombank',

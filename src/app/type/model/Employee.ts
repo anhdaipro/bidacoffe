@@ -14,6 +14,8 @@ export interface EmployeeForm extends CustomerForm{
     bankNo: string;
     baseSalary:number;
     typeEducation: number;
+    note: string;
+    shiftId: number;
 }
 export interface Employee extends Customer{
     roleId:number;
@@ -29,6 +31,8 @@ export interface Employee extends Customer{
     bankNo: string;
     baseSalary:number;
     typeEducation: number;
+    note: string;
+    shiftId: number;
 }
 export interface EmployeeIndex extends CustomerIndex{
     roleId:number;

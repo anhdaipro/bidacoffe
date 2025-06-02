@@ -1,12 +1,17 @@
 import { useQuery,useMutation,useQueryClient } from '@tanstack/react-query';
 import { apiCreateEmployee, apiGetAllEmployee, apigetEmployee, apiGetEmployeeSchedule, apiUpdateEmployee } from '../api/apiEmployee';
 import { EmployeeFormSearch } from '../type/model/Employee';
-import { apiGetAllShift } from '../api/shift';
+import { apiCreateShift, apiGetAllShift, apiUpdateShift } from '../api/shift';
+import { Shift } from '../type/model/Shift';
 export const  useCreateShift= () =>{
+    const queryClient = useQueryClient();
     return useMutation({
-        mutationFn:apiCreateEmployee,
+        mutationFn:apiCreateShift,
         onSuccess: (data, variables, context) => {
-        // I will fire first
+            console.log(data);
+            queryClient.setQueryData(['shifts'], (oldShifts:Shift[]) => {
+                return [...oldShifts, data.data];
+            });
         },
         onError: (error, variables, context) => {
         // I will fire first
@@ -14,9 +19,16 @@ export const  useCreateShift= () =>{
     });
 } 
 export const useUpdateShift = () =>{
+    const queryClient = useQueryClient();
     return useMutation({
-        mutationFn:apiUpdateEmployee,
+        mutationFn:apiUpdateShift,
         onSuccess: (data, variables, context) => {
+            const updatedShift = data.data;
+            queryClient.setQueryData(['shifts'], (oldShifts: Shift[] = []) => {
+                return oldShifts.map((shift) =>
+                    shift.id == updatedShift.id ? updatedShift : shift
+                );
+            });
         // I will fire first
         },
         onError: (error, variables, context) => {
@@ -25,15 +37,6 @@ export const useUpdateShift = () =>{
     });
 } 
  
-export const useGetShift = (id: number) => {
-return useQuery({
-    queryKey:['employee',id],
-    queryFn: async () =>{
-        return await apigetEmployee(id)
-    },
-        staleTime:1000*3,
-    })
-};
 export const usegetAllShift = () => {
     return useQuery({
         queryKey:['shifts'],

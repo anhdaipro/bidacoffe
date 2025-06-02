@@ -4,7 +4,6 @@ import User from '../models/User';
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
 import { JWT_SECRET,REFRESH_TOKEN_SECRET, ROLE_CUSTOMER, STATUS_ACTIVE } from '../BidaConst';
-import crypto from 'crypto';
 import { addDay } from '../Format';
 const refreshTokens: Record<string, number> = {}; // Bộ nhớ tạm (thay bằng DB trong thực tế)
 class UserController {
@@ -151,7 +150,6 @@ class UserController {
                 { id: user.id,roleId: user.roleId },
                 REFRESH_TOKEN_SECRET,
             );
-            // const refreshToken = crypto.randomBytes(64).toString('hex'); // Tạo refresh token
             const { password:passUser,hashedPassword, createdAt, updatedAt, ...safeUser } = user.toJSON();
 
             res.json({ accessToken, refreshToken, user:safeUser});

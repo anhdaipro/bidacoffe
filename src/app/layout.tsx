@@ -6,19 +6,17 @@ import Header from "./conponent/Menu";
 import '../app/css/loading.css'
 import Modal from "./conponent/Modal";
 import React from 'react';
-import styled from 'styled-components';
-import Link from "next/link";
-import StyledComponentsRegistry from "./lib/registry";
-import { useControlStore } from "./store/useStore";
 import ToastContainer from "./conponent/toast/ToastContainer";
 import { usePathname } from 'next/navigation';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from "./type/theme";
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useAuthStore } from "./store/useUserStore";
 import LoginPage from "./login/page";
-
+import ResponsiveDrawer from "./conponent/ResponsiveDrawer";
+import { Box, AppBar, Toolbar, IconButton, Container, Drawer } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import CssBaseline from '@mui/material/CssBaseline';
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -29,95 +27,81 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const Wrapper = styled.div`
-  display: flex;
-  height: 100vh;
-  height: 100dvh;  
-`;
 
-const Sidebar = styled.div`
-  width: 240px;
-  background: #263238;
-  color: white;
-  display: flex;
-  flex-direction: column;
-`;
-interface LinkProps {
-  active?: number;
-}
-const SidebarItem = styled(Link)<LinkProps>`
-  padding: 16px;
-  cursor: pointer;
-  background-color: ${(props) => (props.active ? '#37474f' : 'transparent')};
-
-  &:hover {
-    background: #37474f;
-  }
-`;
-
-const ContentArea = styled.div`
-  flex: 1;
-  background: #f5f5f5;
-  overflow-y: auto;
-`;
-
-const HeaderStyle = styled.div`
-  height: 60px;
-  background: #1976d2;
-  color: white;
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  font-size: 20px;
-`;
-const menus = [
-  {title: 'Quản lý bàn', url: '/table'},
-  {title: 'Setup bàn', url: '/billiardTable'},
-  {title: 'Sản phẩm', url: '/products'},
-  {title: 'Phiên chơi', url: '/tableSession'},
-  {title: 'Nhân viên', url: '/employee'},
-  {title: 'Lịch làm việc', url: '/schedule'},
-  {title: 'Thống kế', url: '/dashboard'},
-  {title: 'Giao dịch sản phẩm', url: '/transaction'},
-  {title: 'Khách hàng', url: '/customer'},
-  {title: 'Cài đặt', url: '/setting'},
-]
+const drawerWidth = 200; // Chiều rộng tiêu chuẩn của Drawer trong Material-UI
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = useAuthStore(state=>state.user)
   const pathname = usePathname();
   const isLoginPage = pathname === '/login'
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <ThemeProvider theme={theme}>
+        <CssBaseline />
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <StyledComponentsRegistry>
+        
         <QueryProvider>
           {!isLoginPage ?
-          <Wrapper>
-            <Sidebar>
-              {menus.map(item =>
-                
-                <SidebarItem key={item.url} active={pathname === item.url ? 1 : 0} href={item.url}>{item.title}</SidebarItem>
-               
-              )}
-            </Sidebar>
+          <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+          {/* Mobile Drawer - Ẩn trên desktop */}
+          <Box
+            component="nav"
+            sx={{ 
+              zIndex: 100, // Đảm bảo Drawer nằm trên AppBar
+              width: { sm: 0 }, // Ẩn hoàn toàn trên desktop
+              flexShrink: { sm: 0 } 
+            }}
+          >
+            <ResponsiveDrawer 
+              mobileOpen={mobileOpen} 
+              handleDrawerToggle={handleDrawerToggle}
+            />
+          </Box>
 
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              <Header/>
-              <ContentArea>
-                {children}
-              </ContentArea>
-            </div>
-          </Wrapper>: <LoginPage/>}
+          {/* Main Content Area */}
+          <Box
+            component="main"
+            sx={{
+              flexGrow: 1,
+              width: { sm: `calc(100% - ${drawerWidth}px)` }, // Quan trọng: trừ đi chiều rộng drawer
+              
+              marginLeft: {sm:0 ,md: `${drawerWidth}px` }, // Đẩy nội dung sang phải
+            }}
+          >
+            {/* Header với menu button cho mobile */}
+            <AppBar position="fixed">
+              <Toolbar>
+                <IconButton
+                  color="inherit"
+                  edge="start"
+                  onClick={handleDrawerToggle}
+                  sx={{ mr: 2, display: { md: 'none' } }}
+                >
+                  <MenuIcon />
+                </IconButton>
+                <Header />
+              </Toolbar>
+            </AppBar>
+
+            {/* Content Area - Thêm padding để tránh bị AppBar che */}
+            <Box sx={{ mt: { xs: 7, sm: 8 },p:0 }}>
+                      <Container sx={{p:{xs:0}}}  maxWidth="xl">
+                        {children}
+                      </Container>
+                    </Box>
+          </Box>
+        </Box>
+          : <LoginPage/>}
           <Modal/>
           <ToastContainer />
         </QueryProvider>
-        </StyledComponentsRegistry>
         </LocalizationProvider>
         </ThemeProvider>
       </body>

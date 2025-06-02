@@ -28,24 +28,24 @@ const Detail: React.FC<PropsDetail> = ({ productId, products, quantity, price, t
   const type = CATEGORY_LABELS[product?.categoryId as keyof typeof CATEGORY_LABELS];
 
   return (
-    <Grid container spacing={2} alignItems="center" sx={{ mb: 1 }}>
-      <Grid size={{xs:12, sm:4}}>
-        <Box display="flex" gap={2} alignItems="center">
+    <Grid container sx={{ mb: 1,p:{sx:1} }}>
+      <Grid size={{xs:5, sm:6}}>
+        <Box display="flex" flexDirection={{xs:'column', sm:'row'}} gap={2} alignItems={{xs:'unset',sm:'center'}}>
           <img src={productImg} width={50} height={50} alt={productName} style={{ borderRadius: 4 }} />
-          <Box>
+          <Box >
             <Typography>{productName}</Typography>
             <Typography variant="body2" color="text.secondary">Loại: {type}</Typography>
           </Box>
         </Box>
       </Grid>
-      <Grid size={{xs:4, sm:2}}>
+      <Grid size={{xs:2, sm:2}}>
         <Typography>{quantity}</Typography>
       </Grid>
-      <Grid size={{xs:4, sm:3}}>
+      <Grid size={{xs:2, sm:2}}>
         <Typography>{formatNumber(price)}</Typography>
       </Grid>
-      <Grid size={{xs:4, sm:3}}>
-        <Typography>{formatNumber(totalPrice)}</Typography>
+      <Grid size={{xs:3, sm:2}}>
+        <Typography textAlign={'right'}>{formatNumber(totalPrice)}</Typography>
       </Grid>
     </Grid>
   );
@@ -104,11 +104,12 @@ const Index: React.FC = () => {
       <Search setFormSearch={setFormSearch} form={formData} />
 
       {user?.roleId === ROLE_ADMIN && (
-        <Box display="flex" justifyContent="flex-end" mb={2}>
+        <Box display="flex" justifyContent="space-between" alignItems={'center'} mb={2}>
+            <Typography variant="h2"  fontSize={20} >Giao dịch sản phẩm</Typography>
             <Button href='/transaction/create' component={Link} variant="contained">Tạo mới</Button>
         </Box>
       )}
-        <Typography variant="h5" mb={2}>Giao dịch sản phẩm</Typography>
+        
       {/* Header */}
       <Box
         sx={{
@@ -121,10 +122,10 @@ const Index: React.FC = () => {
         }}
       >
         <Grid container spacing={2}>
-          <Grid size={{xs:12, sm:4}}><Typography fontWeight="bold">Tên sản phẩm</Typography></Grid>
-          <Grid size={{xs:4, sm:2}}><Typography fontWeight="bold">Số lượng</Typography></Grid>
-          <Grid size={{xs:4, sm:3}}><Typography fontWeight="bold">Giá</Typography></Grid>
-          <Grid size={{xs:4, sm:3}}><Typography fontWeight="bold">Tổng tiền</Typography></Grid>
+          <Grid size={{xs:5, sm:6}}><Typography fontWeight="bold">Tên SP</Typography></Grid>
+          <Grid size={{xs:2, sm:2}}><Typography fontWeight="bold">Số lượng</Typography></Grid>
+          <Grid size={{xs:2, sm:2}}><Typography fontWeight="bold">Giá</Typography></Grid>
+          <Grid size={{xs:3, sm:2}}><Typography textAlign={'right'} fontWeight="bold">Tổng tiền</Typography></Grid>
         </Grid>
       </Box>
 
@@ -158,7 +159,7 @@ const Index: React.FC = () => {
           <Box
   mt={2}
   display="flex"
-  flexDirection={isMobile ? 'column' : 'row'}
+  // flexDirection={isMobile ? 'column' : 'row'}
   gap={2}
   alignItems="flex-start"
 >

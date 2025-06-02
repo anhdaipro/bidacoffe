@@ -12,7 +12,7 @@ export default class ProductTransaction extends Model {
   public codeNo!: string;//db
   public type!: number; //db 1: Nhập, 2: Xuất
   public totalAmount!: number;//db tiền
-  public dateDelivery!: Date;//db ngày nhập xuất
+  public dateDelivery!: string;//db ngày nhập xuất
   public dateDeliveryBigint!: number;//db
   public uidLogin!: number;//db
   public sessionId!: number;//db
@@ -27,7 +27,8 @@ export default class ProductTransaction extends Model {
     return ''
   }
   public async createFromSession(session:TableSession){
-    const date = new Date()
+    const strToday = dayjs().format('YYYY-MM-DD');
+    const date = dayjs(strToday);
     // const productTransaction = new ProductTransaction
     const orders = await TableOrder.findAll({
       where:{sessionId: session.id}
@@ -37,8 +38,8 @@ export default class ProductTransaction extends Model {
     }
     this.type = EXPORT
     this.totalAmount = session.totalAmount - session.amountTable- session.discountAmount
-    this.dateDelivery = date
-    this.dateDeliveryBigint = date.getTime()
+    this.dateDelivery = strToday;
+    this.dateDeliveryBigint = date.unix();
     await this.save();
     const productTransactionDetails = orders.map((detail: TableOrder) => ({
       transactionId: this.id,
@@ -49,7 +50,7 @@ export default class ProductTransaction extends Model {
       price: detail.price,
       totalPrice: detail.quantity * detail.price,
       dateDelivery:date,
-      dateDeliveryBigint:date.getTime(),
+      dateDeliveryBigint:date.unix(),
       uidLogin:session.uidLogin,
     }));
     await ProductTransactionDetail.bulkCreate(productTransactionDetails);

@@ -1,7 +1,6 @@
 "use client"
 import Form from "@/app/conponent/employee/Form"
 import { useGetEmployee } from "@/app/query/useEmployee";
-import { useGetUser } from "@/app/query/useUser";
 import { useParams } from "next/navigation";
 const Update = () =>{
     const params = useParams();

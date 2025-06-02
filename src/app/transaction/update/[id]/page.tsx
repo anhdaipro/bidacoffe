@@ -1,7 +1,6 @@
 'use client';
 import React, { useState,useEffect } from 'react';
 import {useTransaction } from '@/app/query/useTransaction';
-import { useControlStore } from '@/app/store/useStore';
 import FormProductTransaction from '@/app/conponent/transaction/FormTransaction';
 import { useParams } from 'next/navigation';
 export default function CreateProductTransaction() {

@@ -2,14 +2,13 @@
 'use client';
 import React, { useState,useEffect } from 'react';
 import Link from 'next/link';
-import { useControlStore } from '../../store/useStore';
-import { STATUS_ACTIVE, STATUS_INACTIVE, STATUS_LABELS } from '@/form/user';
+import {STATUS_LABELS } from '@/form/user';
 import { formatDate, formatNumber } from '../../helper';
 import { useAuthStore } from '../../store/useUserStore';
 import { ROLE_ADMIN } from '@/backend/BidaConst';
 import { usegetAllUsers } from '@/app/query/useUser';
 import Search from './Search';
-import { Customer, CustomerFormSearch, CustomerIndex } from '@/app/type/model/Customer';
+import {CustomerFormSearch, CustomerIndex } from '@/app/type/model/Customer';
 import {
     Box,
     Button,
@@ -24,6 +23,9 @@ import {
     Paper,
     Pagination,
     Stack,
+    useTheme,
+    useMediaQuery,
+    Grid,
   } from '@mui/material';
 const Index = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -32,6 +34,8 @@ const Index = () => {
         status:'',phone: '',dateFrom: '', dateTo:'',
         uidLogin:'',
     });
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
     const { data, isLoading } = usegetAllUsers(currentPage, itemsPerPage,formData);
     
     const user = useAuthStore(state=>state.user)
@@ -76,9 +80,12 @@ const Index = () => {
         <Box className="product-container" sx={{ p: { xs: 2, md: 4 } }}>
         <Search setFormSearch={setFormSearch} form={formData} />
 
-        {user?.roleId === ROLE_ADMIN && (
-            <Box display="flex" justifyContent="flex-end" mb={2}>
-                <Button
+        
+            <Box display="flex" justifyContent="space-between" alignItems={'center'} my={2}>
+                 <Typography variant="h2" gutterBottom>
+                    Danh sách khách hàng
+                </Typography>
+                {user?.roleId === ROLE_ADMIN &&<Button
                     component={Link}
                     href="/customer/create"
                     variant="contained"
@@ -86,14 +93,37 @@ const Index = () => {
                     size="large"
                 >
                 Tạo mới
-            </Button>
+            </Button>}
             </Box>
-        )}
+        
 
-        <Typography variant="h5" gutterBottom fontWeight={600}>
-            Danh sách khách hàng
-        </Typography>
+       
+        {isMobile ? <Grid container spacing={2}>
+            {aCustomer.map((customer: CustomerIndex, index: number) => (
+            <Grid size={{xs:12, sm:6, md:4}} key={customer.id}>
+            <Paper elevation={3} sx={{ p: 2 }}>
+                <Stack spacing={1}>
+                <Typography variant="subtitle2">STT: {index + 1}</Typography>
+                <Typography variant="subtitle2">Tên KH: {customer.name}</Typography>
+                <Typography variant="subtitle2">SĐT: {customer.phone}</Typography>
+                <Typography variant="subtitle2">Trạng thái: {STATUS_LABELS[customer.status]}</Typography>
+                <Typography variant="subtitle2">Điểm tích lũy: {customer.point}</Typography>
+                <Typography variant="subtitle2">Ngày tạo: {formatDate(customer.createdAt)}</Typography>
 
+                {user.roleId === ROLE_ADMIN && (
+                    <Box mt={1}>
+                    <Link href={`/customer/update/${customer.id}`} passHref legacyBehavior>
+                        <MuiLink underline="none">
+                        <Button variant="outlined" size="small">Chỉnh sửa</Button>
+                        </MuiLink>
+                    </Link>
+                    </Box>
+                )}
+                </Stack>
+            </Paper>
+            </Grid>
+        ))}
+        </Grid>:
         <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
             <Table size="small">
             <TableHead>
@@ -133,7 +163,7 @@ const Index = () => {
             </TableBody>
             </Table>
         </TableContainer>
-
+        }
         {/* Phân trang */}
         <Box display="flex" justifyContent="center" mt={4}>
             <Pagination

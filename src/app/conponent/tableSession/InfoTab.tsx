@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTableStore } from '@/app/store/useTableStore';
-import styled from 'styled-components';
+
 import { STATUS_AVAILABLE, STATUS_PLAYING, STATUS_WAIT_PAID } from '@/form/billiardTable';
 
 import { useToastStore } from '@/app/store/toastStore';
@@ -8,48 +8,8 @@ import { v4 as uuidv4 } from 'uuid'
 import {useFinishTableSession, useStartTableSession } from '@/app/query/useTableSession';
 import { TableSession } from '@/app/type/model/TableSession';
 import { Table } from '@/app/type/model/Table';
-const InfoText = styled.p`
-  margin: 8px 0;
-  font-size: 15px;
-`;
-const ButtonConfirm =  styled.button`
-  margin-top: 20px;
-  padding: 10px 20px;
-  border: none;
-  background-color: #e74c3c;
-  color: white;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
+import { Box, Button, Stack, Typography } from '@mui/material';
 
-  &:hover {
-    background-color: #c0392b;
-  }
-`;
-const ButtonGroup = styled.div`
-  margin-top: 20px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-`;
-
-const Button = styled.button`
-  flex: 1;
-  padding: 8px 12px;
-  background: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  &:hover {
-    background: #0d47a1;
-  }
-  &:disabled {
-    background: #90a4ae;
-    cursor: not-allowed;
-  }
-`;
 interface InfoTab{
   selectedSession?: TableSession;
   tableSessions:TableSession[];
@@ -162,30 +122,67 @@ const InfoTab:React.FC<InfoTab> = ({selectedSession, tableSessions,selectedTable
     })
   }
   return (
-    <div>
-      {selectedTable.status != STATUS_AVAILABLE?
+    <Box>
+    {selectedTable.status !== STATUS_AVAILABLE ? (
       <>
-      <div>
-        <InfoText>Bắt đầu lúc: {startTime ? new Date(startTime).toLocaleString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '---'}</InfoText>
-        <InfoText>Đã chơi: {elapsedTime}</InfoText>
-      </div>
+        <Box mb={1}>
+          <Typography variant="body2" mb={1}>
+            Bắt đầu lúc:{' '}
+            {startTime
+              ? new Date(startTime).toLocaleString('vi-VN', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              : '---'}
+          </Typography>
+          <Typography variant="body2">Đã chơi: {elapsedTime}</Typography>
+        </Box>
       </>
-      :
-      <div>Bàn trống</div>}
-      <ButtonGroup>
-        {selectedTable.status == STATUS_PLAYING ? (
-          <>
-            <Button onClick={finishSession}>Kết thúc phiên</Button>
-            <Button>Chuyển bàn</Button>
-          </>
-        ) : 
-        selectedTable.status == STATUS_WAIT_PAID ?
-        <></> :
-        (
-          <Button onClick={handleTableSession}>Bắt đầu chơi</Button>
-        )}
-      </ButtonGroup>
-    </div>
+    ) : (
+      <Typography>Bàn trống</Typography>
+    )}
+
+    <Stack
+      direction={{ xs: 'column', sm: 'row' }}
+      spacing={2}
+      mt={2}
+      flexWrap="wrap"
+    >
+      {selectedTable.status === STATUS_PLAYING ? (
+        <>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={finishSession}
+            sx={{ flexGrow: 1, borderRadius: 2, fontWeight: 'bold' }}
+          >
+            Kết thúc phiên
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ flexGrow: 1, borderRadius: 2, fontWeight: 'bold' }}
+          >
+            Chuyển bàn
+          </Button>
+        </>
+      ) : selectedTable.status === STATUS_WAIT_PAID ? (
+        <></>
+      ) : (
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleTableSession}
+          sx={{ flexGrow: 1, borderRadius: 2, fontWeight: 'bold' }}
+        >
+          Bắt đầu chơi
+        </Button>
+      )}
+    </Stack>
+  </Box>
     
   );
 };

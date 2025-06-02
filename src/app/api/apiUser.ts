@@ -21,23 +21,23 @@ const apiLogin = async ({identifier, password} : LoginForm) => {
     return response.data;
 }
 const apiCreateCustomer = async ({phone, name} : CustomerForm) => {
-    const response = await axiosInstance.post('/api/customer/create', { phone, name });
+    const response = await axiosInstance.post('/customer/create', { phone, name });
     return response.data;
 }
 const apiSearchCustomer = async (name:string) => {
-    const response = await axiosInstance.get(`/api/customer/search?name=${name}`);
+    const response = await axiosInstance.get(`/customer/search?name=${name}`);
     return response.data;
 }
 const apiUpdateCustomer = async ({id, payload} :{id:number, payload:CustomerForm}) => {
-    const response = await axiosInstance.post(`/api/customer/update/${id}`, payload );
+    const response = await axiosInstance.post(`/customer/update/${id}`, payload );
     return response.data;
 }
 const apiFindCustomer = async (phone :{phone:string}) => {
-    const response = await axiosInstance.post('/api/find-customer', { phone });
+    const response = await axiosInstance.post('/find-customer', { phone });
     return response.data;
 }
 const apigetUser = async (id:number) => {
-    const response = await axiosInstance.get(`/api/user/${id}`);
+    const response = await axiosInstance.get(`/user/${id}`);
     return response.data;
 }
 const apiGetAllCustomer = async (page:number, limit:number, data: CustomerFormSearch) =>{

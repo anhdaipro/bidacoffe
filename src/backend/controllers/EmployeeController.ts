@@ -1,20 +1,23 @@
-import jwt from 'jsonwebtoken';
+
 import { Request, Response } from 'express';
 import User from '../models/User';
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
-import { JWT_SECRET,REFRESH_TOKEN_SECRET, ROLE_CUSTOMER, ROLE_EMPLOYEE, STATUS_ACTIVE } from '../BidaConst';
-import crypto from 'crypto';
+import { STATUS_ACTIVE } from '../BidaConst';
 import { addDay, generateUsername, slugify } from '../Format';
 import UserProfile from '../models/UserProfile';
 import { folder } from '../routes/employeeRoute';
 import { ROLES_EMPLOYEE } from '@/form/user';
-const refreshTokens: Record<string, number> = {}; // Bộ nhớ tạm (thay bằng DB trong thực tế)
 class EmployeeController {
     
     public static async createEmployee(req: Request, res: Response): Promise<void> {
         try {
-            const {phone,email, roleId, address, name, baseSalary,dateOfBirth,position,bankNo,bankId,bankFullname,dateLeave,dateBeginJob } = req.body;
+            const {phone,email, roleId, address, name, 
+                baseSalary,dateOfBirth,
+                position,bankNo,bankId,bankFullname,dateLeave,dateBeginJob,
+                shiftId,
+                status,
+                note } = req.body;
             // Kiểm tra xem username hoặc phone đã tồn tại chưa
             const existingUser = await User.findOne({
                 where: {
@@ -58,6 +61,7 @@ class EmployeeController {
                 bankFullname,
                 dateLeave,
                 dateBeginJob,
+                note,
             });
             Object.assign(newUser, {
                 phone,
@@ -70,7 +74,8 @@ class EmployeeController {
                 hashedPassword,
                 roleId,
                 address,
-                status:STATUS_ACTIVE
+                status,
+                shiftId,
             });
             await newUser.save();
             profile.userId = newUser.id;
@@ -86,7 +91,13 @@ class EmployeeController {
     public static async updateEmployee(req: Request, res: Response): Promise<void> {
         try {
         const { id } = req.params;
-        const { phone, roleId, address, name, baseSalary,dateOfBirth,position,bankNo,bankId,bankFullname,dateLeave,dateBeginJob } = req.body;
+        const { phone, roleId, address, name, 
+            baseSalary,dateOfBirth,position,
+            bankNo,bankId,bankFullname,
+            dateLeave, 
+            shiftId,
+            status,
+            dateBeginJob, note } = req.body;
 
         const user = await User.findByPk(id);
 
@@ -117,6 +128,8 @@ class EmployeeController {
             name,
             baseSalary,
             dateOfBirth,
+            status,
+            shiftId,
         });
         const userProfile = await UserProfile.findOne({
             where: {
@@ -144,6 +157,7 @@ class EmployeeController {
             bankFullname,
             dateLeave,
             dateBeginJob,
+            note,
             ...(files?.cccdFront?.[0] && {cccdFront}),
             ...(files?.cccdBack?.[0] && {cccdBack}),
             ...(files?.avatar?.[0] && {avatar}),

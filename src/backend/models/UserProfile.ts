@@ -18,6 +18,7 @@ class UserProfile extends Model {
     public bankId!: number; // Ngày sinh của người dùng (có thể null)
     public bankFullname!: string; // Tiểu sử hoặc mô tả ngắn của người dùng (có thể null)
     public dateBeginJob!: Date; // Tiểu sử hoặc mô tả ngắn của người dùng (có thể null)
+    public note!: string; // Tiểu sử hoặc mô tả ngắn của người dùng (có thể null)
     public readonly createdAt!: Date; // Thời gian tạo bản ghi
     public readonly updatedAt!: Date; // Thời gian cập nhật bản ghi
 }
@@ -39,6 +40,10 @@ UserProfile.init({
   phone: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  note: {
+    type: DataTypes.TEXT,
+    allowNull: true,
   },
   dateOfBirth: {
     type: DataTypes.STRING,

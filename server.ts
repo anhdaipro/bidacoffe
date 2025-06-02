@@ -12,6 +12,7 @@ import paymentRoutes from '@backend/routes/paymentRoutes'
 import employeeRoutes from '@backend/routes/employeeRoute'
 import shiftRoutes from '@backend/routes/shiftRoutes'
 import scheduleRoutes from '@backend/routes/scheduleRouter'
+import timeSheetRoutes from '@backend/routes/timeSheetRouter'
 import bodyParser from  'body-parser';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -41,6 +42,7 @@ app.prepare().then(() => {
   server.use('/api/billiard-table', billiardTableRoutes);
   server.use('/api/shift', shiftRoutes);
   server.use('/api/schedule', scheduleRoutes);
+  server.use('/api/timesheet', timeSheetRoutes);
   // Route test đơn giản
   server.get('/hello', (_req: Request, res: Response) => {
     res.send('Hello World!');
@@ -59,3 +61,5 @@ app.prepare().then(() => {
     console.log(`✅ Server running at http://localhost:${port}`);
   });
 })
+//lsof -i :3000
+//kill -9 119792

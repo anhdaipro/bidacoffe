@@ -21,6 +21,10 @@ import {
   Typography,
   Pagination,
   Stack,
+  useTheme,
+  Grid,
+  Chip,
+  useMediaQuery,
 } from '@mui/material';
 
 import Search from './Search';
@@ -41,7 +45,8 @@ const Index = () => {
   const updateStore = useControlStore((state) => state.updateStore);
   const user = useAuthStore((state) => state.user);
   const { mutate: updateStatus } = useUpdateStatusProduct();
-
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
   if (isLoading || !user) {
     return (
       <Box
@@ -87,7 +92,7 @@ const Index = () => {
   };
 
   return (
-    <Box sx={{ backgroundColor: '#fff', p: 2, maxWidth:1200,mx:'auto' }}>
+    <Box sx={{ backgroundColor: '#fff', p: 2, maxWidth:1200,m:'auto' }}>
       {/* Search form */}
       <Box sx={{ marginBottom: 3 }}>
         <Search setFormSearch={setFormSearch} form={formData} />
@@ -95,7 +100,10 @@ const Index = () => {
 
       {/* Button Tạo mới */}
       {user?.roleId === ROLE_ADMIN && (
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems:'center', marginBottom: 2 }}>
+          <Typography variant="h2" gutterBottom>
+          Danh sách sản phẩm
+        </Typography>
           <Button
             component={Link}
             href="/products/create"
@@ -108,12 +116,87 @@ const Index = () => {
         </Box>
       )}
 
-      <Typography variant="h5" gutterBottom>
-        Danh sách sản phẩm
-      </Typography>
-
       {/* Table */}
-      <TableContainer component={Paper}>
+      {isMobile ? 
+      <Grid container spacing={2}>
+      {products.map((product: ProductIndex, index: number) => (
+        
+          <Grid size={{xs:12, sm:6, md:6,lg:4}} spacing={1}>
+            <Paper elevation={2} sx={{ p: 2 }}>
+            <Grid container spacing={2}>
+            {/* Hình ảnh và thông tin cơ bản */}
+            <Grid size={{xs:4}}>
+              <Box
+                component="img"
+                src={product.image}
+                alt={product.name}
+                sx={{ 
+                  width: '100%', 
+                  height: 80, 
+                  objectFit: 'cover', 
+                  borderRadius: 1 
+                }}
+              />
+            </Grid>
+            <Grid size={{xs:8}}>
+              <Typography variant="subtitle1" fontWeight="bold">
+                {product.name}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {CATEGORY_LABELS[product.categoryId]}
+              </Typography>
+              <Typography variant="body1" fontWeight="bold">
+                {formatNumber(product.price)} đ
+              </Typography>
+              <Chip 
+                label={STATUS_LABEL[product.status]} 
+                size="small"
+                sx={{ mt: 0.5 }}
+              />
+            </Grid>
+  
+            {/* Thông tin bổ sung */}
+            <Grid size={{xs:12}}>
+              <Typography variant="body2">
+                Ngày tạo: {formatDate(product.createdAt)}
+              </Typography>
+              <Typography variant="body2">
+                Người tạo: {product.rUidLogin?.name || 'N/A'}
+              </Typography>
+            </Grid>
+  
+            {/* Hành động */}
+            {user.roleId === ROLE_ADMIN && (
+              <Grid size={{xs:12}}>
+                <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                  <Button
+                    component={Link}
+                    href={`/products/update/${product.id}`}
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                  >
+                    Sửa
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="small"
+                    onClick={() => handleUpdate(product.id, product.status)}
+                    fullWidth
+                  >
+                    Trạng thái
+                  </Button>
+                </Stack>
+              </Grid>
+            )}
+            </Grid>
+            </Paper>
+          </Grid>
+        
+      ))}
+    </Grid>
+      :<TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
@@ -189,7 +272,7 @@ const Index = () => {
           </TableBody>
         </Table>
       </TableContainer>
-
+      }
       {/* Pagination */}
       <Box
         sx={{

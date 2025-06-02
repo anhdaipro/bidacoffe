@@ -25,11 +25,11 @@ import {
   FormControl,
   InputLabel,
   FormHelperText,
+  useMediaQuery,
+  Stack,
+  useTheme,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from 'dayjs';
 import { useProductsSearch } from '@/app/query/useProducts';
 import { useCreateTableSession, useUpdateTableSession } from '@/app/query/useTableSession';
@@ -71,7 +71,8 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
   } = useForm<TableSessionForm>({
     values: tableSession,
   });
-
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'orders',
@@ -172,7 +173,7 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
   const title = tableSession.id ? 'Cập nhật' : 'Tạo mới';
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    
       <Box sx={{ maxWidth: 800, mx: 'auto', p: { xs: 2, sm: 3 }, bgcolor: 'background.paper', borderRadius: 2 }}>
         {/* Back Link */}
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
@@ -342,34 +343,34 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
                 Thêm sản phẩm
               </Typography>
               <Autocomplete
-            options={products}
-            getOptionLabel={(option: Product) => option.name}
-            value={product}
-            onChange={(_event, newValue) => {
-              setProduct(newValue);
-              if (newValue) {
-                addProductToDetails(newValue);
-              }
-            }}
-            inputValue={searchInput}
-            onInputChange={(_event, newInput, reason) => {
-              if (reason === 'input') {
-                setSearchInput(newInput);
-              } else if (reason === 'clear') {
-                setSearchInput('');
-                setProduct(null);
-              }
-            }}
-            onClose={(_event, reason) => {
-            
-                setSearchInput('');  // reset khi mất focus
-                setProduct(null);
+                options={products}
+                getOptionLabel={(option: Product) => option.name}
+                value={product}
+                onChange={(_event, newValue) => {
+                  setProduct(newValue);
+                  if (newValue) {
+                    addProductToDetails(newValue);
+                  }
+                }}
+                inputValue={searchInput}
+                onInputChange={(_event, newInput, reason) => {
+                  if (reason === 'input') {
+                    setSearchInput(newInput);
+                  } else if (reason === 'clear') {
+                    setSearchInput('');
+                    setProduct(null);
+                  }
+                }}
+              onClose={(_event, reason) => {
               
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Tìm sản phẩm..." placeholder="Tìm sản phẩm..." fullWidth />
-            )}
-        />
+                  setSearchInput('');  // reset khi mất focus
+                  setProduct(null);
+                
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Tìm sản phẩm..." placeholder="Tìm sản phẩm..." fullWidth />
+              )}
+            />
             </Grid>
           </Grid>
 
@@ -377,6 +378,109 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
           <Typography variant="subtitle1" sx={{ mt: 2, mb: 1, fontWeight: 'bold' }}>
             Order sản phẩm
           </Typography>
+          {isSmallScreen ? <Stack spacing={2} sx={{ mt: 2 }}>
+            {details.map((detail, index) => {
+              const product = products.find((p: Product) => p.id === detail.productId);
+              if (!product) return null;
+        
+              return (
+                <Paper key={index} variant="outlined" sx={{ p: 2 }}>
+                  <Grid container spacing={1}>
+                    <Grid size={{xs:12}}>
+                      <Typography fontWeight="bold">
+                        {index + 1}. {product.name}
+                      </Typography>
+                    </Grid>
+        
+                    {/* Price */}
+                    <Grid size={{xs:12}} container alignItems={'center'} justifyContent={'space-between'}>
+                      <Typography variant="body2" color="text.secondary">
+                        Giá
+                      </Typography>
+                      <Controller
+                        name={`orders.${index}.price`}
+                        control={control}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            size="small"
+                            style={{ width: 120 }}
+                            value={formatNumber(field.value)}
+                            onChange={(e) => {
+                              const raw = e.target.value.replace(/,/g, '');
+                              const numeric = Number(raw);
+                              field.onChange(isNaN(numeric) ? 0 : numeric);
+                            }}
+                            error={!!errors.orders?.[index]?.price}
+                            helperText={errors.orders?.[index]?.price?.message}
+                          />
+                        )}
+                      />
+                    </Grid>
+        
+                    {/* Quantity */}
+                    <Grid size={{xs:12}} container alignItems={'center'} justifyContent={'space-between'}>
+                      <Typography variant="body2" color="text.secondary">
+                        Số lượng
+                      </Typography>
+                      <Controller
+                        name={`orders.${index}.quantity`}
+                        control={control}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            size="small"
+                            style={{ width: 120 }}
+                            value={formatNumber(field.value)}
+                            onChange={(e) => {
+                              const raw = e.target.value.replace(/,/g, '');
+                              const numeric = Number(raw);
+                              field.onChange(isNaN(numeric) ? 0 : numeric);
+                            }}
+                            error={!!errors.orders?.[index]?.quantity}
+                            helperText={errors.orders?.[index]?.quantity?.message}
+                          />
+                        )}
+                      />
+                    </Grid>
+        
+                    <Grid size={{xs:6}}>
+                      <Typography fontWeight="bold">Thành tiền:</Typography>
+                    </Grid>
+                    <Grid size={{xs:6}} textAlign="right">
+                      <Typography fontWeight="bold">
+                        {formatNumber(detail.price * detail.quantity)}
+                      </Typography>
+                    </Grid>
+        
+                    <Grid size={{xs:12}} textAlign="right" sx={{ mt: 1 }}>
+                      <IconButton 
+                        onClick={() => remove(index)}
+                        color="error"
+                        size="small"
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+                </Paper>
+              );
+            })}
+        
+            {/* Total */}
+            <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
+              <Grid container>
+                <Grid size={{xs:6}}>
+                  <Typography fontWeight="bold">Tổng tiền:</Typography>
+                </Grid>
+                <Grid size={{xs:6}} textAlign="right">
+                  <Typography fontWeight="bold">
+                    {formatNumber(amountOrder)}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Stack> :
           <TableContainer component={Paper} sx={{ maxWidth: '100%', overflowX: 'auto' }}>
           <Box sx={{ overflowX: 'auto' }}>
               <Table>
@@ -480,7 +584,7 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
                 </TableBody>
               </Table>
             </Box>
-          </TableContainer>
+          </TableContainer>}
 
           {/* Submit Button */}
           <Button variant="contained" color="primary" type="submit" sx={{ mt: 2, alignSelf: 'flex-end' }}>
@@ -488,7 +592,7 @@ const FormTableSession: React.FC<Props> = ({ tableSession }) => {
           </Button>
         </Box>
       </Box>
-    </LocalizationProvider>
+    
   );
 };
 

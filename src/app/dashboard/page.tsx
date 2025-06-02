@@ -9,9 +9,7 @@ import {
   Drawer,
   List,
   ListItem,
-  ListItemIcon,
-  ListItemText,
-  CssBaseline,
+  Container,
   Box,
   Divider,
   Grid,
@@ -127,33 +125,25 @@ export default function Dashboard() {
     new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
 
   return (
-    <Box sx={{ display: 'flex' }}>
-      <CssBaseline />
-
+    <Container maxWidth="md"
+    sx={{
+      mt: 4,
+      mb: 4,
+      bgcolor: '#fff',
+      p: 3,
+      borderRadius: 2,
+      
+      fontFamily: 'Arial, sans-serif',
+    }}>
+     
       {/* AppBar */}
-      <AppBar
-        position="fixed"
-        sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
-          bgcolor: 'primary.main',
-        }}
-      >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
+      
+      
+          <Typography variant="h2" noWrap component="div">
             Dashboard
           </Typography>
-        </Toolbar>
-      </AppBar>
+        
+     
 
       {/* Drawer */}
       
@@ -162,10 +152,9 @@ export default function Dashboard() {
       <Box
         component="main"
         sx={{
-          flexGrow: 1,
-          p: 3,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          mt: 8,
+          
+          // width: { sm: `calc(100% - ${drawerWidth}px)` },
+          mt: 2,
         }}
       >
         {/* Tổng quan */}
@@ -316,6 +305,6 @@ export default function Dashboard() {
           </ResponsiveContainer>
         </Paper>
       </Box>
-    </Box>
+    </Container>
   );
 }

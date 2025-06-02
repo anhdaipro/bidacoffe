@@ -54,9 +54,10 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
   return (
     <Box
       sx={{
-        p: 3,
+        p: 2,
         maxWidth: 800,
         mx: "auto",
+        backgroundColor: "#f1f1f1",
       }}
     >
       <Grid container spacing={2}>

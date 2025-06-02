@@ -1,8 +1,9 @@
 import { Router } from 'express';
 import TableSessionController from '../controllers/TableSessionController';
+import { authenticateJWT } from '../middleware';
 
 const router = Router();
-
+router.use(authenticateJWT)
 router.post('/create', TableSessionController.createTableSession);
 router.post('/start', TableSessionController.startTableSession);
 router.get('', TableSessionController.getAllTableSessions);

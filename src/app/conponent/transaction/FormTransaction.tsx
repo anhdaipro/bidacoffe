@@ -26,9 +26,12 @@ import {
   Link as MuiLink,
   Alert,
   FormHelperText,
+  useTheme,
+  useMediaQuery,
+  Stack,
   styled
 } from '@mui/material';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { DatePicker } from '@mui/x-date-pickers';
 import { useForm, SubmitHandler, useFieldArray, Controller } from 'react-hook-form';
 import { useCreateTransaction, useUpdateTransaction } from '@/app/query/useTransaction';
 import { useControlStore } from '@/app/store/useStore';
@@ -86,7 +89,8 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
     control,
     name: 'details',
   });
-
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const details = watch('details');
   const type = watch('type');
   const dateDelivery = watch('dateDelivery');
@@ -274,10 +278,13 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
                         Ngày giao dịch <RequiredLable required />
                       </span>
                     }
+                    
                     format='DD/MM/YYYY'
                     slotProps={{
                       textField: {
+                        fullWidth: true, 
                         error: !!error,
+                        
                         helperText: error?.message,
                         inputProps: {
                           onKeyDown: (e:any) => e.preventDefault(), // chặn nhập bàn phím
@@ -296,140 +303,246 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
             <Typography variant="subtitle1" gutterBottom>
               Thêm sản phẩm
             </Typography>
-          <Autocomplete
-            options={products}
-            getOptionLabel={(option: Product) => option.name}
-            value={product}
-            onChange={(_event, newValue) => {
-              setProduct(newValue);
-              if (newValue) {
-                addProductToDetails(newValue);
-              }
-            }}
-            inputValue={searchInput}
-            onInputChange={(_event, newInput, reason) => {
-              if (reason === 'input') {
-                setSearchInput(newInput);
-              } else if (reason === 'clear') {
-                setSearchInput('');
-                setProduct(null);
-              }
-            }}
-            onClose={(_event, reason) => {
-            
-                setSearchInput('');  // reset khi mất focus
-                setProduct(null);
+            <Autocomplete
+              options={products}
+              getOptionLabel={(option: Product) => option.name}
+              value={product}
+              onChange={(_event, newValue) => {
+                setProduct(newValue);
+                if (newValue) {
+                  addProductToDetails(newValue);
+                }
+              }}
+              inputValue={searchInput}
+              onInputChange={(_event, newInput, reason) => {
+                if (reason === 'input') {
+                  setSearchInput(newInput);
+                } else if (reason === 'clear') {
+                  setSearchInput('');
+                  setProduct(null);
+                }
+              }}
+              onClose={(_event, reason) => {
               
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Tìm sản phẩm..." placeholder="Tìm sản phẩm..." fullWidth />
-            )}
-        />
+                  setSearchInput('');  // reset khi mất focus
+                  setProduct(null);
+                
+              }}
+              renderInput={(params) => (
+                <TextField {...params} label="Tìm sản phẩm..." placeholder="Tìm sản phẩm..." fullWidth />
+              )}
+            />
           </Grid>
 
           <Grid size={{xs:12}}>
-            <Box sx={{ overflowX: 'auto' }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>STT</TableCell>
-                    <TableCell>Tên sản phẩm</TableCell>
-                    <TableCell sx={{ width: '150px' }}>Giá</TableCell>
-                    <TableCell sx={{ width: '150px' }}>Số lượng</TableCell>
-                    <TableCell>Tiền</TableCell>
-                    <TableCell>Action</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {details.map((detail, index) => {
-                    const product = products.find((p: Product) => p.id === detail.productId);
-                    if (!product) return null;
-
-                    return (
-                      <TableRow key={index}>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell>{product.name}</TableCell>
-                        
-                        {/* Price */}
-                        <TableCell>
-                          <Controller
-                            name={`details.${index}.price`}
-                            control={control}
-                            rules={{
-                              required: 'Giá không hợp lệ',
-                              validate: (value) => value > 0 || 'Giá phải lớn hơn 0',
-                            }}
-                            render={({ field }) => (
-                              <TextField
-                                {...field}
-                                size="small"
-                                fullWidth
-                                value={formatNumber(field.value)}
-                                onChange={(e) => {
-                                  const raw = e.target.value.replace(/,/g, '');
-                                  const numeric = Number(raw);
-                                  field.onChange(isNaN(numeric) ? 0 : numeric);
-                                }}
-                                error={!!errors.details?.[index]?.price}
-                                helperText={errors.details?.[index]?.price?.message}
-                              />
-                            )}
-                          />
-                        </TableCell>
-
-                        {/* Quantity */}
-                        <TableCell>
-                          <Controller
-                            name={`details.${index}.quantity`}
-                            control={control}
-                            rules={{
-                              required: 'Số lượng không hợp lệ',
-                              validate: (value) => value > 0 || 'Số lượng phải lớn hơn 0',
-                            }}
-                            render={({ field }) => (
-                              <TextField
-                                {...field}
-                                size="small"
-                                fullWidth
-                                value={formatNumber(field.value)}
-                                onChange={(e) => {
-                                  const raw = e.target.value.replace(/,/g, '');
-                                  const numeric = Number(raw);
-                                  field.onChange(isNaN(numeric) ? 0 : numeric);
-                                }}
-                                error={!!errors.details?.[index]?.quantity}
-                                helperText={errors.details?.[index]?.quantity?.message}
-                              />
-                            )}
-                          />
-                        </TableCell>
-
-                        <TableCell>{formatNumber(detail.price * detail.quantity)}</TableCell>
-                        <TableCell>
-                          <IconButton 
-                            onClick={() => removeDetail(index)}
-                            color="error"
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                  <TableRow>
-                    <TableCell colSpan={4} align="right">
-                      <Typography fontWeight="bold">Tổng tiền</Typography>
-                    </TableCell>
-                    <TableCell>
+            {isSmallScreen ?
+            <Stack spacing={2} sx={{ mt: 2 }}>
+            {details.map((detail, index) => {
+              const product = products.find((p: Product) => p.id === detail.productId);
+              if (!product) return null;
+        
+              return (
+                <Paper key={index} variant="outlined" sx={{ p: 2 }}>
+                  <Grid container spacing={1}>
+                    <Grid size={{xs:12}}>
                       <Typography fontWeight="bold">
-                        {formatNumber(totalAmount)}
+                        {index + 1}. {product.name}
                       </Typography>
+                    </Grid>
+        
+                    {/* Price */}
+                    <Grid size={{xs:12}} container alignItems={'center'} justifyContent={'space-between'}>
+                      <Typography variant="body2" color="text.secondary">
+                        Giá
+                      </Typography>
+                      <Controller
+                        name={`details.${index}.price`}
+                        control={control}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            size="small"
+                            style={{ width: 120 }}
+                            value={formatNumber(field.value)}
+                            onChange={(e) => {
+                              const raw = e.target.value.replace(/,/g, '');
+                              const numeric = Number(raw);
+                              field.onChange(isNaN(numeric) ? 0 : numeric);
+                            }}
+                            error={!!errors.details?.[index]?.price}
+                            helperText={errors.details?.[index]?.price?.message}
+                          />
+                        )}
+                      />
+                    </Grid>
+        
+                    {/* Quantity */}
+                    <Grid size={{xs:12}} container alignItems={'center'} justifyContent={'space-between'}>
+                      <Typography variant="body2" color="text.secondary">
+                        Số lượng
+                      </Typography>
+                      <Controller
+                        name={`details.${index}.quantity`}
+                        control={control}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            size="small"
+                            style={{ width: 120 }}
+                            value={formatNumber(field.value)}
+                            onChange={(e) => {
+                              const raw = e.target.value.replace(/,/g, '');
+                              const numeric = Number(raw);
+                              field.onChange(isNaN(numeric) ? 0 : numeric);
+                            }}
+                            error={!!errors.details?.[index]?.quantity}
+                            helperText={errors.details?.[index]?.quantity?.message}
+                          />
+                        )}
+                      />
+                    </Grid>
+        
+                    <Grid size={{xs:6}}>
+                      <Typography fontWeight="bold">Thành tiền:</Typography>
+                    </Grid>
+                    <Grid size={{xs:6}} textAlign="right">
+                      <Typography fontWeight="bold">
+                        {formatNumber(detail.price * detail.quantity)}
+                      </Typography>
+                    </Grid>
+        
+                    <Grid size={{xs:12}} textAlign="right" sx={{ mt: 1 }}>
+                      <IconButton 
+                        onClick={() => removeDetail(index)}
+                        color="error"
+                        size="small"
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+                </Paper>
+              );
+            })}
+        
+            {/* Total */}
+            <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
+              <Grid container>
+                <Grid size={{xs:6}}>
+                  <Typography fontWeight="bold">Tổng tiền:</Typography>
+                </Grid>
+                <Grid size={{xs:6}} textAlign="right">
+                  <Typography fontWeight="bold">
+                    {formatNumber(totalAmount)}
+                  </Typography>
+                </Grid>
+              </Grid>
+            </Paper>
+          </Stack>:
+          <Box sx={{ overflowX: 'auto' }}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>STT</TableCell>
+                <TableCell>Tên sản phẩm</TableCell>
+                <TableCell sx={{ width: '150px' }}>Giá</TableCell>
+                <TableCell sx={{ width: '150px' }}>Số lượng</TableCell>
+                <TableCell>Tiền</TableCell>
+                <TableCell>Action</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {details.map((detail, index) => {
+                const product = products.find((p: Product) => p.id === detail.productId);
+                if (!product) return null;
+
+                return (
+                  <TableRow key={index}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{product.name}</TableCell>
+                    
+                    {/* Price */}
+                    <TableCell>
+                      <Controller
+                        name={`details.${index}.price`}
+                        control={control}
+                        rules={{
+                          required: 'Giá không hợp lệ',
+                          validate: (value) => value > 0 || 'Giá phải lớn hơn 0',
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            size="small"
+                            fullWidth
+                            value={formatNumber(field.value)}
+                            onChange={(e) => {
+                              const raw = e.target.value.replace(/,/g, '');
+                              const numeric = Number(raw);
+                              field.onChange(isNaN(numeric) ? 0 : numeric);
+                            }}
+                            error={!!errors.details?.[index]?.price}
+                            helperText={errors.details?.[index]?.price?.message}
+                          />
+                        )}
+                      />
                     </TableCell>
-                    <TableCell></TableCell>
+
+                    {/* Quantity */}
+                    <TableCell>
+                      <Controller
+                        name={`details.${index}.quantity`}
+                        control={control}
+                        rules={{
+                          required: 'Số lượng không hợp lệ',
+                          validate: (value) => value > 0 || 'Số lượng phải lớn hơn 0',
+                        }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            size="small"
+                            fullWidth
+                            value={formatNumber(field.value)}
+                            onChange={(e) => {
+                              const raw = e.target.value.replace(/,/g, '');
+                              const numeric = Number(raw);
+                              field.onChange(isNaN(numeric) ? 0 : numeric);
+                            }}
+                            error={!!errors.details?.[index]?.quantity}
+                            helperText={errors.details?.[index]?.quantity?.message}
+                          />
+                        )}
+                      />
+                    </TableCell>
+
+                    <TableCell>{formatNumber(detail.price * detail.quantity)}</TableCell>
+                    <TableCell>
+                      <IconButton 
+                        onClick={() => removeDetail(index)}
+                        color="error"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
                   </TableRow>
-                </TableBody>
-              </Table>
-            </Box>
+                );
+              })}
+              <TableRow>
+                <TableCell colSpan={4} align="right">
+                  <Typography fontWeight="bold">Tổng tiền</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography fontWeight="bold">
+                    {formatNumber(totalAmount)}
+                  </Typography>
+                </TableCell>
+                <TableCell></TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </Box>
+            }
+            
           </Grid>
 
           <Grid size={{xs:12}}>

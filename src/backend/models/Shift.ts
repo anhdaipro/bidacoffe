@@ -21,6 +21,8 @@ class Shift extends Model {
   public endTime!: string;   // format: "HH:mm:ss"
   public description!: string;
   public status!:number;
+  public numEmployee!:number;
+  public salaryHour!:number;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
   public async getAllShift(){
@@ -34,6 +36,12 @@ class Shift extends Model {
     // Lưu kết quả vào cache
     await redisClient.set(cacheKey, JSON.stringify(shifts), 'EX', SENCOND_DAY); // Cache trong 1 giờ
     return shifts;
+  }
+  public async deleteCache(){
+    const keys = await redisClient.keys('shifts');
+    if (keys.length > 0) {
+      await redisClient.del(...keys);
+    }
   }
 }
 
@@ -64,6 +72,13 @@ Shift.init(
       type: DataTypes.TINYINT,
       allowNull: false,
     },
+    numEmployee: {
+      type: DataTypes.TINYINT,
+      allowNull: false,
+    },
+    salaryHour:{
+      type: DataTypes.INTEGER,
+    }
   },
   {
     sequelize,

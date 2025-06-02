@@ -11,24 +11,50 @@ import {
   InputLabel,
   FormHelperText,
   IconButton,
-  Link,
+  TextareaAutosize,
 } from '@mui/material';
+import Link from 'next/link';
 import { useAuthStore } from '@/app/store/useUserStore';
 import { ROLE_ADMIN } from '@/backend/BidaConst';
 import { BANK_LABELS, POSITION_LABELS, STATUS_LABELS, TYPE_EDUCATION_LABELS } from '@/form/user';
 import React, { useEffect,useState,useRef } from 'react';
 import { useForm,Controller } from 'react-hook-form';
 import { useRouter } from "next/navigation";
-import { useCreateCustomer, useUpdateCustomer } from '@/app/query/useUser';
 import { useToastStore } from '../../store/toastStore';
 import { v4 as uuidv4 } from 'uuid'
 import { EmployeeForm,Employee } from '@/app/type/model/Employee';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import {DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useCreateEmployee, useUpdateEmployee } from '@/app/query/useEmployee';
 import { formatNumber } from '@/app/helper';
 import { RequiredLable } from '../Icon';
+import { styled } from '@mui/system';
+import { SHIFT_LABELS } from '@/form/shifth';
+export const CustomTextarea = styled(TextareaAutosize)(
+  ({ theme }) => ({
+    width: '100%',
+    padding: '12px',
+    fontSize: '14px',
+    fontFamily: 'inherit',
+    borderRadius: '8px',
+    border: '1px solid #ccc',
+    transition: 'border-color 0.2s, box-shadow 0.2s',
+    // minHeight: '100px',
+    resize: 'vertical',
+
+    '&:focus': {
+      outline: 'none',
+      borderWidth: '1.5px',
+      borderColor: '#1976d2', // màu xanh MUI
+      
+    },
+
+    '&::placeholder': {
+      color: '#aaa',
+    },
+  })
+);
 interface Props{
   employee: Employee;
 }
@@ -78,6 +104,7 @@ const Form: React.FC<Props> = ({ employee }) => {
         reset,
         watch,
         control,
+        clearErrors,
         setValue,
         formState: { errors },
     } = useForm<EmployeeForm>({
@@ -89,13 +116,18 @@ const Form: React.FC<Props> = ({ employee }) => {
     key: keyof typeof images,
     file: File | null
   ) => {
+    setValue(key, file); // Cập nhật giá trị trong form
+    if(file){
+      clearErrors(key); // Xóa lỗi nếu có
+    }
     const preview = file ? URL.createObjectURL(file) : null;
     setImages((prev) => ({
       ...prev,
       [key]: { file, preview },
     }));
   };
-  const { dateOfBirth,dateBeginJob,dateLeave,bankFullname,bankId,typeEducation,bankNo,baseSalary,status,roleId } = watch();
+  console.log(errors.cccdFront);
+  const { dateOfBirth,dateBeginJob,dateLeave,bankFullname,bankId,typeEducation,shiftId,baseSalary,status,roleId } = watch();
   const { mutate: addEmployee } = useCreateEmployee();
   const { mutate: updateEmployee } = useUpdateEmployee();
   const handleRequest = (formData: FormData) => {
@@ -149,15 +181,15 @@ const Form: React.FC<Props> = ({ employee }) => {
         formData.append(key, value.toString());
       }
     });
-    Object.entries(images).forEach(([key, imageObj]) => {
-      if (imageObj.file) {
-        formData.append(key, imageObj.file);
-      }
-    });
+    // Object.entries(images).forEach(([key, imageObj]) => {
+    //   if (imageObj.file) {
+    //     formData.append(key, imageObj.file);
+    //   }
+    // });
     handleRequest(formData);
     
   };
-  
+  console.log(images)
   const title = employee.id ? 'Cập nhật' : 'Tạo mới';
   return (
     <Box sx={{ maxWidth: 600, margin: 'auto', p: { xs: 2, sm: 3, md: 4 } }}>
@@ -243,7 +275,29 @@ const Form: React.FC<Props> = ({ employee }) => {
             </FormControl>
           </Grid>
 
-
+          <Grid size={{xs:12,sm:6}}>
+            <FormControl fullWidth error={Boolean(errors.shiftId)}>
+              <InputLabel >Ca làm việc<RequiredLable required /></InputLabel>
+              <Select
+                id="shiftId"
+                label="Ca làm việc"
+                value={shiftId}
+                {...register('shiftId', {
+                  required: 'Vui lòng chọn ca làm việc',
+                  validate: (value) =>
+                    Number(value) > 0 || 'Vui lòng chọn ca làm việc',  
+                })}
+              >
+                <MenuItem value={0}>Ca làm việc</MenuItem>
+                {Object.entries(SHIFT_LABELS).map(([key, value]) => (
+                  <MenuItem key={key} value={key}>
+                    {value}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>{errors.shiftId?.message}</FormHelperText>
+            </FormControl>
+          </Grid>
           {/* Số điện thoại */}
           <Grid size={{xs:12,sm:6}}>
             <TextField
@@ -481,23 +535,31 @@ const Form: React.FC<Props> = ({ employee }) => {
                 helperText={errors.baseSalary?.message}
               />
             </Grid>
+            <Grid size={{xs:12,sm:12}}>
+            
+                <CustomTextarea minRows={3} {...register('note', {})}/>
+            </Grid>
             {/* CCCD Mặt Trước */}
             <Grid size={{xs:6,sm:6}}>
-              <FormControl fullWidth error={!!images.cccdFront.file}>
+              <FormControl fullWidth error={!!images.cccdFront.preview}>
                 <Typography variant="subtitle1" gutterBottom>
                     CCDD Mặt Trước<RequiredLable required />
                     </Typography>
                     <input
                     type="file"
                     accept="image/*"
+                    {...register('cccdFront', {
+                      
+                      validate: (value) =>
+                        images.cccdFront.preview ? true : 'Vui lòng chọn ảnh mặt trước CCCD',
+                    })}
                     ref={inputCccdFrontRef}
                     onChange={(e) => {
                         const file = e.target.files?.[0] || null;
                         if (file) handleImageChange('cccdFront', file);
                       }}
                     />
-                   
-                </FormControl>
+                
                 {!images.cccdFront.preview && <Button variant="contained" onClick={() => inputCccdFrontRef.current?.click()}>
                   Chọn file
                 </Button>}
@@ -523,7 +585,10 @@ const Form: React.FC<Props> = ({ employee }) => {
                 />
                 <IconButton
                     className="delete-btn"
-                    onClick={() => handleImageChange('cccdFront', null)}
+                    onClick={() => {
+                      handleImageChange('cccdFront', null)
+                      
+                    }}
                     aria-label="Xóa file"
                     sx={{
                       position: 'absolute',
@@ -543,6 +608,12 @@ const Form: React.FC<Props> = ({ employee }) => {
                   
                 </Box>
                 )}
+                {errors.cccdFront?.message && (
+                  <FormHelperText error>
+                    {errors.cccdFront.message}
+                  </FormHelperText>
+                )}
+                </FormControl>
             </Grid>
 
             {/* CCCD Mặt Sau */}
@@ -555,13 +626,19 @@ const Form: React.FC<Props> = ({ employee }) => {
                     <input
                     type="file"
                     accept="image/*"
+                    {...register('cccdBack', {
+                      
+                      validate: (value) =>
+                        images.cccdBack.preview ? true : 'Vui lòng chọn ảnh mặt trước CCCD',
+                    })}
                     ref={inputCccdBackRef}
                     onChange={(e) => {
                         const file = e.target.files?.[0] || null;
                         if (file) handleImageChange('cccdBack', file);
+                        
                       }}
                     />
-                </FormControl>
+                
                 {!images.cccdBack.preview && <Button variant="contained" onClick={() => inputCccdBackRef.current?.click()}>
                   Chọn file
                 </Button>}
@@ -587,7 +664,11 @@ const Form: React.FC<Props> = ({ employee }) => {
                   />
                   <IconButton
                     className="delete-btn"
-                    onClick={() => handleImageChange('cccdBack', null)}
+                    onClick={() => {
+                      handleImageChange('cccdBack', null)
+                      
+                    }}
+
                     aria-label="Xóa file"
                     sx={{
                       position: 'absolute',
@@ -606,7 +687,12 @@ const Form: React.FC<Props> = ({ employee }) => {
                   </IconButton>
                 </Box>
                 )}
-            
+              {errors.cccdBack?.message && (
+                  <FormHelperText error>
+                    {errors.cccdBack.message}
+                  </FormHelperText>
+                )}
+              </FormControl>
             </Grid>
 
             {/* Ảnh đại diện */}
@@ -644,7 +730,9 @@ const Form: React.FC<Props> = ({ employee }) => {
                 />
                 <IconButton
                     color="error"
-                    onClick={()=>handleImageChange('avatar', null)}
+                    onClick={()=>{
+                      handleImageChange('avatar', null)
+                    }}
                     aria-label="Xóa file"
                     size="large"
                 >

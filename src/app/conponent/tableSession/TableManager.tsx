@@ -10,7 +10,6 @@ import {
   CircularProgress,
   InputAdornment,
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import TableCard from './TableCard';
 import TablePopup from './TablePopup';
 import { useBilliardTableActive } from '@/app/query/useBilliardTable';

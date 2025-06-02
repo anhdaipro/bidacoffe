@@ -1,6 +1,6 @@
 "use client"
 import FormProductPage from "@/app/conponent/product/FormProduct";
-import { useProduct, useUpdateProduct } from "@/app/query/useProducts";
+import { useProduct } from "@/app/query/useProducts";
 import { useParams } from "next/navigation";
 import '../../create/main.css';
 import { Product } from "@/app/type/model/Product";

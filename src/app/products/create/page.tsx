@@ -1,6 +1,6 @@
 // app/products/create/page.tsx
 'use client';
-import React, { useState,useRef } from 'react';
+import React from 'react';
 import './main.css'
 import FormProductPage from '@/app/conponent/product/FormProduct';
 import { STATUS_ACTIVE } from '@/form/product';

@@ -8,11 +8,10 @@ import {
     Select,
     FormControl,
   } from "@mui/material";
-  import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-  import dayjs from "dayjs";
-  import { useState } from "react";
-  import { TRANSACTION_TYPE_LABELS } from "@/form/transaction";
+import { DatePicker } from '@mui/x-date-pickers';
+import dayjs from "dayjs";
+import { useState } from "react";
+import { TRANSACTION_TYPE_LABELS } from "@/form/transaction";
 import { TransactionFormSearch } from "@/app/type/model/Transaction";
 import SearchAutocomplete, { AutocompleteItem } from "../Autocomplete";
 import { apiSearchCustomer } from "@/app/api/apiUser";
@@ -50,15 +49,16 @@ import { apiSearchCustomer } from "@/app/api/apiUser";
     };
   
     return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+   
       <Box sx={{
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 2,
-    maxWidth: 800,
-    mx: 'auto',
-    p: 2
-  }}>
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 2,
+        maxWidth: 800,
+        mx: 'auto',
+        backgroundColor: "#f1f1f1",
+        p: 2
+      }}>
         <Grid container spacing={2}>
           <Grid size={{xs:12, md:6}}>
             <TextField
@@ -143,7 +143,7 @@ import { apiSearchCustomer } from "@/app/api/apiUser";
           </Grid>
         </Grid>
       </Box>
-     </LocalizationProvider>
+     
     );
   };
   

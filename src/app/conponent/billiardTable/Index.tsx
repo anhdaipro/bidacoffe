@@ -74,7 +74,10 @@ const BilliardTableList: React.FC = () => {
       }}
     >
       {user?.roleId === ROLE_ADMIN && (
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems:'center', my: 2 }}>
+          <Typography variant="h2" gutterBottom sx={{ color: '#333' }}>
+            Quản lý bàn billiard
+          </Typography>
           <Button
             component={Link}
             href="/billiardTable/create"
@@ -87,9 +90,6 @@ const BilliardTableList: React.FC = () => {
         </Box>
       )}
 
-      <Typography variant="h4" align="center" gutterBottom sx={{ color: '#333' }}>
-        Quản lý bàn billiard
-      </Typography>
 
       <Table sx={{ minWidth: 320 }}>
         <TableHead>

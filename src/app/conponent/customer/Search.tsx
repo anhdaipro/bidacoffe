@@ -12,7 +12,7 @@ import {
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from "dayjs";
-import { CATEGORY_LABELS, STATUS_LABEL } from "@/form/product";
+import { STATUS_LABEL } from "@/form/user";
 import SearchAutocomplete, { AutocompleteItem } from "../Autocomplete";
 import { apiSearchCustomer } from "@/app/api/apiUser";
 import { CustomerFormSearch } from "@/app/type/model/Customer";
@@ -54,9 +54,10 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
   return (
     <Box
       sx={{
-        p: 3,
+        p: 2,
         maxWidth: 800,
         mx: "auto",
+        backgroundColor: "#f1f1f1",
       }}
     >
       <Grid container spacing={2}>

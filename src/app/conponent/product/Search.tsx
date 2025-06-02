@@ -11,8 +11,7 @@ import {
   Box,
   SelectChangeEvent,
 } from '@mui/material';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers';
 import dayjs, { Dayjs } from 'dayjs';
 import { CATEGORY_LABELS, STATUS_LABEL } from '@/form/product';
 import SearchAutocomplete, { AutocompleteItem } from '../Autocomplete';
@@ -55,13 +54,14 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
     setItem(item)
   }
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    
       <Box sx={{
         display: 'flex',
         flexDirection: 'column',
         gap: 2,
         maxWidth: 800,
         mx: 'auto',
+        backgroundColor: "#f1f1f1",
         p: 2
       }}>
       <Grid container spacing={2}>
@@ -145,13 +145,13 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
         </Grid>
       </Grid>
       {/* Nút tìm kiếm tách riêng */}
-        <Box sx={{  marginTop: 2 }}>
+        <Box sx={{  marginTop: 1 }}>
             <Button variant="contained" color="primary" onClick={searchData}>
                 Tìm kiếm
             </Button>
         </Box>
-        </Box>
-    </LocalizationProvider>
+      </Box>
+    
   );
 };
 

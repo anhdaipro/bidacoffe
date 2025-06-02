@@ -239,7 +239,13 @@ export const TextArea = styled.textarea<TextAreaProps>`
   font-size: ${(props) => props.size || '14px'};
   width: ${(props) => props.width || '100%'};
   resize: ${(props) => props.resize || 'vertical'};
+  outline: none;
   min-height: ${(props) => props.minHeight || '80px'};
+  transition: border-color 0.2s, box-shadow 0.2s;
+  &:focus {
+    border-color: ${(props) => props.focusBorder || '#1976d2'}; /* MUI blue */
+    box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.25); /* giống MUI focus ring */
+  }
 `;
 
 interface LabelProps {

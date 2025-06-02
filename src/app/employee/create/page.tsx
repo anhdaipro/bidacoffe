@@ -1,5 +1,4 @@
 import Form from "@/app/conponent/employee/Form";
-import { EmployeeForm } from "@/app/type/model/Employee";
 
 const Create = () => {
     const employee = {
@@ -16,6 +15,7 @@ const Create = () => {
         id:0,
         point: 0,
         avatar: '',
+        note:'',
         bankId: 0,
         status:0,
         bankFullname: '',
