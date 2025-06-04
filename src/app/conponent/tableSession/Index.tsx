@@ -145,7 +145,7 @@ const Index: React.FC = () => {
       </Box>
 
       {user?.roleId === ROLE_ADMIN && (
-        <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} sx={{ mb: 2 }}>
+        <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'} sx={{ my: 2 }}>
            <Typography variant="h2"  gutterBottom>
           Phiên chơi
         </Typography>

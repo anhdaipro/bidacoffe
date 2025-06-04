@@ -21,3 +21,24 @@ export const calHourPlay = (playedMinutes: number) => {
   const mins = playedMinutes - hours * 60;
   return `${hours} giờ ${mins} phút`;
 };
+interface PropUpload{
+  secure_url: string;
+  public_id:string;
+}
+export const uploadImageToCloudinary = async (file: File, folder:string): Promise<PropUpload> =>{
+  const cloudName = "dltj2mkhl";
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "upload");
+  formData.append("folder", folder); // 👈 đây là folder đích
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+    {
+      method: "POST",
+      body: formData,
+    }
+  );
+
+  const data = await response.json();
+  return data; // link ảnh
+}

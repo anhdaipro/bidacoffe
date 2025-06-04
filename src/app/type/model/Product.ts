@@ -10,6 +10,7 @@ export interface Product{
     price:number;
     status:number;
     image:string;
+    public_image: string|null;
     categoryId:number;
 }
 export interface ProductForm{
@@ -17,7 +18,8 @@ export interface ProductForm{
     price: number;
     categoryId: number;
     status: number;
-    image: File | null;
+    image: string | null;
+    public_image: string|null
 }
 export interface ProductFormSearch {
     status: string;

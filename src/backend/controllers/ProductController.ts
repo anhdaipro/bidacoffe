@@ -11,7 +11,7 @@ import { SENCOND_DAY } from '../BidaConst';
 import { ChangeLog } from '@/types/Model';
 import LogUpdate, { TYPE_PRODUCT } from '../models/LogUpdate';
 import { PageTitlesMap } from '@/types/controller';
-import { folder } from '../routes/productRoutes';
+// import { folder } from '../routes/productRoutes';
 class ProductController {
   static pageTitles: PageTitlesMap = {
     createProduct: 'Tạo sản phẩm',
@@ -25,17 +25,21 @@ class ProductController {
   // Tạo một sản phẩm mới
   public static async createProduct(req: Request, res: Response): Promise<void> {
     try {
-      const { name, price, categoryId,status } = req.body;
-      const image = req.file ? `${folder}/${req.file.filename}` : null;
+      const { name, price, categoryId,status,image,public_image} = req.body;
       // const image = req.file ? req.file.path : null;
       const uidLogin = req.user?.id;
+      if(!uidLogin){
+        res.status(400).json({ message: 'Không thể lấy ID người dùng' });
+        return;
+      }
       const product = new Product({
         name,
         price,
         categoryId,
         status,
+        ...(public_image &&{ public_image }),
         ...(image && { image }),
-        ...(uidLogin && { uidLogin }),
+        uidLogin,
       });
       
       product.validateCreate();
@@ -160,6 +164,9 @@ class ProductController {
     try {
       const product = (req as any).product;
       if (!product) {
+        res.status(404).json({
+          message: 'Không tìm thấy sản phẩm',
+        });
         return;
       }
 
@@ -179,9 +186,13 @@ class ProductController {
   // Cập nhật thông tin một sản phẩm
   public static async updateProduct(req: Request, res: Response): Promise<void> {
     try {
-      const { name, price, categoryId, status } = req.body;
+      const { name, price, categoryId, status,image,public_image } = req.body;
       const product = (req as any).product;
+      product.modelOld = {...product.toJSON()};
       if (!product) {
+        res.status(404).json({
+          message: 'Không tìm thấy sản phẩm',
+        });
         return;
       }
       // 2. So sánh thay đổi
@@ -196,16 +207,10 @@ class ProductController {
         }
       }
       Object.assign(product, { name, price, categoryId, status });
-      if(req.file){
-        const file = req.file
-        const fileSizeInBytes = file.size; // Kích thước file (bytes)
-        const maxFileSize = 1 * 1024 * 1024; // 1MB
-        const image = `${folder}/${req.file.filename}`;
-        if (fileSizeInBytes > maxFileSize) {
-            res.status(400).json({ message: 'Kích thước file không được vượt quá 1MB.' });
-            return;
-        }
+      if(image){
         product.image = image
+        product.public_image = public_image;
+        product.deleteImage()
       }
       await product.save();
       const uidLogin = req.user?.id;

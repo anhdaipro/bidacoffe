@@ -2,10 +2,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useCreateProduct, useUpdateProduct } from '@/app/query/useProducts';
-import { CATEGORY_LABELS, STATUS_LABEL } from '@/form/product';
+import { CATEGORY_LABELS, maxSizeBytes, maxSizeMB, STATUS_LABEL } from '@/form/product';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
-import { formatNumber } from '../../helper';
+import { formatNumber, uploadImageToCloudinary } from '../../helper';
 import { useToastStore } from '../../store/toastStore';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -42,7 +42,7 @@ const Form: React.FC<Props> = ({ product }) => {
     watch,
     setValue,
   } = useForm<ProductForm>({
-    values: { ...product, image: null },
+    values: { ...product },
   });
 
   const [showPending, setShowPending] = useState(false);
@@ -60,6 +60,14 @@ const Form: React.FC<Props> = ({ product }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
+      if (file.size > maxSizeBytes) {
+        addToast({
+          id: uuidv4(),
+          message: `File quá lớn! Dung lượng tối đa là ${maxSizeMB}MB.`,
+          type: 'error',
+        });
+        return;
+      }
       setImage(file);
       const previewUrl = URL.createObjectURL(file);
       setPreview(previewUrl);
@@ -67,20 +75,21 @@ const Form: React.FC<Props> = ({ product }) => {
   };
 
   const sendData: SubmitHandler<ProductForm> = async (data) => {
-    const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('categoryId', data.categoryId.toString());
-    formData.append('status', data.status.toString());
-    formData.append('price', data.price.toString());
-    if (image) formData.append('image', image);
-    handleRequest(formData);
+    const payload = {
+      ...data
+    }
+    if (image){
+      const {public_id, secure_url} = await uploadImageToCloudinary(image, 'product')
+      Object.assign(payload,{image:secure_url, public_image:public_id})
+    };
+    handleRequest(payload);
   };
 
-  const handleRequest = (formData: FormData) => {
+  const handleRequest = (payload: ProductForm) => {
     if (product.id) {
       const id = product.id;
       updateProduct(
-        { id, formData },
+        { id, payload },
         {
           onSuccess: () => {
             addToast({
@@ -100,7 +109,7 @@ const Form: React.FC<Props> = ({ product }) => {
         }
       );
     } else {
-      addProduct(formData, {
+      addProduct(payload, {
         onSuccess: () => {
           addToast({
             id: uuidv4(),

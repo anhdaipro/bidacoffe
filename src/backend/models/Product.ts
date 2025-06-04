@@ -10,6 +10,7 @@ import { CATEGORY, CATEGORY_ORDER, LSTATUS ,STATUS_ACTIVE} from '@form/product';
 import ProductTransactionDetail from './ProductTransactionDetail';
 import { Op,fn,col,literal } from 'sequelize';
 import { IMPORT,EXPORT } from '@form/transaction';
+import cloudinary from '../utils/cloudinary';
 class Product extends Model {
   public id!: number;
   public name!: string;//tên
@@ -21,9 +22,11 @@ class Product extends Model {
   public canUpdate!:boolean;
   public canDelete!: boolean;
   public inventory!:number;
+  public public_image!:string;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
   public errors!: string[];
+  public modelOld?: Product;
   public validateCreate(){
     if(this.price <=0){
       this.errors.push('Price must be greater than 0.');
@@ -102,7 +105,19 @@ class Product extends Model {
     })
     return productInventory
   }
-  
+  public async deleteImage() {
+    try {
+      if(!this.modelOld || !this.modelOld.public_image){
+        return;
+      }
+      const publicId = this.modelOld.public_image;
+      console.log(this.modelOld)
+      const result = await cloudinary.uploader.destroy(publicId);
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 Product.init(
@@ -113,6 +128,10 @@ Product.init(
       primaryKey: true,
     },
     name: {//tên
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    public_image: {//tên
       type: DataTypes.STRING,
       allowNull: false,
     },

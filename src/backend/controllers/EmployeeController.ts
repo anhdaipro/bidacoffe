@@ -16,6 +16,12 @@ class EmployeeController {
                 baseSalary,dateOfBirth,
                 position,bankNo,bankId,bankFullname,dateLeave,dateBeginJob,
                 shiftId,
+                avatar,
+                cccdFront,
+                cccdBack,
+                publicAvatar,
+                publicCccdFront,
+                publicCccdBack,
                 status,
                 note } = req.body;
             // Kiểm tra xem username hoặc phone đã tồn tại chưa
@@ -43,16 +49,17 @@ class EmployeeController {
             const profile = new UserProfile;
             const files = req.files as {
                 [fieldname: string]: Express.Multer.File[];
-              };
-            const cccdFront = `${folder}/${files?.cccdFront?.[0]?.filename}`  || '';
-            const cccdBack = `${folder}/${files?.cccdBack?.[0]?.filename}`  || '';
-            const avatar = files?.avatar ? `${folder}/${files?.avatar?.[0]?.filename}` : '';
+            };
             Object.assign(profile, {
                 phone,
                 name,
                 dateOfBirth,
                 baseSalary,
                 avatar,
+                publicAvatar,
+                publicCccdFront,
+                publicCccdBack,
+
                 cccdFront,
                 cccdBack,
                 position,
@@ -97,6 +104,12 @@ class EmployeeController {
             dateLeave, 
             shiftId,
             status,
+            avatar,
+            cccdFront,
+            cccdBack,
+            publicAvatar,
+            publicCccdFront,
+            publicCccdBack,
             dateBeginJob, note } = req.body;
 
         const user = await User.findByPk(id);
@@ -143,9 +156,7 @@ class EmployeeController {
         const files = req.files as {
             [fieldname: string]: Express.Multer.File[];
           };
-        const cccdFront = `${folder}/${files?.cccdFront?.[0]?.filename}`  || '';
-        const cccdBack = `${folder}/${files?.cccdBack?.[0]?.filename}`  || '';
-        const avatar = files?.avatar ? `${folder}/${files?.avatar?.[0]?.filename}` : '';
+       
         Object.assign(userProfile, {
             phone,
             name,
@@ -157,11 +168,15 @@ class EmployeeController {
             bankFullname,
             dateLeave,
             dateBeginJob,
+            publicCccdFront,
+            publicCccdBack,
+            publicAvatar,
             note,
-            ...(files?.cccdFront?.[0] && {cccdFront}),
-            ...(files?.cccdBack?.[0] && {cccdBack}),
-            ...(files?.avatar?.[0] && {avatar}),
+            ...(cccdFront && {cccdFront}),
+            ...(cccdBack && {cccdBack}),
+            ...(avatar && {avatar}),
         });
+        await userProfile.deleteFile()
         await userProfile.save();
         res.status(200).json({ message: 'Cập nhật thông tin người dùng thành công', user });
         } catch (error) {

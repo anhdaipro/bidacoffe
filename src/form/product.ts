@@ -14,6 +14,8 @@ export const STATUS_LABEL: Record<number, string> = {
   [STATUS_ACTIVE]: 'Hoạt động',
   [STATUS_INACTIVE]: 'Không hoạt động',
 }
+export const maxSizeMB = 2;
+export const maxSizeBytes = maxSizeMB * 1024 * 1024;
 export const CATEGORY = [
   SNACK,
   DRINK,

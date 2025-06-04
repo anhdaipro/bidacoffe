@@ -22,12 +22,12 @@ import { useForm,Controller } from 'react-hook-form';
 import { useRouter } from "next/navigation";
 import { useToastStore } from '../../store/toastStore';
 import { v4 as uuidv4 } from 'uuid'
-import { EmployeeForm,Employee } from '@/app/type/model/Employee';
+import { EmployeeForm,Employee, EmployeeFormSubmit } from '@/app/type/model/Employee';
 import {DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useCreateEmployee, useUpdateEmployee } from '@/app/query/useEmployee';
-import { formatNumber } from '@/app/helper';
+import { formatNumber, uploadImageToCloudinary } from '@/app/helper';
 import { RequiredLable } from '../Icon';
 import { styled } from '@mui/system';
 import { SHIFT_LABELS } from '@/form/shifth';
@@ -64,9 +64,9 @@ const Form: React.FC<Props> = ({ employee }) => {
     const user = useAuthStore(state=>state.user)
     const router = useRouter();
     const [images, setImages] = useState<{
-        avatar: { file?: File; preview?: string };
-        cccdFront: { file?: File; preview?: string };
-        cccdBack: { file?: File; preview?: string };
+        avatar: { file?: File; preview?: string, public_id?:string; };
+        cccdFront: { file?: File; preview?: string;public_id?:string; };
+        cccdBack: { file?: File; preview?: string;public_id?:string; };
       }>({
         avatar: {},
         cccdFront: {},
@@ -74,9 +74,9 @@ const Form: React.FC<Props> = ({ employee }) => {
       });
     useEffect(() => {
       setImages({
-        avatar: employee.avatar ? { preview: employee.avatar } : {},
-        cccdFront: employee.cccdFront ? { preview: employee.cccdFront } : {},
-        cccdBack: employee.cccdBack ? { preview: employee.cccdBack } : {},
+        avatar: employee.avatar ? { preview: employee.avatar,public_id:employee.publicAvatar } : {},
+        cccdFront: employee.cccdFront ? { preview: employee.cccdFront, public_id:employee.publicCccdFront } : {},
+        cccdBack: employee.cccdBack ? { preview: employee.cccdBack,public_id:employee.publicCccdBack } : {},
       });
     }, [employee.avatar, employee.cccdFront, employee.cccdBack]);
     const inputAvatarRef = useRef<HTMLInputElement | null>(null);
@@ -127,14 +127,14 @@ const Form: React.FC<Props> = ({ employee }) => {
     }));
   };
   console.log(errors.cccdFront);
-  const { dateOfBirth,dateBeginJob,dateLeave,bankFullname,bankId,typeEducation,shiftId,baseSalary,status,roleId } = watch();
+  const {avatar, cccdBack, cccdFront, dateOfBirth,dateBeginJob,dateLeave,bankFullname,bankId,typeEducation,shiftId,baseSalary,status,roleId } = watch();
   const { mutate: addEmployee } = useCreateEmployee();
   const { mutate: updateEmployee } = useUpdateEmployee();
-  const handleRequest = (formData: FormData) => {
+  const handleRequest = (payload: EmployeeFormSubmit) => {
     if (employee.id) {
       const id = employee.id;
       updateEmployee(
-        { id, formData },
+        { id, payload },
         {
           onSuccess: () => {
             addToast({
@@ -154,7 +154,7 @@ const Form: React.FC<Props> = ({ employee }) => {
         }
       );
     } else {
-      addEmployee(formData, {
+      addEmployee(payload, {
         onSuccess: () => {
           addToast({
             id: uuidv4(),
@@ -173,20 +173,34 @@ const Form: React.FC<Props> = ({ employee }) => {
       });
     }
   };
-  const handleFormSubmit = (data: EmployeeForm) => {
-    const formData = new FormData();
-    Object.entries(data).forEach(([key, value]) => {
-      // Nếu value là số thì convert sang string
-      if (value) {
-        formData.append(key, value.toString());
-      }
-    });
+  const handleFormSubmit = async (data: EmployeeForm) => {
+    // const formData = new FormData();
+    // Object.entries(data).forEach(([key, value]) => {
+    //   // Nếu value là số thì convert sang string
+    //   if (value) {
+    //     formData.append(key, value.toString());
+    //   }
+    // });
+    const payload = {...data,cccdBack:'', cccdFront:'',avatar:''}
+    const folder = 'user'
+    if(avatar){
+      const dataAvatar = await uploadImageToCloudinary(avatar,folder)
+      Object.assign(payload,{avatar:dataAvatar.secure_url,publicAvatar:dataAvatar.public_id })
+    }
+    if(cccdBack){
+      const dataCccdBack = await uploadImageToCloudinary(cccdBack,folder)
+      Object.assign(payload,{cccdBack:dataCccdBack.secure_url,publicCccdBack:dataCccdBack.public_id })
+    }
+    if(cccdFront){
+      const dataCccdFront = await uploadImageToCloudinary(cccdFront,folder)
+      Object.assign(payload,{cccdFront:dataCccdFront.secure_url,publicCccdFront:dataCccdFront.public_id })
+    }
     // Object.entries(images).forEach(([key, imageObj]) => {
     //   if (imageObj.file) {
     //     formData.append(key, imageObj.file);
     //   }
     // });
-    handleRequest(formData);
+    handleRequest(payload);
     
   };
   console.log(images)

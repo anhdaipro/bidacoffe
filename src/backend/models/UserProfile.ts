@@ -1,5 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
 import sequelize from '../database/db';
+import cloudinary from '../utils/cloudinary';
 
 class UserProfile extends Model {
     public id!: number; // ID của bản ghi
@@ -8,6 +9,9 @@ class UserProfile extends Model {
     public phone!: string; // Số điện thoại của người dùng (có thể null)
     public dateOfBirth!: Date; // Ngày sinh của người dùng (có thể null)
     public avatar!: string; // URL ảnh đại diện của người dùng (có thể null)
+    public publicAvatar!: string; // URL ảnh đại diện của người dùng (có thể null)
+    public publicCccdFront!: string; // URL ảnh đại diện của người dùng (có thể null)
+    public publicCccdBack!: string; // URL ảnh đại diện của người dùng (có thể null)
     public cccdFront!: string; // Tiểu sử hoặc mô tả ngắn của người dùng (có thể null)
     public position!: number; // Ngày sinh của người dùng (có thể null)
     public baseSalary!: number; // Ngày sinh của người dùng (có thể null)
@@ -21,6 +25,27 @@ class UserProfile extends Model {
     public note!: string; // Tiểu sử hoặc mô tả ngắn của người dùng (có thể null)
     public readonly createdAt!: Date; // Thời gian tạo bản ghi
     public readonly updatedAt!: Date; // Thời gian cập nhật bản ghi
+    public modelOld?:UserProfile;
+    public async deleteFile() {
+      try {
+        if(this.modelOld?.publicAvatar && this.modelOld.publicAvatar != this.publicAvatar){
+          const publicAvatar = this.modelOld.publicAvatar
+          await cloudinary.uploader.destroy(publicAvatar);
+          
+        }
+        if(this.modelOld?.publicCccdBack && this.modelOld.publicCccdBack != this.publicCccdBack){
+          const publicCccdBack = this.modelOld.publicCccdBack
+          await cloudinary.uploader.destroy(publicCccdBack);
+          
+        }
+        if(this.modelOld?.publicCccdFront && this.modelOld.publicCccdFront != this.publicCccdFront){
+          const publicCccdFront = this.modelOld.publicCccdFront
+          await cloudinary.uploader.destroy(publicCccdFront);
+        }
+      } catch (error) {
+        throw error;
+      }
+    }
 }
 
 UserProfile.init({
@@ -36,6 +61,18 @@ UserProfile.init({
   name: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  publicAvatar: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  publicCccdFront: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  publicCccdBack: {
+    type: DataTypes.STRING,
+    allowNull: true,
   },
   phone: {
     type: DataTypes.STRING,

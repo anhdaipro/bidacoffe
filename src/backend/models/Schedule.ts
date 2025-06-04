@@ -7,7 +7,6 @@ import Shift from './Shift';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import { POSITION_LABELS, ROLES_EMPLOYEE } from '@/form/user';
 import TimeSheet from './TimeSheet';
-import Salary from './Salary';
 import { ScheduleForm, ScheduleInsert } from '@/app/type/model/Schedule';
 import EmployeeProblem from './EmployeeProblem';
 import { ScheduleStatus } from '@/form/schedule';

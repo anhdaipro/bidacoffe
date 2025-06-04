@@ -1,4 +1,5 @@
 // src/types/express.d.ts
+import Product from "@/backend/models/Product";
 import { User } from "../models/User";
 
 // Đảm bảo đây là module bằng cách thêm export {} nếu không có import
@@ -10,6 +11,7 @@ declare global {
       user?: User;
       controllerName?: string;
       actionName?: string;
+      product?:Product
     }
   }
 }

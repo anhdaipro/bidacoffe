@@ -1,6 +1,6 @@
 
 import axiosInstance from "../hook/axiosInstance";
-import { ProductFormSearch } from "../type/model/Product";
+import { ProductForm, ProductFormSearch } from "../type/model/Product";
 const fetchProducts = async (page:number, limit:number, data:ProductFormSearch) => {
   try {
     const params = new URLSearchParams({
@@ -57,7 +57,7 @@ const fetchProduct = async (id:number) => {
   }
     
   };
-const createProduct = async (productData: FormData) => {
+const createProduct = async (productData: ProductForm) => {
   try {
     const { data } = await axiosInstance.post('/products/create', productData);
     return data.data;
@@ -74,9 +74,9 @@ const createProduct = async (productData: FormData) => {
   }
     
   };
-const updateProduct = async ({ id, formData }: { id: number, formData: FormData }) => {
+const updateProduct = async ({ id, payload }: { id: number, payload: ProductForm }) => {
   try {
-    const { data } = await axiosInstance.post(`/products/update/${id}`, formData);
+    const { data } = await axiosInstance.post(`/products/update/${id}`, payload);
     return data.data;
   }
   catch (error:any) {
