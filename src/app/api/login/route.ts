@@ -5,8 +5,8 @@ import { Op } from 'sequelize';
 import User from '@/backend/models/User';
 import redisClient from '@/backend/redisClient';
 
-const JWT_SECRET = process.env.JWT_SECRET!;
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
+const JWT_SECRET = process.env.JWT_SECRET;
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
  // ✅ Bắt buộc nếu dùng Sequelize
 
