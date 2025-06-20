@@ -4,9 +4,10 @@ import User from '@backend/models/User';
 import Reward from '@backend/models/Reward';
 import { authenticateJWT } from '@/midleware';
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const transaction = await TableSession.sequelize?.transaction();
   try {
+    const param = await params
     const body = await req.json();
     const { phone } = body;
     const employee = await authenticateJWT(req)
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
       user = await new User().createCustomer(phone);
     }
 
-    const tableSession = await TableSession.findByPk(params.id);
+    const tableSession = await TableSession.findByPk(param.id);
     if (!tableSession) {
       return NextResponse.json({ message: 'Phiên chơi không tồn tại' }, { status: 404 });
     }
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     await tableSession.save();
 
     await Reward.create({
-      sessionId: params.id,
+      sessionId: param.id,
       customerId: user.id,
       uidLogin,
       point,

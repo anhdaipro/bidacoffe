@@ -4,12 +4,13 @@ import TableSession from '@backend/models/TableSession';
 import { STATUS_PAID } from '@/form/billiardTable';
 
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const param = await params
     const body = await req.json();
     const { sessionId, amount, totalAmount, cashAmount, onlineAmount, discount, method, paidAt, note } = body;
 
-    const payment = await Payment.findByPk(params.id);
+    const payment = await Payment.findByPk(param.id);
     const session = await TableSession.findByPk(sessionId);
 
     if (!payment || !session) {

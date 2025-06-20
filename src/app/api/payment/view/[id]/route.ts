@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Payment from '@backend/models/Payment';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const payment = await Payment.findByPk(params.id);
+    const param = await params
+    const payment = await Payment.findByPk(param.id);
 
     if (!payment) {
       return NextResponse.json({ message: 'Payment not found' }, { status: 404 });
