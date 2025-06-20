@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
  
 export const metadata: Metadata = {
-  title: 'My Blog',
+  title: 'Cập nhật sản phẩm',
   description: '...',
 }
 export default function RootLayout({children}:{children: React.ReactNode}){

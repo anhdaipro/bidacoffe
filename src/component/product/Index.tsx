@@ -126,18 +126,16 @@ const Index = () => {
             <Grid container spacing={2}>
             {/* Hình ảnh và thông tin cơ bản */}
             <Grid size={{xs:4}}>
-              <Image
-                
+              <Box
+                component='img'
                 src={product.image}
                 alt={product.name}
-                width={80}
-                height={80}
-                // sx={{ 
-                //   width: '100%', 
-                //   height: 80, 
-                //   objectFit: 'cover', 
-                //   borderRadius: 1 
-                // }}
+                sx={{ 
+                  width: '100%', 
+                  height: 80, 
+                  objectFit: 'cover', 
+                  borderRadius: 1 
+                }}
               />
             </Grid>
             <Grid size={{xs:8}}>
