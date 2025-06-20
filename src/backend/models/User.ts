@@ -3,14 +3,8 @@ import sequelize from '../database/db';
 import bcrypt from 'bcrypt'
 import UserProfile from './UserProfile';
 import dayjs from 'dayjs';
-const ROLE_ADMIN = 1
-const ROLE_EMPLOYEE = 2
-const ROLE_CUSTOMER = 3
-export const ROLE = [
-  ROLE_ADMIN,
-  ROLE_EMPLOYEE,
-  ROLE_CUSTOMER,
-]
+import { ROLE_MANAGE,ROLE_ADMIN,ROLE_EMPLOYEE,ROLE_CUSTOMER } from '@/form/user';
+
 const STATUS_ACTIVE = 1
 const STATUS_INACTIVE = 0
 export const LSTATUS = [
@@ -48,6 +42,16 @@ class User extends Model {
     })
     const aId = users.map(item=>item.id)
     return aId
+  }
+  public aRoleLogipMoreDevice(){
+    return [
+      ROLE_ADMIN,
+      ROLE_MANAGE,
+    ]
+  }
+  public checkRoleLogipMoreDevice(){
+    const aRoleLogipMoreDevice = this.aRoleLogipMoreDevice()
+    return aRoleLogipMoreDevice.includes(this.roleId)
   }
   public async createCustomer(phone:string){
     const username = phone

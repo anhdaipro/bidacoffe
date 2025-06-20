@@ -16,12 +16,13 @@ export async function authenticateJWT(req: NextRequest) {
         userId: decoded.id
       }
     })
-    if (userSesionExist && userSesionExist.accessToken != token) {
-      return NextResponse.json({ message: 'Token khác với token đã lưu' }, { status: 403 });
-    }
     const user = await User.findByPk(decoded.id);
     if (!user) {
       return NextResponse.json({ message: 'Không tìm thấy người dùng' }, { status: 403 });
+    }
+    const check = user.checkRoleLogipMoreDevice()
+    if ((!userSesionExist || userSesionExist.accessToken != token) && !check) {
+      return NextResponse.json({ message: 'Token khác với token đã lưu' }, { status: 403 });
     }
     // Trả về thông tin user nếu thành công
     return user;

@@ -38,7 +38,8 @@ export async function POST(req: NextRequest) {
         userId: user.id
       }
     })
-    if (userSesionExist) {
+    const check = user.checkRoleLogipMoreDevice()
+    if (!check && userSesionExist){
       let message = 'Tài khoản đang được sử dụng ở thiết bị khác'
       if(userSesionExist){
         const type = userSesionExist.deviceInfo.deviceType
