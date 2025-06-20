@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import TimeSheet from '@backend/models/TimeSheet';
-import Schedule from '@backend/models/Schedule';
-import Shift from '@backend/models/Shift';
+import TimeSheet from '@/backend/models/TimeSheet';
+import Schedule from '@/backend/models/Schedule';
+import Shift from '@/backend/models/Shift';
 import dayjs from 'dayjs';
 import { ScheduleStatus, TYPE_CHECKIN, TYPE_CHECKOUT } from '@form/schedule';
 import { Op } from 'sequelize';

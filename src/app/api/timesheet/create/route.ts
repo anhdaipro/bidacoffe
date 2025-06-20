@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import TimeSheet from '@backend/models/TimeSheet';
+import TimeSheet from '@/backend/models/TimeSheet';
 import { verifyQrToken } from '@backend/utils/verifyQrToken';
 
 export async function POST(req: NextRequest) {

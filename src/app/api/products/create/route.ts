@@ -1,6 +1,6 @@
 
 import { authenticateJWT } from '@/midleware';
-import Product from '@backend/models/Product';
+import Product from '@/backend/models/Product';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { ValidationError } from 'sequelize';

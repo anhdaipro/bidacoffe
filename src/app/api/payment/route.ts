@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Payment from '@backend/models/Payment';
+import Payment from '@/backend/models/Payment';
 
 export async function GET(req: NextRequest) {
   try {

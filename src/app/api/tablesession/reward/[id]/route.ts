@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import TableSession from '@backend/models/TableSession';
-import User from '@backend/models/User';
-import Reward from '@backend/models/Reward';
+import TableSession from '@/backend/models/TableSession';
+import User from '@/backend/models/User';
+import Reward from '@/backend/models/Reward';
 import { authenticateJWT } from '@/midleware';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

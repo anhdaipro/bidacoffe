@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import BilliardTable from '@backend/models/BilliardTable';
+import BilliardTable from '@/backend/models/BilliardTable';
 
 export async function POST(req: NextRequest) {
   try {

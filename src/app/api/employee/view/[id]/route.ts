@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import User from '@backend/models/User';
-import UserProfile from '@backend/models/UserProfile';
+import User from '@/backend/models/User';
+import UserProfile from '@/backend/models/UserProfile';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {

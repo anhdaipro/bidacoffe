@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import User from '@backend/models/User';
-import UserProfile from '@backend/models/UserProfile';
+import User from '@/backend/models/User';
+import UserProfile from '@/backend/models/UserProfile';
 import { Op } from 'sequelize';
 import { ROLES_EMPLOYEE } from '@/form/user';
 

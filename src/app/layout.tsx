@@ -2,20 +2,13 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import QueryProvider from "./QueryProvider"; // Import QueryProvider
-import Header from "@component/Menu";
-import '../app/css/loading.css'
 import Modal from "@component/Modal";
 import React from 'react';
 import ToastContainer from "@component/toast/ToastContainer";
-import { usePathname } from 'next/navigation';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from "./type/theme";
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import LoginPage from "./login/page";
-import ResponsiveDrawer from "@component/ResponsiveDrawer";
-import { Box, AppBar, Toolbar, IconButton, Container, Drawer } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
 import CssBaseline from '@mui/material/CssBaseline';
 const geistSans = Geist({
   variable: "--font-geist-sans",

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import TableSession from '@backend/models/TableSession';
-import TableOrderDetail from '@backend/models/TableOrder';
+import TableSession from '@/backend/models/TableSession';
+import TableOrderDetail from '@/backend/models/TableOrder';
 import { authenticateJWT } from '@/midleware';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

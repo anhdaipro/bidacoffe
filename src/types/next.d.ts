@@ -1,6 +1,6 @@
 // src/types/next.d.ts
-import { User } from '@/models/User';
-import Product from '@/models/Product';
+import { User } from '@/backend/models/User';
+import Product from '@/backend/models/Product';
 
 declare module 'next' {
   interface NextApiRequest {

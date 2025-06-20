@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import TimeSheet from '@backend/models/TimeSheet';
+import TimeSheet from '@/backend/models/TimeSheet';
 import dayjs from 'dayjs';
 import { Op } from 'sequelize';
 import { authenticateJWT } from '@/midleware';

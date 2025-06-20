@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import BilliardTable from '@backend/models/BilliardTable';
-import LogUpdate from '@backend/models/LogUpdate';
+import BilliardTable from '@/backend/models/BilliardTable';
+import LogUpdate from '@/backend/models/LogUpdate';
 import { TYPE_TABLE } from '@/backend/models/LogUpdate';
 import { ChangeLog } from '@/types/Model';
 import { authenticateJWT } from '@/midleware';

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import BilliardTable from '@backend/models/BilliardTable';
-import TableSession from '@backend/models/TableSession';
-import TableOrderDetail from '@backend/models/TableOrder';
-import User from '@backend/models/User';
+import BilliardTable from '@/backend/models/BilliardTable';
+import TableSession from '@/backend/models/TableSession';
+import TableOrderDetail from '@/backend/models/TableOrder';
+import User from '@/backend/models/User';
 import { Op } from 'sequelize';
 import { LSESSIONACTIVE } from '@/form/billiardTable';
 

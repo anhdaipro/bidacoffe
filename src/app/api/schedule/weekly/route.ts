@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Schedule from '@backend/models/Schedule';
-import User from '@backend/models/User';
-import Shift from '@backend/models/Shift';
+import Schedule from '@/backend/models/Schedule';
+import User from '@/backend/models/User';
+import Shift from '@/backend/models/Shift';
 import { Op } from 'sequelize';
 
 export async function GET(req: NextRequest) {

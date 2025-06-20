@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Schedule from '@backend/models/Schedule';
+import Schedule from '@/backend/models/Schedule';
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {

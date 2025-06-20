@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcrypt';
-import User from '@backend/models/User';
+import User from '@/backend/models/User';
 import { Op } from 'sequelize';
 import { ROLE_CUSTOMER, STATUS_ACTIVE } from '@/form/user';
 

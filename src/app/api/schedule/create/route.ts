@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Schedule from '@backend/models/Schedule';
+import Schedule from '@/backend/models/Schedule';
 import dayjs from 'dayjs';
 import { Op } from 'sequelize';
 import { ROLE_ADMIN } from '@/form/user';

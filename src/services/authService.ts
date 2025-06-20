@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
-import User  from '@backend/models/User'; // Sequelize/Prisma/... tùy bạn
+import User  from '@/backend/models/User'; // Sequelize/Prisma/... tùy bạn
 const JWT_SECRET = process.env.JWT_SECRET!;
 export async function getUserServerSide() {
     const cookieStore = await cookies(); // ✅ không có await

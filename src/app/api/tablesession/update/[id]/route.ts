@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import TableSession from '@backend/models/TableSession';
-import TableOrderDetail from '@backend/models/TableOrder';
-import BilliardTable from '@backend/models/BilliardTable';
-import LogUpdate, { TYPE_SESSION } from '@backend/models/LogUpdate';
+import TableSession from '@/backend/models/TableSession';
+import TableOrderDetail from '@/backend/models/TableOrder';
+import BilliardTable from '@/backend/models/BilliardTable';
+import LogUpdate, { TYPE_SESSION } from '@/backend/models/LogUpdate';
 import { authenticateJWT } from '@/midleware';
 
 

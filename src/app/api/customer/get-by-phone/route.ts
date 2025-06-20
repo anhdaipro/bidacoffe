@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import User from '@backend/models/User';
+import User from '@/backend/models/User';
 import { ROLE_CUSTOMER } from '@/form/user';
 
 export async function POST(req: NextRequest) {

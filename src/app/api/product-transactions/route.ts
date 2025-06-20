@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import ProductTransaction from '@backend/models/ProductTransaction';
-import ProductTransactionDetail from '@backend/models/ProductTransactionDetail';
-import User from '@backend/models/User';
+import ProductTransaction from '@/backend/models/ProductTransaction';
+import ProductTransactionDetail from '@/backend/models/ProductTransactionDetail';
+import User from '@/backend/models/User';
 import { Op } from 'sequelize';
 import dayjs from 'dayjs';
 import { authenticateJWT } from '@/midleware';

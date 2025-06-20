@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import TableSession from '@backend/models/TableSession';
-import TableOrderDetail from '@backend/models/TableOrder';
-import BilliardTable from '@backend/models/BilliardTable';
+import TableSession from '@/backend/models/TableSession';
+import TableOrderDetail from '@/backend/models/TableOrder';
+import BilliardTable from '@/backend/models/BilliardTable';
 import { STATUS_AVAILABLE, STATUS_PAID } from '@/form/billiardTable';
 import { authenticateJWT } from '@/midleware';
 

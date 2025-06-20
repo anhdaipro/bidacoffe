@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import BilliardTable from '@backend/models/BilliardTable';
+import BilliardTable from '@/backend/models/BilliardTable';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {

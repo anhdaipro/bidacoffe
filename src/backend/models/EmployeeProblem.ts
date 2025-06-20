@@ -2,12 +2,7 @@ import { DataTypes, Model, Op } from 'sequelize';
 import sequelize from '../database/db';
 import User from './User';
 import dayjs from 'dayjs';
-import { ROLE_EMPLOYEE } from '../BidaConst';
-import Shift from './Shift';
 import isoWeek from 'dayjs/plugin/isoWeek';
-import { POSITION_LABELS, ROLES_EMPLOYEE } from '@/form/user';
-import TimeSheet from './TimeSheet';
-import { ScheduleForm, ScheduleInsert } from '@/app/type/model/Schedule';
 dayjs.extend(isoWeek);
 class EmployeeProblem extends Model {
   public id!: number;

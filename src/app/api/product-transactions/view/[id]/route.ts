@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import ProductTransaction from '@backend/models/ProductTransaction';
-import ProductTransactionDetail from '@backend/models/ProductTransactionDetail';
+import ProductTransaction from '@/backend/models/ProductTransaction';
+import ProductTransactionDetail from '@/backend/models/ProductTransactionDetail';
 
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

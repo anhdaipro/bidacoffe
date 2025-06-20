@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Payment from '@backend/models/Payment';
-import TableSession from '@backend/models/TableSession';
+import Payment from '@/backend/models/Payment';
+import TableSession from '@/backend/models/TableSession';
 import { STATUS_PAID } from '@/form/billiardTable';
 
 

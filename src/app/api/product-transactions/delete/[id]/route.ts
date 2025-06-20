@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import ProductTransaction from '@backend/models/ProductTransaction';
+import ProductTransaction from '@/backend/models/ProductTransaction';
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const transaction = await ProductTransaction.sequelize?.transaction();

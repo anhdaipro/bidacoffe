@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt, { JwtPayload, TokenExpiredError } from 'jsonwebtoken';
-import User from '@backend/models/User';
+import User from '@/backend/models/User';
 import UserSession from './backend/models/UserSession';
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
 export async function authenticateJWT(req: NextRequest) {

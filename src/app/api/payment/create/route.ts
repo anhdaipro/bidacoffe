@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Payment from '@backend/models/Payment';
-import TableSession from '@backend/models/TableSession';
-import User from '@backend/models/User';
-import Reward from '@backend/models/Reward';
-import ProductTransaction from '@backend/models/ProductTransaction';
-import BilliardTable from '@backend/models/BilliardTable';
+import Payment from '@/backend/models/Payment';
+import TableSession from '@/backend/models/TableSession';
+import User from '@/backend/models/User';
+import Reward from '@/backend/models/Reward';
+import ProductTransaction from '@/backend/models/ProductTransaction';
+import BilliardTable from '@/backend/models/BilliardTable';
 import { STATUS_AVAILABLE, STATUS_PAID } from '@/form/billiardTable';
 import { authenticateJWT } from '@/midleware';
 

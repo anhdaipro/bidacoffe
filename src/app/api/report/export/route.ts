@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Payment from '@backend/models/Payment';
-import BilliardTable from '@backend/models/BilliardTable';
-import TableSession from '@backend/models/TableSession';
+import Payment from '@/backend/models/Payment';
+import BilliardTable from '@/backend/models/BilliardTable';
+import TableSession from '@/backend/models/TableSession';
 import dayjs from 'dayjs';
 import { Op, fn, col } from 'sequelize';
 

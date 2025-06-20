@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Shift from '@backend/models/Shift';
+import Shift from '@/backend/models/Shift';
 
 export async function POST(req: NextRequest) {
   try {
