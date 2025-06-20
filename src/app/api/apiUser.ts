@@ -50,5 +50,9 @@ const apiGetAllCustomer = async (page:number, limit:number, data: CustomerFormSe
     return response.data;
 }
 
-
-export {apiSearchCustomer, apiLogin,apiCreateCustomer,apiFindCustomer,apiGetAllCustomer,apiUpdateCustomer,apigetUser}
+const apiLogout = async () => {
+    const deviceInfo = await getDeviceInfo();
+    const response = await axiosInstance.post(`/api/logout`,{deviceInfo});
+    return response.data;
+  }
+export {apiSearchCustomer, apiLogout, apiLogin,apiCreateCustomer,apiFindCustomer,apiGetAllCustomer,apiUpdateCustomer,apigetUser}

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
+import redisClient from '@/backend/redisClient';
+import { cookies } from 'next/headers';
 
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'your-refresh-token-secret';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-jwt-secret';
@@ -23,7 +25,15 @@ export async function POST(req: NextRequest) {
       JWT_SECRET,
       { expiresIn: '1h' } // Access token mới hết hạn sau 1 giờ
     );
-
+    await redisClient.set(`user:${payload.id}`, newAccessToken);
+    const cookieStore = await cookies()
+    cookieStore.set('token', newAccessToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60, // 1h
+      path: '/',
+    });
     return NextResponse.json({ accessToken: newAccessToken }, { status: 201 });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';

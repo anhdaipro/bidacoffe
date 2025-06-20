@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
+import { apiLogout } from '../api/apiUser';
 
 const axiosInstance = axios.create({
   baseURL: '/api', // Đặt base URL của API
@@ -38,6 +39,7 @@ axiosInstance.interceptors.request.use(
         }
       } else {
         // Nếu refresh token cũng hết hạn → đăng xuất
+        await apiLogout()
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
         window.location.href = '/login';

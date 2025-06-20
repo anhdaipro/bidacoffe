@@ -16,6 +16,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { useRouter } from 'next/navigation';
 import { useControlStore } from '../app/store/useStore';
 import { useAuthStore } from '../app/store/useUserStore';
+import { apiLogout } from '@/app/api/apiUser';
 
 const Header: React.FC = () => {
   const isLoading = useControlStore((state) => state.isLoading);
@@ -50,7 +51,8 @@ const Header: React.FC = () => {
     setAnchorElUser(null);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await apiLogout()
     logout();
     router.push('/login');
   };

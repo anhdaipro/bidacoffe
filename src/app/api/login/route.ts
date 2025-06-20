@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
       { id: user.id, roleId: user.roleId },
       REFRESH_TOKEN_SECRET
     );
-
+    await redisClient.set(`user:${user.id}`, accessToken);
     const response = NextResponse.json({
       message: 'Đăng nhập thành công',
       accessToken,
