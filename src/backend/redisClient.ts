@@ -2,9 +2,11 @@ import Redis from 'ioredis';
 
 // Tạo một Redis client
 const redisClient = new Redis({
-  host: 'localhost', // Địa chỉ Redis server (mặc định là localhost)
-  port: 6379,        // Cổng Redis server (mặc định là 6379)
-  password: 'anhdai123',      // Mật khẩu Redis (nếu có)
+  username: 'default',
+  password: '7hu8bjxIYVjsZPyxZTYswVMXgwyECo4B',
+  host: 'redis-11670.c295.ap-southeast-1-1.ec2.redns.redis-cloud.com',
+  port: 11670,
+    
 });
 
 // Xử lý sự kiện kết nối
