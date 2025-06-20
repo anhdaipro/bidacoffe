@@ -8,13 +8,11 @@ import Dashboard from "./dashboard/page";
 export default function Home() {
   const user = useAuthStore(state => state.user);
   const router = useRouter();
-  // useEffect(() => {
-  //   const token = localStorage.getItem('token');
-  //   if (!token || !user) {
-  //     // Nếu chưa đăng nhập, chuyển hướng về trang Login
-  //     router.push('/login');
-  //   }
-  // }, [router]);
+  useEffect(()=>{
+    if(!user){
+      router.push('/login')
+    }
+  }, [user])
   return (
     <Dashboard/>
   );
