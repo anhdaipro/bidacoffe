@@ -33,8 +33,8 @@ const InfoTab:React.FC<InfoTab> = ({selectedSession, tableSessions,selectedTable
   const setTableSession = useTableStore(state=>state.setTableSession)
   const setTable = useTableStore(state=>state.selectTable)
   const setTables = useTableStore(state=>state.setTables)
-  const {mutate: createTableSession,isPending:isPendingCreate} = useStartTableSession()
-  const {mutate:finishTableSession,isPending:isPendingUpdate} = useFinishTableSession();
+  const {mutate: createTableSession,isPending:isPendingCreate, isSuccess: isSuccessCreate} = useStartTableSession()
+  const {mutate:finishTableSession,isPending:isPendingUpdate, isSuccess: isSuccessUpdate} = useFinishTableSession();
   const totalAmount = 0;
   if(!selectedTable){
     return <div></div>
@@ -149,7 +149,7 @@ const InfoTab:React.FC<InfoTab> = ({selectedSession, tableSessions,selectedTable
         <>
           <Button
             variant="contained"
-            disabled={isPendingUpdate}
+            disabled={isPendingUpdate || isSuccessUpdate}
             color="error"
             onClick={finishSession}
             sx={{ flexGrow: 1, borderRadius: 2, fontWeight: 'bold' }}
@@ -162,7 +162,7 @@ const InfoTab:React.FC<InfoTab> = ({selectedSession, tableSessions,selectedTable
         <></>
       ) : (
         <Button
-        disabled={isPendingCreate}
+          disabled={isPendingCreate || isSuccessCreate}
           variant="contained"
           color="primary"
           onClick={handleTableSession}

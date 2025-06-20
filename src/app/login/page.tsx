@@ -4,11 +4,13 @@ import { useRouter } from 'next/navigation';
 import './main.css';
 import { useLogin } from '../query/useUser';
 import { useAuthStore } from '../store/useUserStore';
-
+import { useToastStore } from '../store/toastStore';
+import { v4 as uuidv4 } from 'uuid'
 const LoginPage: React.FC = () => {
   const user = useAuthStore(state=>state.user);
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const addToast = useToastStore(state=>state.addToast)
   const router = useRouter();
   console.log(user)
   useEffect(()=>{
@@ -16,7 +18,7 @@ const LoginPage: React.FC = () => {
       router.push('/')
     }
   }, [user])
-  const {mutate: login, isPending} = useLogin()
+  const {mutate: login, isPending, isSuccess} = useLogin()
   const setUser = useAuthStore(state=>state.setUser)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +30,13 @@ const LoginPage: React.FC = () => {
             router.push('/'); // Chuyển hướng đến trang Home
             setUser(data.user)
         },
+        onError: (error: any) => {
+          addToast({
+            id: uuidv4(),
+            message: error.response.data.message,
+            type: 'error',
+          });
+        }
     });
   };
 
@@ -49,7 +58,7 @@ const LoginPage: React.FC = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit" disabled={isPending}>
+        <button type="submit" disabled={isPending || isSuccess}>
           {isPending ? 'Đang đăng nhập...' : 'Đăng nhập'}
         </button>
       </form>

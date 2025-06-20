@@ -38,7 +38,7 @@ const Index = () => {
     });
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
-    const { data, isLoading } = usegetAllEmployee(currentPage, itemsPerPage,formData);
+    const { data, isLoading, isPending} = usegetAllEmployee(currentPage, itemsPerPage,formData);
     console.log(data);
     const user = useAuthStore(state=>state.user)
     
@@ -80,7 +80,7 @@ const Index = () => {
     }
     return (
         <Box className="product-container" sx={{ p: { xs: 2, md: 4 } }}>
-        <Search setFormSearch={setFormSearch} form={formData} />
+        <Search isPending={isPending} setFormSearch={setFormSearch} form={formData} />
 
        
             <Box display="flex" justifyContent="space-between" alignItems={'center'} my={2}>

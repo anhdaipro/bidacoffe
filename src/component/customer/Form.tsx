@@ -47,8 +47,12 @@ const Form: React.FC<Props> = ({ customer }) => {
      ...customer
     },
   });
-  const { mutate: addCustomer } = useCreateCustomer();
-  const { mutate: updateCustomer } = useUpdateCustomer();
+  const { mutate: addCustomer,isPending: isPendingCreate, isSuccess: 
+ isSuccessCreate} = useCreateCustomer();
+  const { mutate: updateCustomer,isPending: isPendingUpdate, isSuccess: 
+ isSuccessUpdate} = useUpdateCustomer();
+  const isPending = isPendingCreate || isPendingUpdate
+   const isSuccess = isSuccessCreate || isSuccessUpdate
   const handleFormSubmit = (data: CustomerForm) => {
     const payload = {
       ...data
@@ -163,7 +167,7 @@ const Form: React.FC<Props> = ({ customer }) => {
 
           {/* Nút Submit */}
           <Grid size={{xs:12}}>
-            <Button type="submit" fullWidth variant="contained">
+            <Button type="submit" disabled={isPending || isSuccess} fullWidth variant="contained">
               {title}
             </Button>
           </Grid>

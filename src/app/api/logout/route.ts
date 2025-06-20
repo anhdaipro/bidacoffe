@@ -1,3 +1,4 @@
+import UserSession from "@/backend/models/UserSession";
 import redisClient from "@/backend/redisClient";
 import { authenticateJWT } from "@/midleware";
 import { NextResponse,NextRequest } from "next/server";
@@ -7,6 +8,9 @@ export async function POST(req: NextRequest) {
         const user = await authenticateJWT(req)
         if (user instanceof NextResponse) return user;
         await redisClient.del(`user:${user.id}`);
+        await UserSession.destroy({
+          where:{userId:user.id}
+        })
         return NextResponse.json({message: 'Đăng xuất thành công'},{status:200})
     } catch (error) {
       console.error('Login error:', error);

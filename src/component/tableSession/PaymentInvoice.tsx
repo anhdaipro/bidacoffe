@@ -52,7 +52,7 @@ export const PaymentInvoice: React.FC<PaymentProps> = ({ table, selectedSession,
   const [paidOnline, setPaidOnline] = useState(false);
   const [isUsePoint, setIsUsePoint] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
-  const { mutate: createPayment } = useCreatePayment();
+  const { mutate: createPayment, isPending, isSuccess} = useCreatePayment();
   const { tableNumber, hourlyRate } = table;
   const orderTotal = orders.reduce((sum, item) => sum + item.quantity * item.price, 0);
   const { setTableSession, setTables, setTable, closePopup } = useTableStore(
@@ -349,6 +349,7 @@ export const PaymentInvoice: React.FC<PaymentProps> = ({ table, selectedSession,
             In hóa đơn
           </Button>
           <Button
+            disabled={isPending || isSuccess}
             variant="contained"
             onClick={onConfirmPaid}
             startIcon={<span>✅</span>}

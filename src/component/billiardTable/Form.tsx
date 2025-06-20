@@ -45,9 +45,12 @@ const Form: React.FC<Props> = ({ table }) => {
     values: { ...table },
   });
 
-  const { mutate: addBilliardTable } = useCreateBilliardTable();
-  const { mutate: updateBilliardTable } = useUpdateBilliardTable();
-
+  const { mutate: addBilliardTable,isPending: isPendingCreate, isSuccess: 
+ isSuccessCreate} = useCreateBilliardTable();
+  const { mutate: updateBilliardTable, isPending: isPendingUpdate, isSuccess: 
+ isSuccessUpdate} = useUpdateBilliardTable();
+  const isPending = isPendingCreate || isPendingUpdate
+   const isSuccess = isSuccessCreate || isSuccessUpdate
   const handleFormSubmit = (data: BilliardTableForm) => {
     const payload = { ...data };
     if (table.id) {
@@ -221,6 +224,7 @@ const Form: React.FC<Props> = ({ table }) => {
           variant="contained"
           color="success"
           type="submit"
+          disabled={isPending || isSuccess}
           fullWidth
           sx={{ mt: 3 }}
         >

@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import { Op } from 'sequelize';
 import User from '@/backend/models/User';
 import redisClient from '@/backend/redisClient';
+import UserSession from '@/backend/models/UserSession';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
@@ -12,10 +13,8 @@ const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
 
 export async function POST(req: NextRequest) {
   try {
-    const { identifier, password } = await req.json();
-
-   
-
+    const body = await req.json()
+    const { identifier, password, deviceInfo } = body;
     const user = await User.findOne({
       where: {
         [Op.or]: [{ username: identifier }, { phone: identifier }],
@@ -34,9 +33,23 @@ export async function POST(req: NextRequest) {
     }
 
     const existingToken = await redisClient.get(`user:${user.id}`);
+    const userSesionExist = await UserSession.findOne({
+      where:{
+        accessToken:existingToken
+      }
+    })
     if (existingToken) {
+      let message = 'Tài khoản đang được sử dụng ở thiết bị khác'
+      if(userSesionExist){
+        const type = userSesionExist.deviceInfo.platform
+        const deviceName = userSesionExist.deviceInfo?.model || userSesionExist.deviceInfo?.browser || 'thiết bị không xác định';
+        const osName = userSesionExist.deviceInfo?.os || 'HĐH không xác định';
+        const ip = userSesionExist.ip || 'IP không xác định';
+        const loginAt = userSesionExist.loginAt ? new Date(userSesionExist.loginAt).toLocaleString('vi-VN') : 'thời gian không rõ';
+        message = `Tài khoản đang được sử dụng ở thiết bị khác:\nLoại thiết bị ${type}\n Tên thiết bị${deviceName} (${osName}), IP: ${ip}, đăng nhập lúc: ${loginAt}`;
+      }
       return NextResponse.json(
-        { message: 'Tài khoản đang được sử dụng ở thiết bị khác' },
+        { message},
         { status: 403 }
       );
     }
@@ -51,7 +64,15 @@ export async function POST(req: NextRequest) {
       { id: user.id, roleId: user.roleId },
       REFRESH_TOKEN_SECRET
     );
-    await redisClient.set(`user:${user.id}`, accessToken);
+    const ip = req.headers.get('x-forwarded-for') || body.ip || 'unknown';
+    await UserSession.create({
+      userId: user.id,
+      accessToken,
+      refreshToken,
+      deviceInfo,
+      ip,
+    });
+    await redisClient.set(`user:${user.id}`, accessToken, 'EX', 3600);
     const response = NextResponse.json({
       message: 'Đăng nhập thành công',
       accessToken,

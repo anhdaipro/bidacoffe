@@ -22,9 +22,10 @@ import { apiSearchCustomer } from "@/app/api/apiUser";
 interface SearchProps {
   setFormSearch: (data: TableSessionFormSearch) => void;
   form: TableSessionFormSearch;
+  isPending: boolean;
 }
 
-const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
+const Search: React.FC<SearchProps> = ({ setFormSearch, form,  isPending}) => {
   const [formData, setFormData] = useState<TableSessionFormSearch>({ ...form });
   const [item,setItem] = useState<AutocompleteItem|null>(null)
   const selectItem = (item:AutocompleteItem|null) =>{
@@ -180,7 +181,7 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
       
       {/* Nút tìm kiếm tách riêng */}
         <Box sx={{  marginTop: 1 }}>
-              <Button variant="contained" color="primary" onClick={searchData}>
+              <Button variant="contained" color="primary" onClick={searchData} disabled={isPending}>
                   Tìm kiếm
               </Button>
         </Box>

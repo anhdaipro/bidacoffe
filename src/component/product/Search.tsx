@@ -21,9 +21,10 @@ import { ProductFormSearch } from '@/app/type/model/Product';
 interface SearchProps {
   setFormSearch: (data: ProductFormSearch) => void;
   form: ProductFormSearch;
+  isPending: boolean;
 }
 
-const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
+const Search: React.FC<SearchProps> = ({ setFormSearch, form,  isPending}) => {
   // Convert string dates to Dayjs objects or null
   const [formData, setFormData] = useState<ProductFormSearch>({ ...form });
   const [item,setItem] = useState<AutocompleteItem|null>(null)
@@ -146,7 +147,7 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
       </Grid>
       {/* Nút tìm kiếm tách riêng */}
         <Box sx={{  marginTop: 1 }}>
-            <Button variant="contained" color="primary" onClick={searchData}>
+            <Button variant="contained" color="primary" onClick={searchData} disabled={isPending}>
                 Tìm kiếm
             </Button>
         </Box>

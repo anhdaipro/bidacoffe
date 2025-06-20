@@ -18,11 +18,12 @@ import { apiSearchCustomer } from "@/app/api/apiUser";
   
 
   interface SearchProps {
+    isPending: boolean;
     setFormSearch: (data: TransactionFormSearch) => void;
     form: TransactionFormSearch;
   }
   
-  const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
+  const Search: React.FC<SearchProps> = ({ setFormSearch, form,  isPending}) => {
     const [formData, setFormData] = useState<TransactionFormSearch>({
       ...form
     });
@@ -136,7 +137,7 @@ import { apiSearchCustomer } from "@/app/api/apiUser";
           </Grid>
           <Grid size={{xs:12}}>
             <Box >
-              <Button variant="contained" color="primary" onClick={searchData}>
+              <Button variant="contained" color="primary" onClick={searchData} disabled={isPending}>
                 Tìm kiếm
               </Button>
             </Box>

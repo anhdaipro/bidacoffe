@@ -33,8 +33,8 @@ interface Props {
 }
 
 const Form: React.FC<Props> = ({ product }) => {
-  const { mutate: addProduct, error: errorCreate, isPending: isPendingCreate } = useCreateProduct();
-  const { mutate: updateProduct, error: errorUpdate, isPending: isPendingUpdate } = useUpdateProduct();
+  const { mutate: addProduct, error: errorCreate, isPending: isPendingCreate, isSuccess: isSuccessCreate } = useCreateProduct();
+  const { mutate: updateProduct, error: errorUpdate, isPending: isPendingUpdate, isSuccess: isSuccessUpdate} = useUpdateProduct();
   const {
     register,
     handleSubmit,
@@ -137,55 +137,22 @@ const Form: React.FC<Props> = ({ product }) => {
     setValue('price', value ? Number(value) : 0);
   };
 
-  useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout> | undefined;
+  // useEffect(() => {
+  //   let timeout: ReturnType<typeof setTimeout> | undefined;
 
-    if (isPendingCreate || isPendingUpdate) {
-      timeout = setTimeout(() => {
-        setShowPending(true);
-      }, 300);
-    } else {
-      if (timeout) clearTimeout(timeout);
-      setShowPending(false);
-    }
+  //   if (isPendingCreate || isPendingUpdate) {
+  //     timeout = setTimeout(() => {
+  //       setShowPending(true);
+  //     }, 300);
+  //   } else {
+  //     if (timeout) clearTimeout(timeout);
+  //     setShowPending(false);
+  //   }
 
-    return () => clearTimeout(timeout);
-  }, [isPendingCreate, isPendingUpdate]);
-
-  if (showPending) {
-    return (
-      <Box
-        sx={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          bgcolor: 'rgba(0,0,0,0.3)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1300,
-        }}
-      >
-        <Box
-          sx={{
-            p: 4,
-            bgcolor: 'background.paper',
-            borderRadius: 2,
-            boxShadow: 24,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-          }}
-        >
-          <CircularProgress size={24} />
-          <Typography>Đang xử lý...</Typography>
-        </Box>
-      </Box>
-    );
-  }
-
+  //   return () => clearTimeout(timeout);
+  // }, [isPendingCreate, isPendingUpdate]);
+  const isPending = isPendingCreate || isPendingUpdate
+  const isSuccess = isSuccessCreate || isSuccessUpdate
   const price = watch('price');
   const title = product.id ? 'Cập nhật' : 'Tạo mới';
 
@@ -348,7 +315,7 @@ const Form: React.FC<Props> = ({ product }) => {
         </Box>
 
         <Stack direction="row" justifyContent="flex-end" mt={3}>
-          <Button variant="contained" type="submit">
+          <Button variant="contained" disabled={isPending || isSuccess} type="submit">
             {title}
           </Button>
         </Stack>

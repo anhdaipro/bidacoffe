@@ -25,7 +25,7 @@ const RewardTab: React.FC<RewardTabProps> = ({ tableSessions, selectedSession })
   const [isNew, setIsNew] = useState(false);
   const addToast = useToastStore((state) => state.addToast);
   const [pointsToUse, setPointsToUse] = useState(0);
-  const { mutate: rewardPoint } = useRewardTableSession();
+  const { mutate: rewardPoint, isPending, isSuccess} = useRewardTableSession();
   const { setTableSession } = useTableStore(
     useShallow((state) => ({
       setTableSession: state.setTableSession,
@@ -97,7 +97,7 @@ const RewardTab: React.FC<RewardTabProps> = ({ tableSessions, selectedSession })
             fullWidth
             size="small"
           />
-          <Button variant="contained" onClick={handleFind} sx={{ minWidth: 120 }}>
+          <Button variant="contained" disabled={isPending || isSuccess} onClick={handleFind} sx={{ minWidth: 120 }}>
             Tích điểm
           </Button>
         </Stack>

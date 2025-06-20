@@ -41,7 +41,7 @@ const Index = () => {
     dateTo: '',
     uidLogin:'',
   });
-  const { data, isLoading } = useProducts(currentPage, itemsPerPage, formData);
+  const { data, isLoading, isPending} = useProducts(currentPage, itemsPerPage, formData);
   const updateStore = useControlStore((state) => state.updateStore);
   const user = useAuthStore((state) => state.user);
   const { mutate: updateStatus } = useUpdateStatusProduct();
@@ -95,7 +95,7 @@ const Index = () => {
     <Box sx={{ backgroundColor: '#fff', p: 2, maxWidth:1200,m:'auto' }}>
       {/* Search form */}
       <Box sx={{ marginBottom: 3 }}>
-        <Search setFormSearch={setFormSearch} form={formData} />
+        <Search isPending={isPending} setFormSearch={setFormSearch} form={formData} />
       </Box>
 
       {/* Button Tạo mới */}

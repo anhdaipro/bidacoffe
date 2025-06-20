@@ -60,7 +60,7 @@ const Index: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  const { data, isLoading, isError } = useTransactions(currentPage, itemsPerPage, formData);
+  const { data, isLoading, isError, isPending} = useTransactions(currentPage, itemsPerPage, formData);
   const { data: products, isLoading: isLoadingProduct } = useProductsSearch();
   const user = useAuthStore((state) => state.user);
   const updateStore = useControlStore(state => state.updateStore);
@@ -113,7 +113,7 @@ const Index: React.FC = () => {
     <Box sx={{ p: 2, maxWidth:1200,mx:'auto', background:'#fff' }}>
       
 
-      <Search setFormSearch={setFormSearch} form={formData} />
+      <Search isPending={isPending} setFormSearch={setFormSearch} form={formData} />
 
       {user?.roleId === ROLE_ADMIN && (
         <Box display="flex" justifyContent="space-between" alignItems={'center'} my={2}>

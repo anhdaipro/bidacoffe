@@ -126,10 +126,14 @@ const Form: React.FC<Props> = ({ employee }) => {
       [key]: { file, preview },
     }));
   };
-  console.log(errors.cccdFront);
+  
   const {avatar, cccdBack, cccdFront, dateOfBirth,dateBeginJob,dateLeave,bankFullname,bankId,typeEducation,shiftId,baseSalary,status,roleId } = watch();
-  const { mutate: addEmployee } = useCreateEmployee();
-  const { mutate: updateEmployee } = useUpdateEmployee();
+  const { mutate: addEmployee,isPending: isPendingCreate, isSuccess: 
+ isSuccessCreate} = useCreateEmployee();
+  const { mutate: updateEmployee,isPending: isPendingUpdate, isSuccess: 
+ isSuccessUpdate} = useUpdateEmployee();
+  const isPending = isPendingCreate || isPendingUpdate
+   const isSuccess = isSuccessCreate || isSuccessUpdate
   const handleRequest = (payload: EmployeeFormSubmit) => {
     if (employee.id) {
       const id = employee.id;
@@ -759,7 +763,7 @@ const Form: React.FC<Props> = ({ employee }) => {
             
           {/* Nút Submit */}
           <Grid size={{xs:12}}>
-            <Button type="submit" fullWidth variant="contained">
+            <Button type="submit" disabled={isPending || isSuccess} fullWidth variant="contained">
               {title}
             </Button>
           </Grid>

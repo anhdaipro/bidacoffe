@@ -5,13 +5,19 @@ import axiosInstance from '../hook/axiosInstance';
 
 async function getDeviceInfo() {
     const parser = new UAParser(); // Correct instantiation as a function call
-    const userAgent = parser.getResult();
+    const result = parser.getResult();
     // Lấy thông tin về thiết bị và trình duyệt
     const deviceInfo = {
-        browser: userAgent.browser.name,
-        browserVersion: userAgent.browser.version,
-        os: userAgent.os.name,
-        device: userAgent.device.model || 'desktop',
+        platform: 'web',
+        os: result.os.name || null,
+        osVersion: result.os.version || null,
+        deviceType: result.device.type || 'desktop',
+        brand: result.device.vendor || null,
+        model: result.device.model || null,
+        browser: result.browser.name || null,
+        browserVersion: result.browser.version || null,
+        uniqueId: null,
+        isEmulator: false
     };
     return deviceInfo;
 }

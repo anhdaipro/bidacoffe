@@ -88,7 +88,7 @@ const Index: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  const { data, isLoading, isError } = useTableSessions(
+  const { data, isLoading, isError, isPending} = useTableSessions(
     currentPage,
     itemsPerPage,
     formData
@@ -143,7 +143,7 @@ const Index: React.FC = () => {
     <Box sx={{ maxWidth: 1200, mx: "auto", px: 2, py: 3,background:'#fff' }}>
       {/* Giữ nguyên phần Search component */}
       <Box sx={{  }}>
-        <Search setFormSearch={setFormSearch} form={formData} />
+        <Search isPending={isPending} setFormSearch={setFormSearch} form={formData} />
       </Box>
 
       {user?.roleId === ROLE_ADMIN && (

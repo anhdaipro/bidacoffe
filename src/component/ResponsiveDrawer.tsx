@@ -29,7 +29,6 @@ const menus = [
   { title: 'Giao dịch', url: '/transaction', icon: <DashboardIcon /> },
   { title: 'Chấm công', url: '/timesheet', icon: <PunchClockIcon /> },
   { title: 'Khách hàng', url: '/customer', icon: <GroupIcon /> },
-  { title: 'Cài đặt', url: '/setting', icon: <SettingsIcon /> },
   { title: 'Check in', url: '/timesheet/checkin', icon: <PunchClockIcon /> },
 ];
 

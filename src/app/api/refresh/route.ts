@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       JWT_SECRET,
       { expiresIn: '1h' } // Access token mới hết hạn sau 1 giờ
     );
-    await redisClient.set(`user:${payload.id}`, newAccessToken);
+    await redisClient.set(`user:${payload.id}`, newAccessToken,'EX', 3600);
     const cookieStore = await cookies()
     cookieStore.set('token', newAccessToken, {
       httpOnly: true,

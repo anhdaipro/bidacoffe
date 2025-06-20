@@ -20,15 +20,12 @@ import { CustomerFormSearch } from "@/app/type/model/Customer";
 interface SearchProps {
   setFormSearch: (data: CustomerFormSearch) => void;
   form: CustomerFormSearch;
+  isPending: boolean;
 }
 
-const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
+const Search: React.FC<SearchProps> = ({ setFormSearch, form,  isPending}) => {
   const [formData, setFormData] = useState<CustomerFormSearch>({
-    status: "",
-    phone: "",
-    dateFrom: "",
-    dateTo: "",
-    uidLogin:""
+    ...form
   });
   const [item,setItem] = useState<AutocompleteItem|null>(null)
   const setForm = (key: keyof CustomerFormSearch, value: string) => {
@@ -149,7 +146,7 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form }) => {
         </Grid>
         {/* Button tìm kiếm */}
         <Grid size={{xs:12}} >
-          <Button variant="contained" onClick={searchData}>
+          <Button variant="contained" onClick={searchData} disabled={isPending}>
             Tìm kiếm
           </Button>
         </Grid>

@@ -78,12 +78,14 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
   });
   const [product, setProduct] = React.useState<Product | null>(null);
 
-  const { mutate: addTransaction } = useCreateTransaction();
-  const { mutate: updateTransaction } = useUpdateTransaction();
-  const setLoading = useControlStore((state) => state.setLoading);
+  const { mutate: addTransaction, isPending: isPendingCreate, isSuccess: 
+ isSuccessCreate} = useCreateTransaction();
+  const { mutate: updateTransaction, isPending: isPendingUpdate, isSuccess: 
+ isSuccessUpdate} = useUpdateTransaction();
   const router = useRouter();
+  const isPending = isPendingCreate || isPendingUpdate
+  const isSuccess = isSuccessCreate || isSuccessUpdate
   const addToast = useToastStore(state => state.addToast);
-  const [ignoreInputChange, setIgnoreInputChange] = useState(false);
   const [searchInput, setSearchInput] = useState('');
   const { fields, append, remove, update } = useFieldArray({
     control,
@@ -547,10 +549,16 @@ const FormProductTransaction: React.FC<Props> = ({ transaction }) => {
 
           <Grid size={{xs:12}}>
             <Button 
+              disabled={isPending || isSuccess}
               variant="contained" 
               size="large" 
               fullWidth
               onClick={handleSubmit(sendData)}
+              sx={{
+    ...(isPending && {
+      cursor: 'not-allowed',
+    }),
+  }}
             >
               {title}
             </Button>
