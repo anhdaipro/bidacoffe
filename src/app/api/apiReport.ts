@@ -1,6 +1,6 @@
 import axiosInstance from "../hook/axiosInstance";
 const fetchReportSummaryLast7Days = async () => {
-    const response = await axiosInstance.get(`/report/revenue/week`);
+    const response = await axiosInstance.get(`/report/revenue-week`);
     return response.data;
 };
 const fetchBilliardTable = async (id:number) => {

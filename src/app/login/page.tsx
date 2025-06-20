@@ -10,16 +10,14 @@ const LoginPage: React.FC = () => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
+  console.log(user)
   useEffect(()=>{
     if(user){
       router.push('/')
     }
-  }, [router])
+  }, [user])
   const {mutate: login, isPending} = useLogin()
   const setUser = useAuthStore(state=>state.setUser)
-  if(user){
-    return <></>
-  }
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const data = {identifier,password};

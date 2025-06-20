@@ -11,6 +11,7 @@ import ProductTransactionDetail from './ProductTransactionDetail';
 import { Op,fn,col,literal } from 'sequelize';
 import { IMPORT,EXPORT } from '@form/transaction';
 import cloudinary from '../utils/cloudinary';
+import dayjs from 'dayjs';
 class Product extends Model {
   public id!: number;
   public name!: string;//tên
@@ -27,6 +28,7 @@ class Product extends Model {
   public readonly updatedAt!: Date;
   public errors!: string[];
   public modelOld?: Product;
+  public rUidLogin?: User;
   public validateCreate(){
     if(this.price <=0){
       this.errors.push('Price must be greater than 0.');
@@ -107,16 +109,86 @@ class Product extends Model {
   }
   public async deleteImage() {
     try {
-      if(!this.modelOld || !this.modelOld.public_image){
+      if(!this.modelOld || !this.modelOld.public_image || this.modelOld.public_image == this.public_image){
         return;
       }
       const publicId = this.modelOld.public_image;
-      console.log(this.modelOld)
+      console.log(publicId)
       const result = await cloudinary.uploader.destroy(publicId);
       return result;
     } catch (error) {
       throw error;
     }
+  }
+  public async getAllProducts({
+    page = 1,
+    limit = 20,
+    name,
+    status,
+    dateFrom,
+    dateTo,
+    categoryId,
+  }: {
+    page?: number;
+    limit?: number;
+    name?: string;
+    status?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    categoryId?: string | number;
+    
+  }) {
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    const offset = (pageNumber - 1) * limitNumber;
+    const cacheKey = `products:${pageNumber}:${limitNumber}:${name || ''}:${categoryId || ''}:${status || ''}:${dateFrom || ''}:${dateTo || ''}`;
+    const cached = await redisClient.get(cacheKey);
+    if (cached) return JSON.parse(cached);
+    if(!this.rUidLogin){
+      return []
+    }
+    const user = this.rUidLogin
+    const where: any = {};
+    if (name) where.name = { [Op.like]: `%${name}%` };
+    if (status) where.status = status;
+    if (categoryId) where.categoryId = categoryId;
+    if (dateFrom || dateTo) {
+      where.createdAt = {
+        ...(dateFrom && { [Op.gte]: dateFrom }),
+        ...(dateTo && { [Op.lte]: dayjs(dateTo as string,).add(1) }),
+      };
+    }
+  
+    const { rows, count } = await Product.findAndCountAll({
+      where,
+      limit: limitNumber,
+      offset,
+      include: [{ model: User, as: 'rUidLogin', attributes: ['name'] }],
+      distinct: true,
+    });
+  
+    const mapped = rows.map((p) => {
+      p.fnCanDelete(user);
+      p.fnCanUpdate(user);
+      return {
+        ...p.toJSON(),
+        canDelete: p.canDelete,
+        canUpdate: p.canUpdate,
+      };
+    });
+  
+    const data = {
+      data: mapped,
+      pagination: {
+        total: count,
+        totalPages: Math.ceil(count / limitNumber),
+        currentPage: pageNumber,
+        limit: limitNumber,
+      },
+    };
+  
+    await redisClient.set(cacheKey, JSON.stringify(data), 'EX', 3600);
+    return data;
   }
 }
 

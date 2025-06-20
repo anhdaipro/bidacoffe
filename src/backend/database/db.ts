@@ -10,6 +10,7 @@ const sequelize = new Sequelize('bida', 'root', 'anhdai123', {
     dateStrings: true,
     typeCast: true
   },
+  dialectModule: require('mysql2'),
 });
 
 export default sequelize;
