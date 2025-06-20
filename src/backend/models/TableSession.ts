@@ -67,9 +67,9 @@ class TableSession extends Model {
       this.canDelete = false;
     }
     public fnCalculatePlayedMinutes(){
-      const startTime = new Date(this.startTime).getTime();
-      const now = this.endTime ? new Date(this.endTime).getTime() : Date.now();
-      const playedMinutes = Math.ceil((now - startTime) / 60000);
+      const startTime = dayjs(this.startTime).unix();
+      const now = this.endTime ? dayjs(this.endTime).unix() : dayjs().unix();
+      const playedMinutes = Math.ceil((now - startTime) / 60);
       return playedMinutes;
     }
     public async getTablePlaying(){

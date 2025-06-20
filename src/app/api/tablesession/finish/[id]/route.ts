@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import TableSession from '@backend/models/TableSession';
 import BilliardTable from '@backend/models/BilliardTable';
 import { STATUS_WAIT_PAID } from '@/form/billiardTable';
+import dayjs from 'dayjs';
 
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ message: 'Bàn không tồn tại hoặc phiên chơi không tồn tại' }, { status: 404 });
     }
 
-    tableSession.endTime = new Date();
+    tableSession.endTime = dayjs().toDate();
     const playedMinutes = tableSession.fnCalculatePlayedMinutes();
     tableSession.playedMinutes = playedMinutes;
 
