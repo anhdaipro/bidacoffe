@@ -5,6 +5,7 @@ import TableOrderDetail from '@backend/models/TableOrder';
 import User from '@backend/models/User';
 import { Op } from 'sequelize';
 import dayjs from 'dayjs';
+import { authenticateJWT } from '@/midleware';
 
 
 export async function GET(req: NextRequest) {
@@ -13,7 +14,12 @@ export async function GET(req: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '20', 10);
     const offset = (page - 1) * limit;
-
+    const user = await authenticateJWT(req)
+    if (user instanceof NextResponse) return user;
+    const uidLogin = user.id
+    if (!uidLogin) {
+      return NextResponse.json({ message: 'Không thể lấy ID người dùng' }, { status: 400 });
+    }
     const where: any = {};
     if (searchParams.get('codeNo')) {
       where.codeNo = searchParams.get('codeNo');

@@ -12,7 +12,6 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const addToast = useToastStore(state=>state.addToast)
   const router = useRouter();
-  console.log(user)
   useEffect(()=>{
     if(user){
       router.push('/')

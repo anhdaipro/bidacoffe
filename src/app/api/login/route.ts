@@ -32,21 +32,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Mật khẩu không chính xác' }, { status: 401 });
     }
 
-    const existingToken = await redisClient.get(`user:${user.id}`);
+    // const existingToken = await redisClient.get(`user:${user.id}`);
     const userSesionExist = await UserSession.findOne({
       where:{
-        accessToken:existingToken
+        userId: user.id
       }
     })
-    if (existingToken) {
+    if (userSesionExist) {
       let message = 'Tài khoản đang được sử dụng ở thiết bị khác'
       if(userSesionExist){
-        const type = userSesionExist.deviceInfo.platform
+        const type = userSesionExist.deviceInfo.deviceType
         const deviceName = userSesionExist.deviceInfo?.model || userSesionExist.deviceInfo?.browser || 'thiết bị không xác định';
         const osName = userSesionExist.deviceInfo?.os || 'HĐH không xác định';
         const ip = userSesionExist.ip || 'IP không xác định';
         const loginAt = userSesionExist.loginAt ? new Date(userSesionExist.loginAt).toLocaleString('vi-VN') : 'thời gian không rõ';
-        message = `Tài khoản đang được sử dụng ở thiết bị khác:\nLoại thiết bị ${type}\n Tên thiết bị${deviceName} (${osName}), IP: ${ip}, đăng nhập lúc: ${loginAt}`;
+        message = `Tài khoản đang được sử dụng ở thiết bị khác:\n- Loại thiết bị ${type} \n- Tên thiết bị ${deviceName} (${osName}) \n- Địa chỉ IP: ${ip} \n- Đăng nhập lúc: ${loginAt}`;
       }
       return NextResponse.json(
         { message},
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
       deviceInfo,
       ip,
     });
-    await redisClient.set(`user:${user.id}`, accessToken, 'EX', 3600);
+    // await redisClient.set(`user:${user.id}`, accessToken, 'EX', 3600);
     const response = NextResponse.json({
       message: 'Đăng nhập thành công',
       accessToken,

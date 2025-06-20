@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     try {
         const user = await authenticateJWT(req)
         if (user instanceof NextResponse) return user;
-        await redisClient.del(`user:${user.id}`);
+        // await redisClient.del(`user:${user.id}`);
         await UserSession.destroy({
           where:{userId:user.id}
         })

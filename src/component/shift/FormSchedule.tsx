@@ -113,7 +113,6 @@ const FormSchedule:React.FC<Props> = ({schedule}) => {
                 message: 'Lưu phân công thành công',
                 type: 'success',
               })
-              console.log('Lưu phân công thành công:', data);
             },
             onError: (error) => {
               addToast({
@@ -121,7 +120,6 @@ const FormSchedule:React.FC<Props> = ({schedule}) => {
                 message: 'Lỗi khi lưu phân công',
                 type: 'error',
               })
-              console.error('Lỗi khi lưu phân công:', error);
             },
           });
     }

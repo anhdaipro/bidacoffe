@@ -26,7 +26,6 @@ class PaymentController {
     try {
       const { sessionId, cashAmount, onlineAmount, method, note, isUsePoint } = req.body;
       const employeeId = req.user?.id
-      console.log(`employeeId`, req.user)
       if (!employeeId) {
         res.status(400).json({ message: 'Không thể lấy ID người dùng' });
         return;

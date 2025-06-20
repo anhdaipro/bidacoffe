@@ -20,7 +20,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         { status: 404 }
       );
     }
-    // console.log(product)
     await product.update({
         status
       });

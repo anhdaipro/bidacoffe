@@ -60,7 +60,6 @@ interface Props{
 }
 
 const Form: React.FC<Props> = ({ employee }) => {
-  console.log(employee);
     const user = useAuthStore(state=>state.user)
     const router = useRouter();
     const [images, setImages] = useState<{
@@ -207,7 +206,6 @@ const Form: React.FC<Props> = ({ employee }) => {
     handleRequest(payload);
     
   };
-  console.log(images)
   const title = employee.id ? 'Cập nhật' : 'Tạo mới';
   return (
     <Box sx={{ maxWidth: 600, margin: 'auto', p: { xs: 2, sm: 3, md: 4 } }}>

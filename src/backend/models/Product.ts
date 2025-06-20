@@ -113,7 +113,6 @@ class Product extends Model {
         return;
       }
       const publicId = this.modelOld.public_image;
-      console.log(publicId)
       const result = await cloudinary.uploader.destroy(publicId);
       return result;
     } catch (error) {

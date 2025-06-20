@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt, { JwtPayload, TokenExpiredError } from 'jsonwebtoken';
 import User from '@backend/models/User';
+import UserSession from './backend/models/UserSession';
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
 export async function authenticateJWT(req: NextRequest) {
   const authHeader = req.headers.get('authorization');
@@ -10,6 +11,14 @@ export async function authenticateJWT(req: NextRequest) {
   }
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const userSesionExist = await UserSession.findOne({
+      where:{
+        userId: decoded.id
+      }
+    })
+    if (userSesionExist && userSesionExist.accessToken != token) {
+      return NextResponse.json({ message: 'Token khác với token đã lưu' }, { status: 403 });
+    }
     const user = await User.findByPk(decoded.id);
     if (!user) {
       return NextResponse.json({ message: 'Không tìm thấy người dùng' }, { status: 403 });

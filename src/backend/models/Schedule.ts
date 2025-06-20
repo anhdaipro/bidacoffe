@@ -129,7 +129,6 @@ class Schedule extends Model {
           // });
         }
       }
-      console.log(aInsert)
       await Schedule.bulkCreate(aInsert, {});
     } catch (error) {
       console.error('Error in cronGenerateWeeklySchedule:', error);
@@ -220,7 +219,6 @@ class Schedule extends Model {
       const strDate = targetDate.format('YYYY-MM-DD');
       const startOfLastWeek = dayjs(today).subtract(1, 'week').startOf('isoWeek');
       const endOfLastWeek = dayjs(today).subtract(1, 'week').endOf('isoWeek');
-      console.log(startOfLastWeek.format('YYYY-MM-DD'))
       const timeSheets = await TimeSheet.findAll({
         where: {
           date: strDate
@@ -284,7 +282,6 @@ class Schedule extends Model {
           });
           continue;
         }
-        console.log(mTimeSheet)
         const { id:timeSheetId, checkInTime, checkOutTime } = mTimeSheet;
         const actualCheckIn = dayjs(checkInTime);
         const actualCheckOut = dayjs(checkOutTime);

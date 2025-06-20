@@ -12,14 +12,14 @@ interface ToastProps {
 const Toast: React.FC<ToastProps> = ({ message, type, onClose, content }) => {
   const [open, setOpen] = useState(true);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setOpen(false);
-      onClose();
-    }, 5000); // Tự động đóng toast sau 5 giây
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setOpen(false);
+  //     onClose();
+  //   }, 5000); // Tự động đóng toast sau 5 giây
 
-    return () => clearTimeout(timer);
-  }, [onClose]);
+  //   return () => clearTimeout(timer);
+  // }, [onClose]);
 
   const handleClose = (
     event?: React.SyntheticEvent | Event,
@@ -54,7 +54,7 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose, content }) => {
           </IconButton>
         }
       >
-        <Box sx={{ flexGrow: 1 }}>
+        <Box sx={{ flexGrow: 1,whiteSpace:'pre-line' }}>
           {message}
           {content && <Box sx={{ mt: 1 }}>{content}</Box>}
         </Box>

@@ -4,10 +4,15 @@ import BilliardTable from '@backend/models/BilliardTable';
 import TableSession from '@backend/models/TableSession';
 import dayjs from 'dayjs';
 import { Op, fn, col } from 'sequelize';
-
-
+import { authenticateJWT } from '@/midleware';
 export async function GET(req: NextRequest) {
   try {
+    const user = await authenticateJWT(req)
+    if (user instanceof NextResponse) return user;
+    const uidLogin = user.id
+    if (!uidLogin) {
+      return NextResponse.json({ message: 'Không thể lấy ID người dùng' }, { status: 400 });
+    }
     const today = dayjs();
     const todayStr = today.format('YYYY-MM-DD');
     const todayBigint = dayjs(todayStr).unix();

@@ -10,7 +10,6 @@ export const  useCreateSchedules = () =>{
     return useMutation({
         mutationFn:apiCreateSchedules,
         onSuccess: (data, variables, context) => {
-            console.log(data);
             queryClient.setQueryData(['shifts'], (oldShifts:Shift[]) => {
                 return [...oldShifts, data.data];
             });
