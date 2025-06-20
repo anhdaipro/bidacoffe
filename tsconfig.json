@@ -23,6 +23,7 @@
       "@/*": ["./src/*"],
       "@backend/*": ["src/backend/*"],
       "@form/*": ["src/form/*"],
+      "@component/*": ["src/component/*"],
       "@uploads/*": ["uploads/*"],
     }
   },

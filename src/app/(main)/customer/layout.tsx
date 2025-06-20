@@ -1,10 +1,6 @@
 // app/products/page.tsx
 import { Metadata } from 'next';
-export async function generateMetadata({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string  | undefined };
-}): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   
 
   return {
