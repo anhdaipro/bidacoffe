@@ -75,7 +75,7 @@ Payment.init(
     sequelize,
     modelName: 'Payment',
     tableName: 'payment',
-    timestamps: false,
+    timestamps: true,
     underscored: true,
   }
 );

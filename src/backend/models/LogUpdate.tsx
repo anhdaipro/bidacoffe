@@ -12,6 +12,7 @@ class LogUpdate extends Model {
   public userId?:number;
   public changes?:string;
   public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
 }
 
 LogUpdate.init(
@@ -27,7 +28,7 @@ LogUpdate.init(
     sequelize,
     modelName: 'LogUpdate',
     tableName: 'log_update',
-    timestamps: false,
+    timestamps: true,
     underscored: true,
   }
 );
