@@ -43,14 +43,14 @@ class User extends Model {
     const aId = users.map(item=>item.id)
     return aId
   }
-  public aRoleLogipMoreDevice(){
+  public aRoleLoginMoreDevice(){
     return [
       ROLE_ADMIN,
       ROLE_MANAGE,
     ]
   }
   public checkRoleLoginMoreDevice(){
-    const aRoleLogipMoreDevice = this.aRoleLogipMoreDevice()
+    const aRoleLogipMoreDevice = this.aRoleLoginMoreDevice()
     return aRoleLogipMoreDevice.includes(this.roleId)
   }
   public async createCustomer(phone:string){
