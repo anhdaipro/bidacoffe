@@ -219,12 +219,16 @@ const Index = () => {
                 <TableCell align="right">{formatNumber(product.price)}</TableCell>
                 <TableCell>{STATUS_LABEL[product.status]}</TableCell>
                 <TableCell>
-                  <Image
-                   
+                  <Box
+                    component='img'
                     src={product.image}
                     alt={product.name}
-                    width={80}
-                    height={80}
+                    sx={{ 
+                      width: '100%', 
+                      height: 80, 
+                      objectFit: 'cover', 
+                      borderRadius: 1 
+                    }}
       
                   />
                 </TableCell>
