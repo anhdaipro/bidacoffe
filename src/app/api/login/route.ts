@@ -3,7 +3,6 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { Op } from 'sequelize';
 import User from '@/backend/models/User';
-import redisClient from '@/backend/redisClient';
 import UserSession from '@/backend/models/UserSession';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
@@ -38,7 +37,7 @@ export async function POST(req: NextRequest) {
         userId: user.id
       }
     })
-    const check = user.checkRoleLogipMoreDevice()
+    const check = user.checkRoleLoginMoreDevice()
     if (!check && userSesionExist){
       let message = 'Tài khoản đang được sử dụng ở thiết bị khác'
       if(userSesionExist){

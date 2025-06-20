@@ -20,7 +20,7 @@ export async function authenticateJWT(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ message: 'Không tìm thấy người dùng' }, { status: 403 });
     }
-    const check = user.checkRoleLogipMoreDevice()
+    const check = user.checkRoleLoginMoreDevice()
     if ((!userSesionExist || userSesionExist.accessToken != token) && !check) {
       return NextResponse.json({ message: 'Token khác với token đã lưu' }, { status: 403 });
     }

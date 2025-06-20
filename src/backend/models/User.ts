@@ -49,7 +49,7 @@ class User extends Model {
       ROLE_MANAGE,
     ]
   }
-  public checkRoleLogipMoreDevice(){
+  public checkRoleLoginMoreDevice(){
     const aRoleLogipMoreDevice = this.aRoleLogipMoreDevice()
     return aRoleLogipMoreDevice.includes(this.roleId)
   }
