@@ -235,14 +235,14 @@ const Index: React.FC = () => {
                   Chỉnh sửa
                 </Button>
               
-              <Button
+              {/* <Button
                 variant="outlined"
                 color="error"
                
                 onClick={() => handleDelete(tableSession.id)}
               >
                 Xóa
-              </Button>
+              </Button> */}
             </Box>
           </Paper>
         ))
