@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
       '@backend': path.resolve(__dirname, 'src/backend'), // Alias `@backend` trỏ đến `src/backend`
       '@form': path.resolve(__dirname, 'src/form'), // Alias `@form` trỏ đến `src/form`
       '@component': path.resolve(__dirname, 'src/component'), // Alias `@form` trỏ đến `src/form`
+      '@utils': path.resolve(__dirname, 'src/utils'), // Alias `@form` trỏ đến `src/form`
     };
     return config;
   },

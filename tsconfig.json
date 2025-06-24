@@ -24,6 +24,7 @@
       "@backend/*": ["src/backend/*"],
       "@form/*": ["src/form/*"],
       "@component/*": ["src/component/*"],
+      "@utils/*": ["src/utils/*"],
       "@uploads/*": ["uploads/*"],
     }
   },
