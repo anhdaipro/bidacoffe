@@ -36,6 +36,8 @@ export async function GET(req: NextRequest) {
       limit,
       offset,
       attributes: ['phone', 'point', 'name', 'createdAt', 'status', 'id'],
+      order: [['id', 'DESC']],
+
     });
 
     const totalPages = Math.ceil(total / limit);

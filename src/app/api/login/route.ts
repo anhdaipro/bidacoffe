@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import { Op } from 'sequelize';
 import User from '@/backend/models/User';
 import UserSession from '@/backend/models/UserSession';
+import { cookies } from 'next/headers';
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
@@ -73,25 +74,35 @@ export async function POST(req: NextRequest) {
       ip,
     });
     // await redisClient.set(`user:${user.id}`, accessToken, 'EX', 3600);
+    const { password:passwordUser, hashedPassword, createdAt, updatedAt, ...safeUser } = user.toJSON();
     const response = NextResponse.json({
       message: 'Đăng nhập thành công',
       accessToken,
       refreshToken,
-      user: (() => {
-        const { password, hashedPassword, createdAt, updatedAt, ...safeUser } = user.toJSON();
-        return safeUser;
-      })(),
+      user: safeUser,
     });
-
+    const cookieStore  = await cookies()
     // ✅ Set cookie HTTPOnly
-    response.cookies.set('token', accessToken, {
+    cookieStore.set('token', accessToken, {
       httpOnly: true,
       sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60, // 1h
       path: '/',
     });
-
+    const storageData = {
+      state: {
+        user:safeUser
+      },
+    };
+    cookieStore.set('refreshToken', refreshToken)
+    cookieStore.set('auth-storage', JSON.stringify(storageData),{
+      path: '/',
+      maxAge: 60 * 60 * 24, // 1 ngày
+      httpOnly: false,      // để client-side (và server) đều đọc được nếu cần
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+    })
     return response;
   } catch (error) {
     console.error('Login error:', error);

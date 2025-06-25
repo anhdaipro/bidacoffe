@@ -215,15 +215,11 @@ const Form: React.FC<Props> = ({ product }) => {
           fullWidth
           margin="normal"
           error={!!errors.categoryId}
-          required
         >
-          <InputLabel id="category-label">Loại sản phẩm</InputLabel>
+          <InputLabel id="category-label">Loại sản phẩm <RequiredLable required/></InputLabel>
           <Select
             labelId="category-label"
-            label={
-              <span>
-                Loại sản phẩm <RequiredLable  required />
-              </span>
+            label={'Loại sản phẩm'
             }
             defaultValue={product.categoryId}
             {...register('categoryId', { required: 'Vui lòng chọn loại sản phẩm',
@@ -248,12 +244,12 @@ const Form: React.FC<Props> = ({ product }) => {
           fullWidth
           margin="normal"
           error={!!errors.status}
-          required
+          
         >
-          <InputLabel id="status-label">Trạng thái <RequiredLable required /></InputLabel>
+          <InputLabel>Trạng thái <RequiredLable required/></InputLabel>
           <Select
             labelId="status-label"
-            label="Trạng thái *"
+            label={'Trạng thái'}
             defaultValue={product.status || ''}
             {...register('status', { required: 'Vui lòng chọn trạng thái',
               validate: (value) => (Number(value) > 0 ? true : 'Vui lòng chọn trạng thái'),

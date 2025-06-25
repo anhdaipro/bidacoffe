@@ -7,7 +7,6 @@ async function getDeviceInfo() {
     const parser = new UAParser(); // Correct instantiation as a function call
     const result = parser.getResult();
     // Lấy thông tin về thiết bị và trình duyệt
-    console.log(result)
     const deviceInfo = {
         platform: 'web',
         os: result.os.name || null,

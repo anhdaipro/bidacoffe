@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { sessionId, cashAmount, onlineAmount, method, note, isUsePoint } = body;
-    const user = await authenticateJWT(req)
+    const user = await authenticateJWT()
     if (user instanceof NextResponse) return user;
     const employeeId = user.id;
 

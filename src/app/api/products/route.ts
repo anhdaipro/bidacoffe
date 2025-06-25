@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   const dateTo = searchParams.get('dateTo') || '';
   try {
     const product = new Product()
-    const user = await authenticateJWT(req)
+    const user = await authenticateJWT()
     if (user instanceof NextResponse) return user;
     product.rUidLogin = user
     const result = await product.getAllProducts({

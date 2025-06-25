@@ -16,6 +16,7 @@ export default class ProductTransaction extends Model {
   public dateDeliveryBigint!: number;//db
   public uidLogin!: number;//db
   public sessionId!: number;//db
+  public customerId!:number;
   public readonly createdAt!: Date;//db
   public readonly updatedAt!: Date;//db
   public codeSession?: string;
@@ -71,6 +72,9 @@ ProductTransaction.init(
     uidLogin:{
       type:DataTypes.INTEGER,
       allowNull:false,
+    },
+    customerId:{
+      type:DataTypes.INTEGER
     },
     sessionId:{
       type:DataTypes.INTEGER,

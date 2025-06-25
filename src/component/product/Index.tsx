@@ -1,11 +1,11 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import Link from 'next/link';
 import { useProducts, useUpdateStatusProduct } from '../../app/query/useProducts';
 import { useControlStore } from '../../app/store/useStore';
 import { CATEGORY_LABELS, STATUS_ACTIVE, STATUS_INACTIVE, STATUS_LABEL } from '@/form/product';
 import { formatDate, formatNumber } from '../../app/helper';
-import { useAuthStore } from '../../app/store/useUserStore';
+import { useAuthStore, User } from '../../app/store/useUserStore';
 import { ROLE_ADMIN } from '@/backend/BidaConst';
 import Image from 'next/image'
 import {
@@ -29,25 +29,27 @@ import {
 
 import Search from './Search';
 import { ProductFormSearch, ProductIndex } from '@/app/type/model/Product';
-
-const Index = () => {
+interface Props{
+  defaultFormData:ProductFormSearch;
+  user:User;
+}
+const Index:React.FC<Props> = ({defaultFormData,user}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const [formData, setFormData] = useState<ProductFormSearch>({
-    status: '',
-    categoryId: '',
-    name: '',
-    dateFrom: '',
-    dateTo: '',
-    uidLogin:'',
+    ...defaultFormData
   });
-  const { data, isLoading, isPending} = useProducts(currentPage, itemsPerPage, formData);
+  const { data, isLoading, isPending,isFetching} = useProducts(currentPage, itemsPerPage, formData);
+  console.log('🚀 Hydrated render:',isLoading && isFetching && isPending);
+  
   const updateStore = useControlStore((state) => state.updateStore);
-  const user = useAuthStore((state) => state.user);
+  // const user = useAuthStore((state) => state.user);
+  
   const { mutate: updateStatus } = useUpdateStatusProduct();
   const theme = useTheme();
+  
   const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
-  if (isLoading || !user) {
+  if (isLoading) {
     return (
       <Box
         sx={{
@@ -299,4 +301,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default memo(Index);

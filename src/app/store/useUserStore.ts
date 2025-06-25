@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware'
 export interface User{
   name:string;
-  id:string;
+  id:number;
   roleId:number
 }
 interface Props {
@@ -19,6 +19,7 @@ export const useAuthStore = create<Props>()(
       setUser: (user) => set({ user }),
       logout: () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
         set({ user: null });
       },
     }),

@@ -1,12 +1,15 @@
 
-import { EmployeeForm, EmployeeFormSearch, EmployeeFormSubmit } from '../type/model/Employee';
+import { EmployeeFormSearch, EmployeeFormSubmit } from '../type/model/Employee';
 import axiosInstance from '../hook/axiosInstance';
 
 const apiCreateEmployee = async (payload: EmployeeFormSubmit) => {
     const response = await axiosInstance.post('/employee/create', payload);
     return response.data;
 }
-
+const apiSearchEmployee = async (name:string) => {
+    const response = await axiosInstance.get(`/employee/search?name=${name}`);
+    return response.data;
+}
 const apiUpdateEmployee = async ({id, payload} :{id:number, payload:EmployeeFormSubmit}) => {
 
     const response = await axiosInstance.post(`/employee/update/${id}`, payload );
@@ -31,6 +34,6 @@ const apiGetEmployeeSchedule = async () =>{
 }
 
 export {apiCreateEmployee, apiUpdateEmployee, apigetEmployee, 
-    apiGetAllEmployee,
+    apiGetAllEmployee,apiSearchEmployee,
     apiGetEmployeeSchedule
 }

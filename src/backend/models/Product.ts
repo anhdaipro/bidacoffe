@@ -164,6 +164,7 @@ class Product extends Model {
       offset,
       include: [{ model: User, as: 'rUidLogin', attributes: ['name'] }],
       distinct: true,
+      order: [['id', 'DESC']],
     });
   
     const mapped = rows.map((p) => {

@@ -3,11 +3,11 @@ import {fetchProducts, fetchProduct, createProduct, updateProduct, deleteProdcut
 import { ProductFormSearch } from '../type/model/Product';
 export const useProducts = (page: number, limit: number, formData:ProductFormSearch ) => {
   return useQuery({
-    queryKey:['products',page, limit,formData],
+    queryKey:['products',page, limit,JSON.stringify(formData)],
     queryFn: async () =>{
         return await fetchProducts(page,limit,formData)
     },
-    staleTime:1000*6,
+    staleTime:1000*60,
     refetchOnWindowFocus: false, // ✅ KHÔNG refetch khi quay lại tab
     })
 };
@@ -22,9 +22,7 @@ export const useProductsSearch = () => {
 export const useProduct = (id:number) => {
     return useQuery({
         queryKey:['product', id],
-        queryFn: async () => {
-            return await fetchProduct(id)
-        },
+        queryFn:() =>fetchProduct(id),
         staleTime:1000*6,
         
         refetchOnWindowFocus: false, // ✅ KHÔNG refetch khi quay lại tab

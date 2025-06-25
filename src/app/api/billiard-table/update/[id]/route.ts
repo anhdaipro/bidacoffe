@@ -14,7 +14,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!table) {
       return NextResponse.json({ message: 'Không tìm thấy bàn billiard' }, { status: 404 });
     }
-    const user = await authenticateJWT(req)
+    const user = await authenticateJWT()
     if (user instanceof NextResponse) return user;
     const uidLogin = user.id
     const updates = body;

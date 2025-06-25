@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt'
 import UserProfile from './UserProfile';
 import dayjs from 'dayjs';
 import { ROLE_MANAGE,ROLE_ADMIN,ROLE_EMPLOYEE,ROLE_CUSTOMER } from '@/form/user';
+import { Op } from 'sequelize';
 
 const STATUS_ACTIVE = 1
 const STATUS_INACTIVE = 0
@@ -30,6 +31,7 @@ class User extends Model {
   public point!: number;
   public shiftId!: number;
   public dateOfBirth!:Date;
+  public aRoleId!: number[];
   public salaryType!: number; // Loại lương (theo giờ, theo tháng, theo sản phẩm)
   public  createdAtBigint!: number;
   public readonly createdAt!: Date;
@@ -69,6 +71,28 @@ class User extends Model {
         roleId,
     });
     return newUser
+  }
+  public async getUserByName(){
+    const aRoleId = this.aRoleId.length > 0 ? this.aRoleId : []
+    const users = await User.findAll({
+      where: {
+          [Op.or]: [
+              {
+                  name: {
+                      [Op.like]: `%${this.name}%`
+                  }
+              },
+              {
+                  phone: {
+                      [Op.like]: `%${this.name}%`
+                  }
+              }
+          ],
+          roleId:{[Op.in] : aRoleId} 
+      },
+      limit: 10
+    });
+    return users
   }
 }
 

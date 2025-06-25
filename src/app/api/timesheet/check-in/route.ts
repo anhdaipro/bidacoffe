@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { location, type, shiftId } = body;
-    const user = await authenticateJWT(req)
+    const user = await authenticateJWT()
     if (user instanceof NextResponse) return user;
     const employeeId = user.id;
     if (!employeeId) {

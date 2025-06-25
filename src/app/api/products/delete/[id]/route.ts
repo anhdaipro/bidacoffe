@@ -7,7 +7,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   try {
     const param = await params
     const productId = param.id;
-    const user = await authenticateJWT(req)
+    const user = await authenticateJWT()
     if (user instanceof NextResponse) return user;
     const product = await Product.findByPk(productId);
     if (!product) {

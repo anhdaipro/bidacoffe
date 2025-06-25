@@ -3,9 +3,15 @@ import jwt, { JwtPayload, TokenExpiredError } from 'jsonwebtoken';
 import User from '@/backend/models/User';
 import UserSession from './backend/models/UserSession';
 const JWT_SECRET = process.env.JWT_SECRET || 'default_secret_key';
-export async function authenticateJWT(req: NextRequest) {
-  const authHeader = req.headers.get('authorization');
-  const token = authHeader?.split(' ')[1];
+import { cookies, headers } from 'next/headers';
+export async function authenticateJWT() {
+  const headerList = await headers();
+  const authHeader = headerList.get('authorization');
+  let token = authHeader?.split(' ')[1];
+  const cookieStore = await cookies()
+   if (!token) {
+    token = cookieStore.get('token')?.value;
+  }
   if (!token) {
     return NextResponse.json({ message: 'Token không được cung cấp' }, { status: 401 });
   }

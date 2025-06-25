@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Box,
   Grid,
@@ -44,10 +44,10 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form,  isPending}) => {
       [key]: value,
     }));
   };
-  const selectItem = (item:AutocompleteItem|null) =>{
-    handleChange('uidLogin', item ? item?.id.toString() : '')
-    setItem(item)
-  }
+  const selectItem = useCallback((item:AutocompleteItem|null) =>{
+      handleChange('uidLogin', item ? item?.id.toString() : '')
+      setItem(item)
+    },[])
   return (
     <Box
       sx={{

@@ -9,6 +9,9 @@ const fetchProducts = async (page:number, limit:number, data:ProductFormSearch) 
       ...(data && Object.fromEntries(Object.entries(data).map(([key, value]) => [key, String(value)])))
     });
     const response = await axiosInstance.get(`/products?${params}`);
+     console.log("🛜 fetchProducts", {
+  gọiTừ: typeof window === 'undefined' ? 'server' : 'client',
+});
     return response.data;
   }
   catch (error:any) {

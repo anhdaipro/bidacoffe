@@ -11,7 +11,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const param = await params
     const body = await req.json();
     const { type, dateDelivery, totalAmount, details } = body;
-    const user = await authenticateJWT(req)
+    const user = await authenticateJWT()
     if (user instanceof NextResponse) return user;
     const uidLogin = user.id
 

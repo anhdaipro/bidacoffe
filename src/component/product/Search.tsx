@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import {
   Grid,
   TextField,
@@ -38,7 +38,7 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form,  isPending}) => {
       [key]: value,
     }));
   };
-
+  console.log('con')
   const searchData = () => {
     // Convert Dayjs dates back to string format 'YYYY-MM-DD' or empty string
     setFormSearch({
@@ -156,4 +156,4 @@ const Search: React.FC<SearchProps> = ({ setFormSearch, form,  isPending}) => {
   );
 };
 
-export default Search;
+export default memo(Search);

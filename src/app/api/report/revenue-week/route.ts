@@ -7,7 +7,7 @@ import { Op, fn, col } from 'sequelize';
 import { authenticateJWT } from '@/midleware';
 export async function GET(req: NextRequest) {
   try {
-    const user = await authenticateJWT(req)
+    const user = await authenticateJWT()
     if (user instanceof NextResponse) return user;
     const uidLogin = user.id
     if (!uidLogin) {
