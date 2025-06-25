@@ -39,7 +39,9 @@ const Index = () => {
     const { data, isLoading, isPending} = usegetAllUsers(currentPage, itemsPerPage,formData);
     
     const user = useAuthStore(state=>state.user)
-    
+    const setFormSearch = useCallback((data:CustomerFormSearch)=>{
+        setFormData(prev => ({ ...prev, ...data }));
+    },[])
     if (isLoading || !user) {
         return (
         <Box
@@ -66,9 +68,7 @@ const Index = () => {
         }
     };
     
-    const setFormSearch = useCallback((data:CustomerFormSearch)=>{
-        setFormData(prev => ({ ...prev, ...data }));
-    },[])
+    
     return (
         <Box className="product-container" sx={{ p: { xs: 2, md: 4 } }}>
         <Search isPending={isPending} setFormSearch={setFormSearch} form={formData} />
