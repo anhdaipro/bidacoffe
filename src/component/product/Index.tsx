@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, memo } from 'react';
+import React, { useState, memo, useCallback } from 'react';
 import Link from 'next/link';
 import { useProducts, useUpdateStatusProduct } from '../../app/query/useProducts';
 import { useControlStore } from '../../app/store/useStore';
@@ -7,7 +7,6 @@ import { CATEGORY_LABELS, STATUS_ACTIVE, STATUS_INACTIVE, STATUS_LABEL } from '@
 import { formatDate, formatNumber } from '../../app/helper';
 import { useAuthStore, User } from '../../app/store/useUserStore';
 import { ROLE_ADMIN } from '@/backend/BidaConst';
-import Image from 'next/image'
 import {
   Box,
   Button,
@@ -44,7 +43,9 @@ const Index:React.FC<Props> = ({defaultFormData,user}) => {
   
   const updateStore = useControlStore((state) => state.updateStore);
   // const user = useAuthStore((state) => state.user);
-  
+   const setFormSearch = useCallback((data: ProductFormSearch) => {
+    setFormData((prev) => ({ ...prev, ...data }));
+  },[]);
   const { mutate: updateStatus } = useUpdateStatusProduct();
   const theme = useTheme();
   
@@ -73,6 +74,7 @@ const Index:React.FC<Props> = ({defaultFormData,user}) => {
 
   const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDelete = (id: number) => {
@@ -87,10 +89,6 @@ const Index:React.FC<Props> = ({defaultFormData,user}) => {
   const handleUpdate = (id: number, statusCurrent: number) => {
     const status = statusCurrent === STATUS_ACTIVE ? STATUS_INACTIVE : STATUS_ACTIVE;
     updateStatus({ id, status });
-  };
-
-  const setFormSearch = (data: ProductFormSearch) => {
-    setFormData((prev) => ({ ...prev, ...data }));
   };
 
   return (

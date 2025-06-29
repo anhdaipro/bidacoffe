@@ -123,6 +123,7 @@ const Index: React.FC = () => {
   const handlePageChange = (_event: React.ChangeEvent<unknown>, page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
